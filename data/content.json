@@ -1,0 +1,324 @@
+{
+  "brand": {
+    "name": "Maloon Services",
+    "tagline": "Professional Cleaning",
+    "slogan": "save money. go green. make a difference."
+  },
+  "contact": {
+    "phone": "614-555-1234",
+    "email": "info@maloonservices.com",
+    "address": "123 Cleaning Way, Columbus, OH 43215",
+    "whatsapp": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.",
+    "hours": "Mon–Sat • 8:00 AM – 6:00 PM"
+  },
+  "services": {
+    "commercial": {
+      "title": "Commercial Cleaning Services",
+      "subtitle": "Professional Solutions for Every Business in Columbus, OH",
+      "categories": [
+        {
+          "icon": "🏢",
+          "title": "Corporate Cleaning",
+          "description": "Professional office cleaning services designed to maintain productive work environments.",
+          "details": [
+            "LEED-certified green cleaning programs",
+            "Routine janitorial services and contract cleaning",
+            "Daytime porter services for continuous maintenance",
+            "Custom cleaning plans designed to support sustainability",
+            "Complete floor care maintenance",
+            "Carpet extraction cleaning",
+            "Pressure washing for exterior areas",
+            "Temporary staffing for special events"
+          ]
+        },
+        {
+          "icon": "⚕️",
+          "title": "Healthcare Cleaning",
+          "description": "Specialized cleaning for medical facilities with strict hygiene standards.",
+          "details": [
+            "Deep cleaning for hospitals, clinics, and medical offices",
+            "Scheduled janitorial services and custom cleaning contracts",
+            "Daytime cleaning options to fit your facility's schedule",
+            "Porter services for busy, high-traffic medical spaces",
+            "Restroom sanitation and disinfection",
+            "Specialized cleaning for biomedical labs",
+            "Upholstery and furniture cleaning",
+            "Window and glass cleaning"
+          ]
+        },
+        {
+          "icon": "🛍️",
+          "title": "Retail Cleaning",
+          "description": "Keep your retail spaces clean and inviting for customers.",
+          "details": [
+            "Contract janitorial services and scheduled maintenance",
+            "Day porter support to keep stores looking their best",
+            "Restroom sanitation services",
+            "Cleaning for shopping centers and mixed-use developments",
+            "Multi-location cleaning for chain retailers",
+            "Professional floor care for high-traffic areas",
+            "Storefront detailing to enhance curb appeal",
+            "Window and glass cleaning"
+          ]
+        },
+        {
+          "icon": "🏨",
+          "title": "Hospitality Cleaning",
+          "description": "Comprehensive cleaning solutions for hotels and restaurants.",
+          "details": [
+            "Housekeeping services for hotels and resorts",
+            "Event space cleaning for banquets and conferences",
+            "Public area maintenance for lobbies and hallways",
+            "Restaurant and kitchen cleaning",
+            "General janitorial services for high-traffic areas",
+            "Green cleaning programs for sustainability",
+            "Stewarding support for event spaces",
+            "Valet area cleaning"
+          ]
+        }
+      ],
+      "disinfection": {
+        "title": "Advanced Disinfection Services",
+        "subtitle": "Comprehensive disinfection solutions for Columbus businesses",
+        "features": [
+          {
+            "icon": "💨",
+            "title": "Touch-Free Disinfection Applications",
+            "description": "Our fogging disinfectant system evenly covers both vertical and horizontal surfaces, reducing germs without requiring direct contact."
+          },
+          {
+            "icon": "🧽",
+            "title": "Manual and Mechanical Disinfection",
+            "description": "We use a combination of hands-on cleaning and advanced equipment to disinfect high-touch areas, reducing the spread of bacteria and viruses."
+          }
+        ],
+        "services": [
+          "Electrostatic spray disinfection",
+          "ATP testing to verify cleanliness",
+          "High-touch surface disinfection",
+          "EPA-approved disinfectants",
+          "COVID-19 cleaning protocols",
+          "Emergency response cleaning",
+          "Ongoing disinfection programs",
+          "Customized disinfection schedules"
+        ]
+      },
+      "ongoing": {
+        "title": "Ongoing Cleaning and Maintenance",
+        "subtitle": "Keep Your Columbus Workspace Clean Year-Round",
+        "items": [
+          {
+            "icon": "🌿",
+            "text": "LEED-certified green cleaning programs"
+          },
+          {
+            "icon": "🧵",
+            "text": "Deep carpet cleaning with extraction technology"
+          },
+          {
+            "icon": "🪟",
+            "text": "Full-service floor care for all surfaces"
+          },
+          {
+            "icon": "👤",
+            "text": "Day porter services for daily needs"
+          },
+          {
+            "icon": "✨",
+            "text": "Marble polishing for high-end spaces"
+          },
+          {
+            "icon": "🍽️",
+            "text": "Cafeteria cleaning for sanitary dining"
+          },
+          {
+            "icon": "💦",
+            "text": "Pressure washing for outdoor areas"
+          },
+          {
+            "icon": "📋",
+            "text": "Custom janitorial service contracts"
+          }
+        ]
+      }
+    },
+    "residential": {
+      "title": "Residential Cleaning Services",
+      "subtitle": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
+      "categories": [
+        {
+          "icon": "🏠",
+          "title": "Regular Cleaning",
+          "description": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
+          "details": [
+            "Dusting and vacuuming",
+            "Mopping floors",
+            "Bathroom sanitization",
+            "Kitchen cleaning",
+            "Laundry folding and organizing",
+            "Trash removal"
+          ]
+        },
+        {
+          "icon": "🧼",
+          "title": "Deep Cleaning",
+          "description": "Detailed top-to-bottom cleaning for a true reset. Great before events.",
+          "details": [
+            "Deep cleaning of all rooms",
+            "Cleaning behind and under furniture",
+            "Interior window cleaning",
+            "Baseboard and crown molding cleaning",
+            "Appliance cleaning (oven, fridge, microwave)",
+            "Carpet and upholstery cleaning"
+          ]
+        },
+        {
+          "icon": "📦",
+          "title": "Move-In / Move-Out",
+          "description": "Make your new place shine — or leave your old one spotless for inspection.",
+          "details": [
+            "Thorough cleaning of entire property",
+            "Focus on high-traffic areas",
+            "Kitchen and bathroom deep clean",
+            "Window cleaning",
+            "Garage and outdoor area cleaning",
+            "Final walkthrough and inspection"
+          ]
+        },
+        {
+          "icon": "🪟",
+          "title": "Kitchen & Bathroom Focus",
+          "description": "High-impact detailing where it matters most: grease, grout, and shine.",
+          "details": [
+            "Deep scrubbing of sinks and tubs",
+            "Grout cleaning",
+            "Grease removal from stovetops",
+            "Tile and grout restoration",
+            "Mirror and glass cleaning",
+            "Sanitization of high-touch areas"
+          ]
+        }
+      ]
+    }
+  },
+  "why_us": {
+    "title": "Why Choose Maloon Services?",
+    "features": [
+      {
+        "icon": "🌿",
+        "title": "Sustainable Cleaning Solutions",
+        "description": "Looking for an effective way to keep your business clean without harming the environment? We offer high-quality, eco-conscious cleaning services tailored to your needs."
+      },
+      {
+        "icon": "💰",
+        "title": "Cost-Effective Green Cleaning",
+        "description": "Our recycling and waste management solutions help businesses save money while reducing their environmental impact."
+      },
+      {
+        "icon": "✅",
+        "title": "Dependable and Professional Service",
+        "description": "With years of experience, our team delivers reliable, high-quality cleaning that businesses across Columbus can count on."
+      },
+      {
+        "icon": "🧴",
+        "title": "Powerful Cleaning Without Harsh Chemicals",
+        "description": "Our natural cleaning products remove dirt and grime without harmful chemicals, keeping employees and customers safe."
+      },
+      {
+        "icon": "🏢",
+        "title": "Tailored Cleaning for Any Industry",
+        "description": "From small offices to large corporate spaces, Maloon Services offers customized cleaning solutions for all types of businesses in Columbus, OH."
+      }
+    ]
+  },
+  "process": {
+    "title": "How It Works",
+    "steps": [
+      {
+        "number": 1,
+        "title": "Request a quote",
+        "description": "Send your address area, size, and service type on WhatsApp."
+      },
+      {
+        "number": 2,
+        "title": "Pick a time",
+        "description": "We confirm availability and schedule your cleaning."
+      },
+      {
+        "number": 3,
+        "title": "Enjoy the clean",
+        "description": "We arrive ready and leave your space fresh and spotless."
+      }
+    ]
+  },
+  "locations": {
+    "title": "Our Columbus Service Areas",
+    "subtitle": "Proudly serving businesses throughout Central Ohio",
+    "areas": [
+      "Columbus Downtown",
+      "Short North",
+      "Dublin",
+      "Worthington",
+      "Hilliard",
+      "Westerville",
+      "Gahanna",
+      "Reynoldsburg",
+      "New Albany",
+      "Upper Arlington",
+      "Bexley",
+      "Grandview Heights",
+      "Powell",
+      "Lewis Center",
+      "Pickerington",
+      "Canal Winchester",
+      "Grove City",
+      "And surrounding areas"
+    ]
+  },
+  "testimonials": [
+    {
+      "stars": "★★★★★",
+      "quote": "Maloon Services has transformed our office environment. Their team is professional, reliable, and always goes above and beyond. The eco-friendly cleaning products have significantly improved our indoor air quality.",
+      "author": "Sarah Johnson",
+      "role": "Office Manager, Downtown Columbus"
+    },
+    {
+      "stars": "★★★★★",
+      "quote": "As a healthcare facility, we require the highest standards of cleanliness. Maloon Services consistently delivers exceptional results with their specialized healthcare cleaning protocols. Their attention to detail is unmatched.",
+      "author": "Dr. Michael Chen",
+      "role": "Clinic Director, Dublin"
+    },
+    {
+      "stars": "★★★★★",
+      "quote": "We've been using Maloon Services for our retail locations across Columbus for over 3 years. Their flexibility with scheduling and consistent quality have been invaluable to our operations. Highly recommend!",
+      "author": "Emily Rodriguez",
+      "role": "Retail Operations Manager"
+    }
+  ],
+  "faq": [
+    {
+      "question": "What types of businesses do you serve?",
+      "answer": "We serve a wide range of businesses including corporate offices, healthcare facilities, retail stores, restaurants, hotels, schools, and more. Our services are customized to meet the specific needs of each industry."
+    },
+    {
+      "question": "Are your cleaning products eco-friendly?",
+      "answer": "Yes! We use environmentally responsible cleaning products that are safe for employees, customers, and the environment. Our green cleaning programs help improve indoor air quality while maintaining high cleanliness standards."
+    },
+    {
+      "question": "How often can you clean our facility?",
+      "answer": "We offer flexible scheduling options including daily, weekly, bi-weekly, monthly, or one-time cleaning services. We can also provide daytime porter services for continuous maintenance during business hours."
+    },
+    {
+      "question": "Do you provide disinfection services?",
+      "answer": "Absolutely. We offer advanced disinfection services including electrostatic spray disinfection, high-touch surface cleaning, and EPA-approved disinfectants to help reduce the spread of germs and viruses."
+    },
+    {
+      "question": "Are your staff trained and insured?",
+      "answer": "Yes, all our cleaning professionals are thoroughly trained, background-checked, and fully insured. We maintain high standards for quality, safety, and professionalism."
+    },
+    {
+      "question": "What areas of Columbus do you serve?",
+      "answer": "We serve the entire Columbus metropolitan area including Downtown, Short North, Dublin, Worthington, Hilliard, Westerville, Gahanna, Reynoldsburg, and surrounding communities in Central Ohio."
+    }
+  ]
+}

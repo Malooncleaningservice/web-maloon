@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Get a Free Quote - Maloon Services</title>
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <style>
+        body {
+            background: var(--bg-dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+            color: var(--text-light);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .mobile-cta-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+        .mobile-cta-container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .mobile-cta-container p {
+            font-size: 16px;
+            color: var(--muted-dark);
+            margin-bottom: 30px;
+        }
+        .mobile-cta-container .cta-button {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--brand-blue), var(--brand-purple));
+        }
+        .mobile-cta-container .phone-number {
+            font-size: 24px;
+            color: var(--brand-green);
+            text-decoration: none;
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-cta-container">
+        <h1>Get a Free Quote Today</h1>
+        <p>Let us help you keep your business spotless and professional.</p>
+        <a href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." class="cta-button">WhatsApp Quote</a>
+        <p>Or call us directly:</p>
+        <a href="tel:6145551234" class="phone-number">614-555-1234</a>
+    </div>
+    <script>
+        // Close the popup when clicking outside the container (if used as a modal)
+        document.addEventListener('click', function(e) {
+            if (e.target === document.body) {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

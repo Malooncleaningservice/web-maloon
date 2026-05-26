@@ -1,495 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Maloon Services | Professional Cleaning</title>
-  <meta name="description" content="Residential & commercial cleaning with reliable pros. Deep cleaning, move-in/out, and recurring service. Get a fast quote on WhatsApp." />
-
-  <!-- Open Graph (nice previews on social) -->
-  <meta property="og:title" content="Maloon Services | Professional Cleaning" />
-  <meta property="og:description" content="Reliable residential & commercial cleaning. Fast quotes on WhatsApp." />
-  <meta property="og:type" content="website" />
-
-  <style>
-    :root{
-      --bg:#0b1220;
-      --card:#0f1a2f;
-      --muted:#93a4c7;
-      --text:#eaf0ff;
-      --brand:#35d0ff;
-      --brand2:#7c5cff;
-      --good:#2ee59d;
-      --shadow: 0 18px 55px rgba(0,0,0,.35);
-      --radius: 18px;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maloon Services | Professional Commercial & Residential Cleaning in Columbus, OH</title>
+    <meta name="description" content="Maloon Services offers eco-friendly commercial cleaning services for offices, healthcare, retail, and hospitality businesses in Columbus, OH and Central Ohio. Also providing residential cleaning."/>
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="icon" href="favicon.ico" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Maloon Services | Professional Commercial & Residential Cleaning in Columbus, OH" />
+    <meta property="og:description" content="Eco-friendly commercial and residential cleaning services in Columbus, OH with sustainable solutions and professional results." />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- JSON-LD Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Maloon Services",
+      "image": "https://maloonservices.com/logo-maloon.png",
+      "telephone": "+1-614-555-1234",
+      "email": "info@maloonservices.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Cleaning Way",
+        "addressLocality": "Columbus",
+        "addressRegion": "OH",
+        "postalCode": "43215",
+        "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.014985,
+        "longitude": -83.017259
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "18:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:00",
+          "closes": "18:00"
+        }
+      ],
+      "url": "https://maloonservices.com",
+      "sameAs": [
+        "https://www.facebook.com/",
+        "https://twitter.com/",
+        "https://www.instagram.com/",
+        "https://www.linkedin.com/"
+      ],
+      "description": "Professional cleaning services for both commercial and residential clients in Columbus, OH and Central Ohio. Eco-friendly, reliable, and detail-focused."
     }
-
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(53,208,255,.18), transparent 60%),
-        radial-gradient(900px 500px at 90% 25%, rgba(124,92,255,.18), transparent 55%),
-        radial-gradient(800px 500px at 30% 95%, rgba(46,229,157,.10), transparent 60%),
-        var(--bg);
-      color:var(--text);
-      line-height:1.55;
-    }
-
-    a{color:inherit;text-decoration:none}
-    .container{max-width:1100px;margin:0 auto;padding:0 18px}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:8px 12px;border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--muted);
-      font-size:14px;
-    }
-    .nav{
-      position:sticky;top:0;z-index:50;
-      backdrop-filter: blur(10px);
-      background:rgba(11,18,32,.65);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .nav-inner{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 0;
-    }
-    .brand{
-      display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px;
-    }
-    .logo{
-      width:36px;height:36px;border-radius:12px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow: 0 14px 30px rgba(124,92,255,.25);
-    }
-    .nav-links{display:flex;gap:14px;align-items:center}
-    .nav-links a{
-      color:var(--muted);
-      padding:8px 10px;border-radius:10px;
-    }
-    .nav-links a:hover{background:rgba(255,255,255,.06);color:var(--text)}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:12px 16px;border-radius:14px;
-      background:linear-gradient(135deg, var(--brand), var(--brand2));
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow: var(--shadow);
-      font-weight:700;
-    }
-    .btn:hover{transform: translateY(-1px)}
-    .btn:active{transform: translateY(0px)}
-    .btn.secondary{
-      background:rgba(255,255,255,.08);
-      box-shadow:none;
-    }
-
-    /* Hero */
-    .hero{
-      padding:56px 0 30px;
-    }
-    .hero-grid{
-      display:grid;gap:22px;
-      grid-template-columns: 1.15fr .85fr;
-      align-items:stretch;
-    }
-    .hero h1{
-      font-size: clamp(34px, 4.6vw, 56px);
-      line-height:1.05;margin:12px 0 14px;
-      letter-spacing:-.8px;
-    }
-    .hero p{color:var(--muted);font-size:18px;margin:0 0 18px;max-width:58ch}
-    .cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:18px}
-    .trust{
-      display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;color:var(--muted);font-size:14px
-    }
-    .trust span{
-      padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .hero-card{
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.12);
-      padding:18px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-      min-height: 320px;
-    }
-    .hero-card:before{
-      content:"";
-      position:absolute;inset:-60px -60px auto auto;
-      width:220px;height:220px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, rgba(53,208,255,.55), rgba(124,92,255,.05));
-      filter: blur(0px);
-      opacity:.9;
-    }
-    .quote{
-      position:relative;
-      display:flex;flex-direction:column;gap:10px;
-    }
-    .quote h3{margin:2px 0 0}
-    .quote p{margin:0;color:var(--muted)}
-    .mini{
-      margin-top:12px;
-      display:grid;gap:10px;
-      grid-template-columns: 1fr 1fr;
-    }
-    .mini .box{
-      padding:12px;border-radius:14px;
-      background:rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .box b{display:block;margin-bottom:4px}
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      background:rgba(46,229,157,.14);
-      border:1px solid rgba(46,229,157,.30);
-      color:#d9fff0;
-      font-weight:700;
-      width:fit-content;
-    }
-
-    /* Sections */
-    section{padding:46px 0}
-    .section-title{
-      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px
-    }
-    .section-title h2{margin:0;font-size:28px}
-    .section-title p{margin:0;color:var(--muted)}
-    .grid3{display:grid;gap:14px;grid-template-columns: repeat(3, 1fr)}
-    .card{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      padding:16px;
-    }
-    .card h3{margin:8px 0 6px}
-    .card p{margin:0;color:var(--muted)}
-    .icon{
-      width:44px;height:44px;border-radius:14px;
-      display:grid;place-items:center;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      font-size:20px;
-    }
-
-    /* Process */
-    .steps{display:grid;gap:12px;grid-template-columns: repeat(3, 1fr)}
-    .step{
-      border-radius: var(--radius);
-      background:rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-      padding:16px;
-    }
-    .step .num{
-      width:34px;height:34px;border-radius:12px;
-      display:grid;place-items:center;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      font-weight:800;
-      margin-bottom:10px;
-    }
-    .step b{display:block;margin-bottom:6px}
-    .step p{margin:0;color:var(--muted)}
-
-    /* Contact */
-    .contact-wrap{
-      display:grid;gap:14px;
-      grid-template-columns: 1.2fr .8fr;
-      align-items:stretch;
-    }
-    .contact-card{
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.12);
-      padding:18px;
-      box-shadow: var(--shadow);
-    }
-    .contact-card p{color:var(--muted)}
-    .contact-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
-    .small{
-      font-size:14px;color:var(--muted)
-    }
-
-    footer{
-      padding:26px 0 40px;
-      border-top:1px solid rgba(255,255,255,.08);
-      color:var(--muted);
-      text-align:center;
-    }
-<link rel="icon" href="favicon.ico" />
-<meta name="robots" content="index, follow" />
-
-    /* Responsive */
-    @media (max-width: 920px){
-      .hero-grid{grid-template-columns:1fr}
-      .grid3{grid-template-columns:1fr}
-      .steps{grid-template-columns:1fr}
-      .contact-wrap{grid-template-columns:1fr}
-      .nav-links{display:none}
-    }
-  </style>
+    </script>
 </head>
+<body id="main-content">
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<body>
-  <!-- Top Nav -->
-  <div class="nav">
-    <div class="container nav-inner">
-     <div class="brand">
-  <img src="images/logo-maloon.png"
-       alt="Maloon Cleaning Service Logo"
-       style="height:40px; width:auto;">
-  <div>
-    <div style="font-size:15px">Maloon Cleaning Service</div>
-    <div style="font-size:12px;color:var(--muted);margin-top:2px">
-      Professional Cleaning
-    </div>
-  </div>
-</div>
+    <!-- Navigation Menu -->
+    <div id="navbar-placeholder"></div>
+    
+     <!-- Main Content Wrapper -->
+     <main class="main-content">
 
+<!-- Hero Section -->
+<div id="index-hero-placeholder"></div>
 
-      <div class="nav-links" aria-label="Primary">
-        <a href="#services">Services</a>
-        <a href="#why">Why us</a>
-        <a href="#process">Process</a>
-        <a href="#contact">Contact</a>
-      </div>
-
-      <!-- WhatsApp CTA -->
-      <!-- ✅ Replace TEL below with your full number (country code + number, no +, no spaces) -->
-      <a class="btn" href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." target="_blank" rel="noopener">
-        WhatsApp Quote →
-      </a>
-    </div>
-  </div>
-
-  <!-- Hero -->
-  <header class="hero">
-    <div class="container hero-grid">
-      <div>
-        <span class="pill">✨ Fast quotes • Reliable pros • Sparkling results</span>
-        <h1>Premium cleaning for homes & businesses.</h1>
-        <p>
-          Maloon Services delivers consistent, high-quality cleaning: deep cleaning, recurring service,
-          move-in/move-out, and office cleaning. Book in minutes and enjoy a fresh space.
-        </p>
-
-        <div class="cta-row">
-          <a class="btn" href="#contact">Get a Free Quote</a>
-          <a class="btn secondary" href="#services">See Services</a>
-        </div>
-
-        <div class="trust">
-          <span>✅ Insured & trusted</span>
-          <span>✅ Supplies included</span>
-          <span>✅ On-time arrival</span>
-          <span>✅ Satisfaction focused</span>
-        </div>
-      </div>
-
-      <div class="hero-card">
-        <div class="quote">
-          <span class="badge">⭐ 5-star care</span>
-          <h3>Quick Quote</h3>
-          <p>Send the basics on WhatsApp and we’ll reply fast.</p>
-
-          <div class="mini">
-            <div class="box">
-              <b>Tell us</b>
-              <div class="small">Home/Office • Size • Frequency</div>
+    <!-- Services Overview -->
+    <section id="services-overview" class="services-overview">
+        <div class="container">
+            <div class="section-header">
+                <h2>Janitorial Services and <span class="green-accent">Residential Cleaning</span> in <span class="green-accent">Columbus, OH</span></h2>
+                <p>Keep your business space clean and professional with customized, eco-friendly cleaning services built to meet your needs.</p>
             </div>
-            <div class="box">
-              <b>We reply</b>
-              <div class="small">Price • Time • Next availability</div>
+
+            <div class="service-highlight">
+                <h3>A Clean Workplace Leaves a Strong First Impression</h3>
+                <p>A spotless and well-organized environment speaks volumes about your business. Whether you manage a corporate office, retail store, or large facility, cleanliness helps create a welcoming atmosphere while supporting productivity and health.</p>
             </div>
-            <div class="box">
-              <b>We clean</b>
-              <div class="small">Pros arrive ready & equipped</div>
+
+            <div class="service-areas">
+                <h3><span class="green-accent">Serving Businesses Across Central Ohio</span></h3>
+                <p>Maloon Services proudly offers high-quality cleaning services in:</p>
+                <ul class="areas-list">
+                    <li>Columbus Downtown</li>
+                    <li>Short North</li>
+                    <li>Dublin</li>
+                    <li>Worthington</li>
+                    <li>Hilliard</li>
+                    <li>Westerville</li>
+                    <li>Gahanna</li>
+                    <li>Reynoldsburg</li>
+                </ul>
             </div>
-            <div class="box">
-              <b>You relax</b>
-              <div class="small">Fresh, spotless, stress-free</div>
+        </div>
+    </section>
+
+    <!-- Sustainability Section -->
+    <section class="sustainability">
+        <div class="container">
+            <div class="section-header">
+                <h2>Sustainable Cleaning for a Healthier Columbus</h2>
             </div>
-          </div>
 
-          <div class="cta-row" style="margin-top:14px">
-            <a class="btn" href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." target="_blank" rel="noopener">
-              Message on WhatsApp →
-            </a>
-            <a class="btn secondary" href="mailto:maloonservice@gmail.com">
-              Email Us
-            </a>
-          </div>
+            <div class="sustainability-grid">
+                <div class="sustainability-item">
+                    <div class="toggle-header">
+                        <h3>Eco-Friendly Cleaning for a Safer Workspace</h3>
+                        <span class="toggle-icon">+</span>
+                    </div>
+                    <div class="toggle-content">
+                        <p>We use environmentally responsible cleaning products that improve air quality while creating a safer space for employees and customers.</p>
+                    </div>
+                </div>
 
-          <div class="small" style="margin-top:10px">
-            Tip: Share photos for more accurate estimates.
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+                <div class="sustainability-item">
+                    <div class="toggle-header">
+                        <h3>Smarter Waste Management and Recycling</h3>
+                        <span class="toggle-icon">+</span>
+                    </div>
+                    <div class="toggle-content">
+                        <p>Our waste reduction programs help Columbus businesses cut down on landfill waste, lower disposal costs, and adopt greener practices.</p>
+                    </div>
+                </div>
 
-  <!-- Services -->
-  <section id="services">
-    <div class="container">
-      <div class="section-title">
-        <div>
-          <h2>Services</h2>
-          <p>Choose what you need — we’ll handle the rest.</p>
+                <div class="sustainability-item">
+                    <div class="toggle-header">
+                        <h3>Water-Saving Cleaning Techniques</h3>
+                        <span class="toggle-icon">+</span>
+                    </div>
+                    <div class="toggle-content">
+                        <p>We use advanced cleaning methods that use less water while still delivering deep and effective results for businesses across Central Ohio.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <span class="pill">Flexible scheduling</span>
-      </div>
+    </section>
 
-      <div class="grid3">
-        <div class="card">
-          <div class="icon">🏠</div>
-          <h3>Residential Cleaning</h3>
-          <p>Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🧼</div>
-          <h3>Deep Cleaning</h3>
-          <p>Detailed top-to-bottom cleaning for a true reset. Great before events.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🏢</div>
-          <h3>Commercial / Offices</h3>
-          <p>Clean workspaces that impress clients and keep teams comfortable.</p>
-        </div>
-        <div class="card">
-          <div class="icon">📦</div>
-          <h3>Move-In / Move-Out</h3>
-          <p>Make your new place shine — or leave your old one spotless for inspection.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🪟</div>
-          <h3>Kitchen & Bathroom Focus</h3>
-          <p>High-impact detailing where it matters most: grease, grout, and shine.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🧽</div>
-          <h3>Custom Requests</h3>
-          <p>Tell us what you need. We’ll tailor a plan and deliver consistent results.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Why Choose Us -->
+<div id="index-why-choose-placeholder"></div>
 
-  <!-- Why Us -->
-  <section id="why">
-    <div class="container">
-      <div class="section-title">
-        <div>
-          <h2>Why Maloon Services</h2>
-          <p>Reliable, respectful, and detail-obsessed (in a good way).</p>
-        </div>
-        <span class="pill">Quality you can feel</span>
-      </div>
+<!-- CTA Section -->
+<div id="index-cta-placeholder"></div>
 
-      <div class="grid3">
-        <div class="card">
-          <div class="icon">✅</div>
-          <h3>Trusted Pros</h3>
-          <p>We show up on time, work efficiently, and respect your space.</p>
-        </div>
-        <div class="card">
-          <div class="icon">🧴</div>
-          <h3>Supplies Included</h3>
-          <p>We come prepared with the essentials to get the job done right.</p>
-        </div>
-        <div class="card">
-          <div class="icon">💎</div>
-          <h3>Spotless Finish</h3>
-          <p>We focus on the details that make a space feel truly clean.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
 
-  <!-- Process -->
-  <section id="process">
-    <div class="container">
-      <div class="section-title">
-        <div>
-          <h2>How it Works</h2>
-          <p>Simple steps — fast results.</p>
-        </div>
-        <span class="pill">Book in minutes</span>
-      </div>
-
-      <div class="steps">
-        <div class="step">
-          <div class="num">1</div>
-          <b>Request a quote</b>
-          <p>Send your address area, size, and service type on WhatsApp.</p>
-        </div>
-        <div class="step">
-          <div class="num">2</div>
-          <b>Pick a time</b>
-          <p>We confirm availability and schedule your cleaning.</p>
-        </div>
-        <div class="step">
-          <div class="num">3</div>
-          <b>Enjoy the clean</b>
-          <p>We arrive ready and leave your space fresh and spotless.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact">
-    <div class="container contact-wrap">
-      <div class="contact-card">
-        <h2 style="margin:0 0 8px">Get a Free Quote</h2>.logo-img{
-  width:48px;
-  height:auto;
-  border-radius:10px;
-}
-
-        <p style="margin:0 0 12px">
-          Tell us what you need and we’ll reply fast. Photos help for accurate pricing.
-        </p>
-
-        <div class="contact-actions">
-          <a class="btn" href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." target="_blank" rel="noopener">
-            WhatsApp Now →
-          </a>
-          <a class="btn secondary" href="mailto:maloonservice@gmail.com">
-            Email: maloonservice@gmail.com
-          </a>
-        </div>
-
-        <div class="small" style="margin-top:12px">
-          Business hours: Mon–Sat • 8:00 AM – 6:00 PM
-        </div>
-      </div>
-
-      <div class="card" style="padding:18px">
-        <h3 style="margin-top:0">Quick info</h3>
-        <p class="small" style="margin-top:6px">📍 Service area: Your city / nearby</p>
-        <p class="small">🧾 Free estimates • Transparent pricing</p>
-        <p class="small">🧡 Respectful teams • Detail-first cleaning</p>
-
-        <div style="height:12px"></div>
-        <span class="pill">Need a custom plan? Message us.</span>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="container">
-      <div style="font-weight:800;color:var(--text)">Maloon Services</div>
-      <div style="margin-top:6px">© <span id="y"></span> • All rights reserved</div>
-    </div>
-  </footer>
-
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
-  </script>
+    <script src="assets/js/main.js"></script>
 </body>
 </html>
