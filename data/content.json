@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "Maloon Services",
+    "name": "Maloon Cleaning Service",
     "tagline": "Professional Cleaning",
     "slogan": "save money. go green. make a difference."
   },
@@ -11,7 +11,7 @@
     "whatsapp": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.",
     "hours": "Mon–Sat • 8:00 AM – 6:00 PM"
   },
-  "services": {
+    "services": {
     "commercial": {
       "title": "Commercial Cleaning Services",
       "subtitle": "Professional Solutions for Every Business in Columbus, OH",
@@ -74,6 +74,21 @@
             "Green cleaning programs for sustainability",
             "Stewarding support for event spaces",
             "Valet area cleaning"
+          ]
+        },
+        {
+          "icon": "🏗️",
+          "title": "Construction Cleaning",
+          "description": "Post-construction cleanup services to prepare your site for occupancy.",
+          "details": [
+            "Debris removal and site cleanup",
+            "Dust and dirt removal from all surfaces",
+            "Window and glass cleaning",
+            "Floor cleaning and polishing",
+            "Final touch-up cleaning",
+            "Exterior pressure washing",
+            "Interior deep cleaning",
+            "Waste disposal and recycling"
           ]
         }
       ],
@@ -202,7 +217,7 @@
     }
   },
   "why_us": {
-    "title": "Why Choose Maloon Services?",
+    "title": "Why Choose Maloon Cleaning Service?",
     "features": [
       {
         "icon": "🌿",
@@ -227,7 +242,7 @@
       {
         "icon": "🏢",
         "title": "Tailored Cleaning for Any Industry",
-        "description": "From small offices to large corporate spaces, Maloon Services offers customized cleaning solutions for all types of businesses in Columbus, OH."
+        "description": "From small offices to large corporate spaces, Maloon Cleaning Service offers customized cleaning solutions for all types of businesses in Columbus, OH."
       }
     ]
   },
@@ -278,21 +293,41 @@
   "testimonials": [
     {
       "stars": "★★★★★",
-      "quote": "Maloon Services has transformed our office environment. Their team is professional, reliable, and always goes above and beyond. The eco-friendly cleaning products have significantly improved our indoor air quality.",
+      "quote": "Maloon Cleaning Service has transformed our office environment. Their team is professional, reliable, and always goes above and beyond. The eco-friendly cleaning products have significantly improved our indoor air quality.",
       "author": "Sarah Johnson",
       "role": "Office Manager, Downtown Columbus"
     },
     {
       "stars": "★★★★★",
-      "quote": "As a healthcare facility, we require the highest standards of cleanliness. Maloon Services consistently delivers exceptional results with their specialized healthcare cleaning protocols. Their attention to detail is unmatched.",
+      "quote": "As a healthcare facility, we require the highest standards of cleanliness. Maloon Cleaning Service consistently delivers exceptional results with their specialized healthcare cleaning protocols. Their attention to detail is unmatched.",
       "author": "Dr. Michael Chen",
       "role": "Clinic Director, Dublin"
     },
     {
       "stars": "★★★★★",
-      "quote": "We've been using Maloon Services for our retail locations across Columbus for over 3 years. Their flexibility with scheduling and consistent quality have been invaluable to our operations. Highly recommend!",
+      "quote": "We've been using Maloon Cleaning Service for our retail locations across Columbus for over 3 years. Their flexibility with scheduling and consistent quality have been invaluable to our operations. Highly recommend!",
       "author": "Emily Rodriguez",
       "role": "Retail Operations Manager"
+    }
+  ],
+  "articles": [
+    {
+      "title": "The Benefits of Green Cleaning for Your Business",
+      "excerpt": "Discover how eco-friendly cleaning products can improve indoor air quality and employee productivity.",
+      "date": "June 1, 2026",
+      "link": "articles.html#green-cleaning"
+    },
+    {
+      "title": "Post-Construction Cleaning Checklist",
+      "excerpt": "A comprehensive guide to preparing your construction site for occupancy with professional cleaning.",
+      "date": "May 15, 2026",
+      "link": "articles.html#construction-checklist"
+    },
+    {
+      "title": "How Often Should You Clean Your Office?",
+      "excerpt": "Find the ideal cleaning schedule based on your business type, size, and industry requirements.",
+      "date": "April 28, 2026",
+      "link": "articles.html#office-cleaning-frequency"
     }
   ],
   "faq": [
