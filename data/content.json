@@ -2,16 +2,21 @@
   "brand": {
     "name": "Maloon Cleaning Service",
     "tagline": "Professional Cleaning",
-    "slogan": "save money. go green. make a difference."
+    "slogan": "save money. go green. make a difference.",
+    "logo": "logo-maloon.png",
+    "favicon": "favicon.ico"
   },
   "contact": {
-    "phone": "614-555-1234",
     "email": "info@maloonservices.com",
     "address": "123 Cleaning Way, Columbus, OH 43215",
     "whatsapp": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.",
-    "hours": "Mon–Sat • 8:00 AM – 6:00 PM"
+    "hours": "Mon–Sat • 8:00 AM – 6:00 PM",
+    "facebook": "#",
+    "twitter": "#",
+    "instagram": "#",
+    "linkedin": "#"
   },
-    "services": {
+  "services": {
     "commercial": {
       "title": "Commercial Cleaning Services",
       "subtitle": "Professional Solutions for Every Business in Columbus, OH",
@@ -355,5 +360,510 @@
       "question": "What areas of Columbus do you serve?",
       "answer": "We serve the entire Columbus metropolitan area including Downtown, Short North, Dublin, Worthington, Hilliard, Westerville, Gahanna, Reynoldsburg, and surrounding communities in Central Ohio."
     }
-  ]
+  ],
+  "navigation": {
+    "main": [
+      {
+        "id": "home",
+        "title": "Home",
+        "url": "index.html",
+        "icon": "home"
+      },
+      {
+        "id": "business",
+        "title": "For Businesses",
+        "url": "#",
+        "icon": "building",
+        "dropdown": [
+          {
+            "id": "commercial-services",
+            "title": "Commercial Services",
+            "url": "services.html#commercial"
+          },
+          {
+            "id": "industries",
+            "title": "Industries We Serve",
+            "url": "services.html#industries"
+          },
+          {
+            "id": "business-contact",
+            "title": "Business Contact",
+            "url": "contact.html"
+          }
+        ]
+      },
+      {
+        "id": "homes",
+        "title": "For Homes",
+        "url": "#",
+        "icon": "home",
+        "dropdown": [
+          {
+            "id": "residential-services",
+            "title": "Residential Services",
+            "url": "services.html#residential"
+          },
+          {
+            "id": "home-contact",
+            "title": "Home Contact",
+            "url": "contact.html"
+          }
+        ]
+      },
+      {
+        "id": "about",
+        "title": "About",
+        "url": "about.html",
+        "icon": "info-circle"
+      },
+      {
+        "id": "contact",
+        "title": "Contact",
+        "url": "contact.html",
+        "icon": "phone"
+      }
+    ],
+    "sidebar": {
+      "index": [
+        {
+          "id": "index-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "services-overview",
+          "title": "Services Overview"
+        },
+        {
+          "id": "index-why-choose-placeholder",
+          "title": "Why Choose Us"
+        },
+        {
+          "id": "index-cta-placeholder",
+          "title": "Get a Quote"
+        }
+      ],
+      "about": [
+        {
+          "id": "about-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "company-overview",
+          "title": "Company Overview"
+        },
+        {
+          "id": "mission-section",
+          "title": "Our Mission"
+        },
+        {
+          "id": "about-why-choose-placeholder",
+          "title": "Why Choose Us"
+        },
+        {
+          "id": "about-service-areas-placeholder",
+          "title": "Service Areas"
+        },
+        {
+          "id": "testimonials-section",
+          "title": "Testimonials"
+        },
+        {
+          "id": "about-cta-placeholder",
+          "title": "Get a Quote"
+        }
+      ],
+      "services": [
+        {
+          "id": "services-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "services-overview",
+          "title": "Services Overview"
+        },
+        {
+          "id": "commercial",
+          "title": "Commercial Services"
+        },
+        {
+          "id": "residential",
+          "title": "Residential Services"
+        },
+        {
+          "id": "disinfection",
+          "title": "Disinfection Services"
+        },
+        {
+          "id": "corporate",
+          "title": "Corporate"
+        },
+        {
+          "id": "healthcare",
+          "title": "Healthcare"
+        },
+        {
+          "id": "retail",
+          "title": "Retail"
+        },
+        {
+          "id": "hospitality",
+          "title": "Hospitality"
+        },
+        {
+          "id": "ongoing-maintenance",
+          "title": "Maintenance"
+        },
+        {
+          "id": "services-why-choose-placeholder",
+          "title": "Why Choose Us"
+        },
+        {
+          "id": "services-service-areas-placeholder",
+          "title": "Service Areas"
+        },
+        {
+          "id": "services-cta-placeholder",
+          "title": "Get a Quote"
+        }
+      ],
+      "residential": [
+        {
+          "id": "residential-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "residential-why-choose-placeholder",
+          "title": "Why Choose Us"
+        }
+      ],
+      "locations": [
+        {
+          "id": "locations-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "locations-why-choose-placeholder",
+          "title": "Why Choose Us"
+        }
+      ],
+      "contact": [
+        {
+          "id": "contact-hero-placeholder",
+          "title": "Overview"
+        },
+        {
+          "id": "contactForm",
+          "title": "Quote Form"
+        },
+        {
+          "id": "contact-service-areas-placeholder",
+          "title": "Service Areas"
+        }
+      ]
+    }
+  },
+  "pages": {
+    "index": {
+      "hero": {
+        "title": "Maloon Services<br>Columbus, OH",
+        "subtitle": "Professional Janitorial Services for Businesses & Homes",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Get a Free Quote Today",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    },
+    "about": {
+      "hero": {
+        "title": "About Maloon Services",
+        "subtitle": "Columbus, OH's Trusted Commercial & Residential Cleaning Company",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Experience the Maloon Cleaning Service Difference",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    },
+    "services": {
+      "commercial": {
+        "title": "Commercial Cleaning Services",
+        "subtitle": "Professional Solutions for Every Business in Columbus, OH",
+        "categories": [
+          {
+            "icon": "🏢",
+            "title": "Corporate Cleaning",
+            "description": "Professional office cleaning services designed to maintain productive work environments.",
+            "details": [
+              "LEED-certified green cleaning programs",
+              "Routine janitorial services and contract cleaning",
+              "Daytime porter services for continuous maintenance",
+              "Custom cleaning plans designed to support sustainability",
+              "Complete floor care maintenance",
+              "Carpet extraction cleaning",
+              "Pressure washing for exterior areas",
+              "Temporary staffing for special events"
+            ]
+          },
+          {
+            "icon": "⚕️",
+            "title": "Healthcare Cleaning",
+            "description": "Specialized cleaning for medical facilities with strict hygiene standards.",
+            "details": [
+              "Deep cleaning for hospitals, clinics, and medical offices",
+              "Scheduled janitorial services and custom cleaning contracts",
+              "Daytime cleaning options to fit your facility's schedule",
+              "Porter services for busy, high-traffic medical spaces",
+              "Restroom sanitation and disinfection",
+              "Specialized cleaning for biomedical labs",
+              "Upholstery and furniture cleaning",
+              "Window and glass cleaning"
+            ]
+          },
+          {
+            "icon": "🛍️",
+            "title": "Retail Cleaning",
+            "description": "Keep your retail spaces clean and inviting for customers.",
+            "details": [
+              "Contract janitorial services and scheduled maintenance",
+              "Day porter support to keep stores looking their best",
+              "Restroom sanitation services",
+              "Cleaning for shopping centers and mixed-use developments",
+              "Multi-location cleaning for chain retailers",
+              "Professional floor care for high-traffic areas",
+              "Storefront detailing to enhance curb appeal",
+              "Window and glass cleaning"
+            ]
+          },
+          {
+            "icon": "🏨",
+            "title": "Hospitality Cleaning",
+            "description": "Comprehensive cleaning solutions for hotels and restaurants.",
+            "details": [
+              "Housekeeping services for hotels and resorts",
+              "Event space cleaning for banquets and conferences",
+              "Public area maintenance for lobbies and hallways",
+              "Restaurant and kitchen cleaning",
+              "General janitorial services for high-traffic areas",
+              "Green cleaning programs for sustainability",
+              "Stewarding support for event spaces",
+              "Valet area cleaning"
+            ]
+          },
+          {
+            "icon": "🏗️",
+            "title": "Construction Cleaning",
+            "description": "Post-construction cleanup services to prepare your site for occupancy.",
+            "details": [
+              "Debris removal and site cleanup",
+              "Dust and dirt removal from all surfaces",
+              "Window and glass cleaning",
+              "Floor cleaning and polishing",
+              "Final touch-up cleaning",
+              "Exterior pressure washing",
+              "Interior deep cleaning",
+              "Waste disposal and recycling"
+            ]
+          }
+        ],
+        "disinfection": {
+          "title": "Advanced Disinfection Services",
+          "subtitle": "Comprehensive disinfection solutions for Columbus businesses",
+          "features": [
+            {
+              "icon": "💨",
+              "title": "Touch-Free Disinfection Applications",
+              "description": "Our fogging disinfectant system evenly covers both vertical and horizontal surfaces, reducing germs without requiring direct contact."
+            },
+            {
+              "icon": "🧽",
+              "title": "Manual and Mechanical Disinfection",
+              "description": "We use a combination of hands-on cleaning and advanced equipment to disinfect high-touch areas, reducing the spread of bacteria and viruses."
+            }
+          ],
+          "services": [
+            "Electrostatic spray disinfection",
+            "ATP testing to verify cleanliness",
+            "High-touch surface disinfection",
+            "EPA-approved disinfectants",
+            "COVID-19 cleaning protocols",
+            "Emergency response cleaning",
+            "Ongoing disinfection programs",
+            "Customized disinfection schedules"
+          ]
+        },
+        "ongoing": {
+          "title": "Ongoing Cleaning and Maintenance",
+          "subtitle": "Keep Your Columbus Workspace Clean Year-Round",
+          "items": [
+            {
+              "icon": "🌿",
+              "text": "LEED-certified green cleaning programs"
+            },
+            {
+              "icon": "🧵",
+              "text": "Deep carpet cleaning with extraction technology"
+            },
+            {
+              "icon": "🪟",
+              "text": "Full-service floor care for all surfaces"
+            },
+            {
+              "icon": "👤",
+              "text": "Day porter services for daily needs"
+            },
+            {
+              "icon": "✨",
+              "text": "Marble polishing for high-end spaces"
+            },
+            {
+              "icon": "🍽️",
+              "text": "Cafeteria cleaning for sanitary dining"
+            },
+            {
+              "icon": "💦",
+              "text": "Pressure washing for outdoor areas"
+            },
+            {
+              "icon": "📋",
+              "text": "Custom janitorial service contracts"
+            }
+          ]
+        }
+      },
+      "residential": {
+        "title": "Residential Cleaning Services",
+        "subtitle": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
+        "categories": [
+          {
+            "icon": "🏠",
+            "title": "Regular Cleaning",
+            "description": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
+            "details": [
+              "Dusting and vacuuming",
+              "Mopping floors",
+              "Bathroom sanitization",
+              "Kitchen cleaning",
+              "Laundry folding and organizing",
+              "Trash removal"
+            ]
+          },
+          {
+            "icon": "🧼",
+            "title": "Deep Cleaning",
+            "description": "Detailed top-to-bottom cleaning for a true reset. Great before events.",
+            "details": [
+              "Deep cleaning of all rooms",
+              "Cleaning behind and under furniture",
+              "Interior window cleaning",
+              "Baseboard and crown molding cleaning",
+              "Appliance cleaning (oven, fridge, microwave)",
+              "Carpet and upholstery cleaning"
+            ]
+          },
+          {
+            "icon": "📦",
+            "title": "Move-In / Move-Out",
+            "description": "Make your new place shine — or leave your old one spotless for inspection.",
+            "details": [
+              "Thorough cleaning of entire property",
+              "Focus on high-traffic areas",
+              "Kitchen and bathroom deep clean",
+              "Window cleaning",
+              "Garage and outdoor area cleaning",
+              "Final walkthrough and inspection"
+            ]
+          },
+          {
+            "icon": "🪟",
+            "title": "Kitchen & Bathroom Focus",
+            "description": "High-impact detailing where it matters most: grease, grout, and shine.",
+            "details": [
+              "Deep scrubbing of sinks and tubs",
+              "Grout cleaning",
+              "Grease removal from stovetops",
+              "Tile and grout restoration",
+              "Mirror and glass cleaning",
+              "Sanitization of high-touch areas"
+            ]
+          }
+        ]
+      },
+      "hero": {
+        "title": "Our Comprehensive Cleaning Services",
+        "subtitle": "Professional Solutions for Every Business & Home in Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Ready for a Cleaner Workspace?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    },
+    "contact": {
+      ,
+      ,
+      "email": "info@maloonservices.com",
+      "address": "123 Cleaning Way, Columbus, OH 43215",
+      "whatsapp": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.",
+      "hours": "Mon–Sat • 8:00 AM – 6:00 PM",
+      "facebook": "#",
+      "twitter": "#",
+      "instagram": "#",
+      "linkedin": "#",
+      "hero": {
+        "title": "Contact Maloon Services",
+        "subtitle": "Get a Free Quote for Professional Cleaning in Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Ready for a Cleaner, Healthier Workspace?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    },
+    "residential": {
+      "hero": {
+        "title": "Residential Cleaning Services",
+        "subtitle": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
+        "background": "https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Ready for a Spotless Home?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    },
+    "locations": {
+      "title": "Our Columbus Service Areas",
+      "subtitle": "Proudly serving businesses throughout Central Ohio",
+      "areas": [
+        "Columbus Downtown",
+        "Short North",
+        "Dublin",
+        "Worthington",
+        "Hilliard",
+        "Westerville",
+        "Gahanna",
+        "Reynoldsburg",
+        "New Albany",
+        "Upper Arlington",
+        "Bexley",
+        "Grandview Heights",
+        "Powell",
+        "Lewis Center",
+        "Pickerington",
+        "Canal Winchester",
+        "Grove City",
+        "And surrounding areas"
+      ],
+      "hero": {
+        "title": "Our Service Areas",
+        "subtitle": "Serving Businesses & Homes Throughout Central Ohio",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Ready for a Cleaner Space?",
+        ,
+        "whatsapp_url": "https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote."
+      }
+    }
+  }
 }

@@ -1,231 +1,119 @@
-# Maloon Services - Fresh Green Market Design Guide
+# 🌿 Maloon Design System: "Pristine Freshness" (v2.0)
 
-## Design Philosophy
-**"Like an ad you pick up at the local market"**
-- Clean, informative, scannable
-- Fresh yet grounded
-- Professional but approachable
-- Easy to understand at a glance
+## 1. Core Philosophy: The Breath of Fresh Air
+The Maloon brand should not feel "clinical" or "sterile." It should feel **revitalized**. We move away from the "methodical checklist" look and toward a "transformation" experience.
 
-## Color Palette 🎨
-
-### Primary Greens
-- **Fresh Mint** `#e8f5e9` - Light, airy backgrounds for freshness
-- **Sage Light** `#c8e6c9` - Soft accent areas
-- **Leaf Green** `#4caf50` - Primary action color (buttons, accents)
-- **Forest** `#2e7d32` - Darker green for trust/tradition
-- **Deep Pine** `#1b5e20` - Main text and strong accents
-
-### Supporting Colors
-- **White** `#ffffff` - Clean backgrounds
-- **Off-White** `#fafafa` - Subtle variations
-- **Warm Sand** `#f5f5dc` - Warm accents
-- **Accent Warm** `#ffb74d` - For special CTAs/highlights (minimal use)
-
-### Text Colors
-- **Primary Text** - Deep Pine (#1b5e20)
-- **Secondary Text** - Forest (#2e7d32)
-- **Muted Text** - Muted Green (#558b2f)
-
-## Typography
-
-### Hierarchy
-- **Headings:** 700 weight, Deep Pine color
-- **Subheadings:** 600 weight, Forest color
-- **Body Text:** 400 weight, line-height 1.7
-- **Font Stack:** system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif
-
-### Sizes
-- Main heading: clamp(36px, 5vw, 56px)
-- Section headers: clamp(28px, 3.5vw, 36px)
-- Subheadings: clamp(22px, 3vw, 28px)
-- Body text: 16px base, 1.05-1.1rem for emphasis
-
-## Components
-
-### Buttons
-- **Primary:** Forest green background, white text
-- **Secondary:** Leaf green background, white text
-- **Hover:** Transforms translateY(-2px) with deeper color
-- **Border radius:** 12px
-- **Padding:** 0.85rem 1.75rem
-
-### Cards
-- **Background:** White or Fresh Mint
-- **Border:** 2px solid Sage Light
-- **Border Radius:** 12px
-- **Hover:** Border changes to Leaf Green, slight lift effect
-- **Shadow:** Soft natural shadows (rgba(27,94,32,.06))
-
-### Lists with Checkmarks
-Use `.checkmark-list` class for scannable bullet points:
-- Green circular checkmark icons
-- Good spacing for easy scanning
-- 1.7 line-height for readability
-
-### Info Boxes
-- **Background:** Gradient from Fresh Mint to Sage Light
-- **Border-left:** 4px solid Leaf Green
-- **Use for:** Key information highlights
-
-### Highlight Boxes
-- **Background:** White
-- **Border:** 2px solid Leaf Green
-- **Use for:** Important callouts, special offers
-
-### Icon Badges
-- **Size:** 60px circle
-- **Background:** Gradient Leaf Green to Forest
-- **Use for:** Service categories, features
-
-## Layout Principles
-
-### Spacing
-- **Section padding:** 5rem 0
-- **Content spacing:** 24px margins
-- **Card gaps:** 2rem in grids
-
-### Grids
-- **Feature Grid:** repeat(auto-fit, minmax(300px, 1fr))
-- **Process Steps:** repeat(auto-fit, minmax(250px, 1fr))
-- **Stats Grid:** repeat(auto-fit, minmax(200px, 1fr))
-
-### Responsive
-- **Mobile first approach**
-- **Breakpoint:** 768px for tablets, 920px for desktop
-- **Stack grids to single column on mobile**
-
-## Special Elements
-
-### Process Steps
-Three-step layout with:
-- Numbered circles (Forest background)
-- Clean cards with hover effects
-- Center-aligned content
-
-### Stats Display
-- Large numbers (2.5rem, Forest color)
-- Small labels below
-- Fresh Mint background cards
-
-### Testimonials
-- White cards with Sage Light border
-- Decorative quotation mark
-- Star ratings in warm accent color
-- Author info in Forest color
-
-### Service Areas Tags
-- Pills with Sage Light background
-- Leaf Green border
-- Hover: Background changes to Leaf Green with white text
-
-## Shadows
-
-- **Soft:** `0 4px 12px rgba(27,94,32,.06)`
-- **Normal:** `0 8px 24px rgba(27,94,32,.08)`
-- **Hover:** `0 12px 32px rgba(27,94,32,.12)`
-
-## Transitions
-
-- **Standard:** `all 0.3s ease`
-- **Fast:** `all 0.15s ease`
-
-## Usage Tips
-
-### For Scannable Content
-1. Use checkmark lists instead of regular bullets
-2. Break content into cards with clear headings
-3. Use info boxes for important details
-4. Keep paragraphs short (2-3 sentences max)
-
-### For Trust Building
-1. Use Forest/Deep Pine for professional elements
-2. Add subtle shadows to cards
-3. Use the gradient backgrounds sparingly
-4. Include testimonials with the special styling
-
-### For Call-to-Actions
-1. Use Leaf Green or Forest for buttons
-2. Ensure good contrast with white text
-3. Add hover effects for interactivity
-4. Make phone numbers large and clickable
-
-## Accessibility
-
-- **Focus states:** 3px solid Leaf Green outline with offset
-- **Color contrast:** All text meets WCAG AA standards
-- **Line height:** 1.7 for body text (excellent readability)
-- **Font size:** Minimum 16px base, scalable with clamp()
-
-## Do's and Don'ts
-
-### ✅ Do:
-- Use generous white space
-- Keep text concise and scannable
-- Use checkmarks for lists
-- Maintain the green color palette
-- Use hover effects subtly
-- Keep cards clean and simple
-
-### ❌ Don't:
-- Overcrowd sections with too much text
-- Use more than 2-3 colors per section
-- Make buttons too flashy
-- Use complex gradients everywhere
-- Ignore mobile optimization
-- Make clickable areas too small
-
-## File Structure
-
-- **Main CSS:** `assets/css/main.css` - All styles including the fresh green theme
-- **Components:** `assets/components/` - Reusable HTML components
-- **JavaScript:** `assets/js/main.js` - Dynamic component injection
-- **Content:** `data/content.json` - Content management
-
-## Quick Reference Classes
-
-```html
-<!-- Scannable List -->
-<ul class="checkmark-list">
-  <li>Item with green checkmark</li>
-</ul>
-
-<!-- Info Box -->
-<div class="info-box">
-  <h3>Title</h3>
-  <p>Important information</p>
-</div>
-
-<!-- Highlight Box -->
-<div class="highlight-box">
-  <h3>Special Callout</h3>
-  <p>Key message</p>
-</div>
-
-<!-- Service Card -->
-<div class="service-card">
-  <h3>Service Name</h3>
-  <p>Description</p>
-</div>
-
-<!-- Process Steps -->
-<div class="process-steps">
-  <div class="process-step">
-    <div class="step-number">1</div>
-    <h3>Step Title</h3>
-    <p>Description</p>
-  </div>
-</div>
-
-<!-- Icon Badge -->
-<div class="icon-badge">🌿</div>
-
-<!-- Badge Tag -->
-<span class="badge">Certified</span>
-```
+*   **The Goal:** To communicate the feeling of walking into a room that has just been deep-cleaned: airy, bright, organized, and revitalized.
+*   **The Vibe:** High-end, organic, breathable, and effortless.
 
 ---
 
-**Last Updated:** May 28, 2026
-**Theme:** Fresh Green Market
-**Version:** 1.0
+## 2. The Color Atmosphere 🎨
+We use colors to create "atmospheres" rather than just filling containers.
+
+### A. Atmospheric Gradients (The Environment)
+*   **`gradient-fresh`**: `linear-gradient(135deg, #f0f7f0 0%, #e8f5e9 100%)`
+    *   *Use:* Hero sections, large background blocks. Creates a sense of light and air.
+*   **`gradient-sunlight`**: `linear-gradient(to bottom, #ffffff 0%, #fafafa 100%)`
+    *   *Use:* Standard content sections. Maintains a clean, "high-end hotel linen" feel.
+*   **`gradient-deep`**: `linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%)`
+    *   *Use:* High-impact sections (Footers, CTAs). Provides grounding and trust.
+
+### B. Functional Tones (The UI)
+*   **`vitality-green` (`#4caf50`)**: The pulse. Primary actions and active states.
+*   **`forest-anchor` (`#2e7d32`)**: The weight. Subheaders and secondary buttons.
+*   **`deep-pine` (`#1b5e20`)**: The foundation. Main headings and primary text.
+*   **`sage-soft` (`#c8e6c9`)**: The texture. Borders, dividers, and subtle accents.
+*   **`sparkle-warm` (`#ffb74d`)**: The glint. Used sparingly for high-value CTAs to suggest a "polished" finish.
+
+---
+
+## 3. The Z-Axis: Depth & Elevation 🏔️
+We treat the website as a 3D space to break the "flat/methodical" feeling.
+
+| Level | Name | Visual Signature | Use Case |
+| :--- | :--- | :--- | :--- |
+| **0** | **Ground** | Flat, no shadow. | Page backgrounds, base sections. |
+| **1** | **Surface** | `0 4px 12px rgba(27,94,32,.06)` | Standard cards, info boxes. |
+| **2** | **Interaction** | `0 12px 32px rgba(27,94,32,.12)` + `scale(1.02)` | Hover states for cards and buttons. |
+| **3** | **Focus** | `0 24px 48px rgba(27,94,32,.16)` | Modals, pop-ups, critical alerts. |
+
+---
+
+## 4. Organic Geometry 🍃
+We break the "boxiness" of standard web design.
+
+1.  **The Squircle Rule:** Use generous, soft corner radii.
+    *   Large containers: `24px`
+    *   Cards/Buttons: `16px`
+2.  **Background Blobs:** Use low-opacity (`0.05`), large, organic SVG shapes in `sage-soft` behind text to create depth and visual interest without adding clutter.
+3.  **Glassmorphism:** Use `backdrop-filter: blur(10px)` on cards to create a "frosted glass" effect, suggesting clarity and transparency.
+4.  **Subtle Texture:** Add a fine "paper" texture overlay (`noise.png` pattern) on fresh-mint backgrounds at 3% opacity for an organic, grounded feel.
+
+### Organic Shape Library
+*   **Leaf Blob:** Large, asymmetrical leaf-shaped SVG for hero sections
+*   **Water Droplet:** Circular with wavy edges for service highlights
+*   **Cloud Form:** Soft, irregular cloud shapes for info boxes
+*   **Wave Divider:** Gentle wave patterns for section transitions
+
+---
+
+## 5. The Motion Language (Life) ⚡
+Interaction is how the site "breathes."
+
+*   **The Lift:** On hover, elements should feel like they are being lifted toward the user (`translateY(-6px)`).
+*   **The Pulse:** High-value buttons should have a very subtle, slow-moving gradient animation to attract the eye.
+*   **The Reveal (Scroll-Triggered):** Content sections should "fade in and lift" as they enter the viewport, creating a sense of discovery.
+*   **The Breathe:** Organic background elements should have gentle, continuous motion to simulate natural movement.
+*   **The Glow:** Interactive elements should have a soft glow effect on focus/hover to enhance accessibility and visual interest.
+
+### Micro-Interaction Patterns
+*   **Icon Badge Pulse:** Service icons should gently pulse when their parent card is hovered
+*   **Border Glow:** Card borders should transition from sage-soft to leaf-green with a subtle glow effect
+*   **CTA Shimmer:** Primary call-to-action buttons should have a horizontal gradient shimmer
+*   **Section Transition Fade:** As users scroll, sections should fade in with a 200ms delay between elements for a cascading effect
+
+---
+
+## 6. Typography Hierarchy ✍️
+A wider contrast between headings and body text creates an "editorial" feel.
+
+*   **Display (H1):** `clamp(40px, 6vw, 64px)`, `font-weight: 800`, `color: var(--deep-pine)`.
+*   **Headline (H2):** `clamp(30px, 4vw, 42px)`, `font-weight: 700`, `color: var(--forest-anchor)`.
+*   **Subhead (H3/H4):** `clamp(20px, 2.5vw, 28px)`, `font-weight: 600`, `color: var(--text-secondary)`.
+*   **Body:** `17px` base, `1.8` line-height for maximum readability and "air."
+
+---
+
+## 7. Component Patterns
+
+### A. The "Glass Pane" Card
+*   `background: rgba(255, 255, 255, 0.7)`
+*   `backdrop-filter: blur(12px)`
+*   `border: 1px solid rgba(200, 230, 201, 0.5)` (Sage Soft)
+*   `border-radius: 24px`
+
+### B. The "Breathing" List
+*   Instead of standard bullets, use elegant, small green checkmarks.
+*   Use generous `padding-left` to give the text "room to breathe."
+
+### C. The "Floating" CTA
+*   Buttons should have a slight shadow and a clear hover lift.
+*   Primary buttons: `forest-anchor` background $\rightarrow$ `deep-pine` on hover.
+
+### D. Color Blocking Patterns
+*   **Full-Width Block:** Use `var(--forest)` or `var(--deep-pine)` backgrounds with white text for high-impact sections
+*   **Gradient Block:** Apply `var(--gradient-deep)` to create depth in key sections like "How It Works"
+*   **Accent Block:** Use `var(--leaf-green)` for highlight sections with 90% opacity overlay
+
+### E. Section Transition Patterns
+*   **Wave Divider:** SVG wave pattern between sections (height: 60px, color: sage-soft at 20% opacity)
+*   **Gradient Fade:** 100px gradient transition between color blocks (from section color to next section color)
+*   **Organic Blob:** Large SVG blob overlapping two sections to create visual continuity
+
+---
+
+**Last Updated:** June 16, 2026
+**Theme:** Living Green (Pristine Freshness v2.1)
+**Version:** 2.1
+**Key Upgrades:** Enhanced motion language, organic geometry patterns, color blocking system, and micro-interaction guidelines
