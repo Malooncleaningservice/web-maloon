@@ -415,6 +415,11 @@ class HeroComponent {
         subtitle: 'Columbus, OH\'s Trusted Commercial & Residential Cleaning Company',
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
+      'business': {
+        title: 'Commercial Cleaning Services',
+        subtitle: 'Professional Solutions for Every Business in Columbus, OH',
+        background_url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+      },
       'services': {
         title: 'Our Comprehensive Cleaning Services',
         subtitle: 'Professional Solutions for Every Business & Home in Columbus, OH',
@@ -468,6 +473,13 @@ class CTAComponent {
       },
       'about': {
         title: 'Experience the Maloon Services Difference',
+        phone: '6145551234',
+        phone_formatted: '614-555-1234',
+        whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
+        background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+      },
+      'business': {
+        title: 'Ready for a Cleaner Workspace?',
         phone: '6145551234',
         phone_formatted: '614-555-1234',
         whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
@@ -609,31 +621,43 @@ class Sidebar {
     this.setupScrollSpy();
   }
 
-  static populateLinks() {
-    const currentPage = Utils.getCurrentPage();
-    const sidebarMenu = document.querySelector('.sidebar-menu');
+    static populateLinks() {
+        const currentPage = Utils.getCurrentPage();
+        const sidebarContainer = document.getElementById('page-sidebar-menu');
 
-    if (!sidebarMenu) return;
+        if (!sidebarContainer) return;
 
-    sidebarMenu.innerHTML = '';
+        sidebarContainer.innerHTML = '';
 
-    let sidebarItems = this.getSidebarItemsForPage(currentPage);
+        let sidebarItems = this.getSidebarItemsForPage(currentPage);
 
-    if (sidebarItems.length === 0) {
-      const sidebarEl = document.querySelector('.sidebar');
-      if (sidebarEl) sidebarEl.style.display = 'none';
-      return;
+        if (sidebarItems.length === 0) {
+            const sidebarEl = document.querySelector('.sidebar');
+            if (sidebarEl) sidebarEl.style.display = 'none';
+            return;
+        }
+
+        sidebarItems.forEach((item, index) => {
+            const sidebarItem = document.createElement('div');
+            sidebarItem.className = 'sidebar-item';
+            sidebarItem.dataset.sectionId = item.id;
+
+            const sidebarDot = document.createElement('div');
+            sidebarDot.className = 'sidebar-dot';
+
+            const sidebarText = document.createElement('div');
+            sidebarText.className = 'sidebar-text';
+            sidebarText.textContent = item.text;
+
+            const link = document.createElement('a');
+            link.href = `#${item.id}`;
+            link.appendChild(sidebarDot);
+            link.appendChild(sidebarText);
+
+            sidebarItem.appendChild(link);
+            sidebarContainer.appendChild(sidebarItem);
+        });
     }
-
-    sidebarItems.forEach(item => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `#${item.id}`;
-      a.textContent = item.text;
-      li.appendChild(a);
-      sidebarMenu.appendChild(li);
-    });
-  }
 
   static getSidebarItemsForPage(pageName) {
     const content = ContentManager.getContent();
@@ -647,10 +671,13 @@ class Sidebar {
     switch(pageName) {
       case 'index.html':
         return [
-          { id: 'index-hero-placeholder', text: 'Overview' },
-          { id: 'services-overview', text: 'Services Overview' },
-          { id: 'index-why-choose-placeholder', text: 'Why Choose Us' },
-          { id: 'index-cta-placeholder', text: 'Get a Quote' }
+          { id: 'home-hero-placeholder', text: 'Overview' },
+          { id: 'services-overview', text: 'Services' },
+          { id: 'services-overview', text: 'How it works' },
+          { id: 'services-overview', text: 'Service areas' },
+          { id: 'services-overview', text: 'Sustainability' },
+          { id: 'services-overview', text: 'Why choose us' },
+          { id: 'final-cta', text: 'Get a quote' }
         ];
       // Additional cases would follow...
       default:
@@ -659,7 +686,7 @@ class Sidebar {
   }
 
   static setupNavigation() {
-    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    document.querySelectorAll('#page-sidebar-menu a').forEach(link => {
       Utils.addEventListener(link, 'click', (e) => {
         e.preventDefault();
         const targetId = link.getAttribute('href').substring(1);
@@ -698,12 +725,43 @@ class Sidebar {
   }
 
   static updateActiveLink(activeId) {
-    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    document.querySelectorAll('#page-sidebar-menu a').forEach(link => {
       const linkId = link.getAttribute('href').substring(1);
       if (linkId === activeId) {
         link.classList.add('active');
+        link.querySelector('.sidebar-dot').classList.add('active');
+        link.querySelector('.sidebar-text').classList.add('active');
       } else {
         link.classList.remove('active');
+        link.querySelector('.sidebar-dot').classList.remove('active');
+        link.querySelector('.sidebar-text').classList.remove('active');
+      }
+    });
+    this.updateScrollProgress();
+  }
+
+  static updateScrollProgress() {
+    const scrollPosition = window.scrollY;
+    const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercentage = (scrollPosition / documentHeight) * 100;
+
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+      progressFill.style.height = `${scrollPercentage}%`;
+    }
+
+    // Mark completed sections
+    const sections = document.querySelectorAll('section[id]');
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionId = section.getAttribute('id');
+
+      if (scrollPosition >= sectionTop - 100) {
+        const link = document.querySelector(`#page-sidebar-menu a[href="#${sectionId}"]`);
+        if (link) {
+          link.querySelector('.sidebar-dot').classList.add('done');
+          link.querySelector('.sidebar-text').classList.add('done');
+        }
       }
     });
   }
