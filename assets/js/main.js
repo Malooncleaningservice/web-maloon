@@ -325,15 +325,49 @@ class ComponentInjector {
   }
 
   static async injectAllComponents() {
+    await this.injectStickyBar();
     await this.injectNavbar();
     await this.injectFooter();
     await this.injectSidebar();
 
     // Inject page-specific components
+    await this.injectSplitHero();
+    await this.injectTransformationStrip();
     this.injectHeroComponents();
     this.injectCTAComponents();
     this.injectWhyChooseUsComponents();
     this.injectServiceAreasComponents();
+  }
+
+  static async injectStickyBar() {
+    const placeholder = document.getElementById('sticky-bar-placeholder');
+    if (!placeholder) return;
+
+    const template = await Utils.fetchHTML('assets/components/sticky-quote-bar.html');
+    if (template) {
+      placeholder.innerHTML = template;
+      StickyBarManager.init();
+    }
+  }
+
+  static async injectSplitHero() {
+    const placeholder = document.getElementById('split-hero-placeholder');
+    if (!placeholder) return;
+
+    const template = await Utils.fetchHTML('assets/components/split-hero.html');
+    if (template) {
+      placeholder.innerHTML = template;
+    }
+  }
+
+  static async injectTransformationStrip() {
+    const placeholder = document.getElementById('transformation-strip-placeholder');
+    if (!placeholder) return;
+
+    const template = await Utils.fetchHTML('assets/components/transformation-strip.html');
+    if (template) {
+      placeholder.innerHTML = template;
+    }
   }
 
   static injectHeroComponents() {
@@ -484,8 +518,25 @@ class CTAComponent {
   }
 }
 
-// Additional component classes would follow the same pattern...
-// WhyChooseUsComponent, ServiceAreasComponent, etc.
+class WhyChooseUsComponent {
+  static async inject(pageName, placeholder) {
+    // Keep existing functionality for other pages
+    const template = await Utils.fetchHTML('assets/components/why-choose-us.html');
+    if (template) {
+      placeholder.innerHTML = template;
+    }
+  }
+}
+
+class ServiceAreasComponent {
+  static async inject(pageName, placeholder) {
+    // Keep existing functionality for other pages
+    const template = await Utils.fetchHTML('assets/components/service-areas.html');
+    if (template) {
+      placeholder.innerHTML = template;
+    }
+  }
+}
 
 /**
  * Navigation Components
@@ -655,6 +706,39 @@ class Sidebar {
         link.classList.remove('active');
       }
     });
+  }
+}
+
+/**
+ * Sticky Bar Manager
+ */
+class StickyBarManager {
+  static init() {
+    const stickyBar = document.getElementById('sticky-quote-bar');
+    const mainNav = document.querySelector('.main-nav');
+    const hero = document.querySelector('.hero-split');
+
+    if (!stickyBar || !mainNav || !hero) return;
+
+    const handleScroll = () => {
+      const heroBottom = hero.offsetTop + hero.offsetHeight;
+      
+      if (window.scrollY > heroBottom - 100) {
+        stickyBar.classList.add('visible');
+        mainNav.style.transform = 'translateY(-100%)';
+        mainNav.style.opacity = '0';
+      } else {
+        stickyBar.classList.remove('visible');
+        mainNav.style.transform = 'translateY(0)';
+        mainNav.style.opacity = '1';
+      }
+    };
+
+    const debouncedScroll = Utils.debounce(handleScroll, 10);
+    Utils.addEventListener(window, 'scroll', debouncedScroll);
+    
+    // Initial check
+    handleScroll();
   }
 }
 

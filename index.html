@@ -68,6 +68,9 @@
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <!-- Sticky Quote Bar (appears on scroll) -->
+    <div id="sticky-bar-placeholder"></div>
+
     <!-- Navigation Menu -->
     <div id="navbar-placeholder"></div>
     
@@ -77,15 +80,14 @@
         <div id="sidebar-placeholder"></div>
         <main class="main-content">
 
-    <!-- Hero Section (Injected via JS) -->
-    <div id="index-hero-placeholder"></div>
+    <!-- Beat 1: Split Hero (LOUD - Pine Background) -->
+    <div id="split-hero-placeholder"></div>
 
-    <!-- Organic Blob Background for Hero -->
-    <div class="organic-blob" style="width: 60vw; height: 60vw; top: 10%; right: -20%;"></div>
-    <div class="organic-blob" style="width: 40vw; height: 40vw; bottom: 20%; left: -10%;"></div>
+    <!-- Beat 2: Transformation Strip (Quiet - Sage Background) -->
+    <div id="transformation-strip-placeholder"></div>
 
-            <!-- Quick Services Overview -->
-            <section id="services-overview" class="services-overview reveal">
+            <!-- Beat 3: Services Overview (Quiet - White Background) -->
+            <section id="services-overview" class="section-white reveal">
                 <div class="container">
                     <div class="section-header reveal">
                         <h2>Professional Cleaning Services in <span class="green-accent">Columbus, OH</span></h2>
@@ -127,11 +129,8 @@
                 </div>
             </section>
 
-            <!-- Wave Divider -->
-            <div class="wave-divider"></div>
-
-            <!-- How It Works - Enhanced with Color Blocking -->
-            <section class="color-block section-spacing reveal">
+            <!-- Beat 4: How It Works (LOUD - Pine Background) -->
+            <section id="how-it-works" class="section-pine reveal">
                 <div class="container">
                     <div class="section-header reveal">
                         <h2 style="color: var(--white);">Simple, Fast, Professional</h2>
@@ -160,35 +159,33 @@
                 </div>
             </section>
 
-            <!-- Section Transition -->
-            <div class="section-transition"></div>
-
-            <!-- Service Areas -->
-            <section class="section-spacing-sm reveal">
+            <!-- Beat 5: Service Areas (Quiet - White Background) -->
+            <section id="service-areas" class="section-white reveal">
                 <div class="container">
                     <div class="section-header reveal">
-                        <h3><span class="green-accent">Serving Central Ohio</span></h3>
+                        <h2><span class="green-accent">Serving Central Ohio</span></h2>
                         <p>Professional cleaning services throughout the Columbus metropolitan area</p>
                     </div>
-                    <ul class="areas-list">
-                        <li>Columbus Downtown</li>
-                        <li>Short North</li>
-                        <li>Dublin</li>
-                        <li>Worthington</li>
-                        <li>Hilliard</li>
-                        <li>Westerville</li>
-                        <li>Gahanna</li>
-                        <li>Reynoldsburg</li>
-                        <li>New Albany</li>
-                        <li>Upper Arlington</li>
-                        <li>Bexley</li>
-                        <li>Grove City</li>
-                    </ul>
+                    <div class="areas-grid">
+                        <span class="area-pill">Columbus Downtown</span>
+                        <span class="area-pill">Short North</span>
+                        <span class="area-pill">Dublin</span>
+                        <span class="area-pill">Worthington</span>
+                        <span class="area-pill">Hilliard</span>
+                        <span class="area-pill">Westerville</span>
+                        <span class="area-pill">Gahanna</span>
+                        <span class="area-pill">Reynoldsburg</span>
+                        <span class="area-pill">New Albany</span>
+                        <span class="area-pill">Upper Arlington</span>
+                        <span class="area-pill">Bexley</span>
+                        <span class="area-pill">Grove City</span>
+                        <span class="area-pill">+ surrounding areas</span>
+                    </div>
                 </div>
             </section>
 
-            <!-- What We Offer -->
-            <section class="sustainability section-spacing reveal" style="background: var(--gradient-sunlight);">
+            <!-- Beat 6: Sustainability (Quiet - Sage Background) -->
+            <section id="sustainability" class="section-sage reveal">
                 <div class="container">
                     <div class="section-header reveal">
                         <h2>Our Commitment to Sustainability</h2>
@@ -223,11 +220,23 @@
                 </div>
             </section>
 
-            <!-- Why Choose Us (Injected via JS) -->
-            <div id="index-why-choose-placeholder"></div>
-
-            <!-- CTA Section (Injected via JS) -->
-            <div id="index-cta-placeholder"></div>
+            <!-- Beat 7: Final CTA (LOUDEST - Forest Background with Sparkle Warm) -->
+            <section id="final-cta" class="final-cta reveal">
+                <div class="container">
+                    <h2 class="cta-h">Ready for a fresher space?</h2>
+                    <p class="cta-sub">Serving Columbus businesses and homes — Mon to Sat, 8am–6pm</p>
+                    <div class="cta-buttons">
+                        <a href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." class="btn-cta-sparkle">
+                            <i class="fab fa-whatsapp"></i>
+                            Message us on WhatsApp
+                        </a>
+                        <a href="tel:6145551234" class="btn-cta-ghost-white">
+                            <i class="fas fa-phone"></i>
+                            614-555-1234
+                        </a>
+                    </div>
+                </div>
+            </section>
 
         </main>
     </div>
