@@ -263,7 +263,7 @@ class ComponentInjector {
           <div class="container">
             <div class="footer-grid">
               <div class="footer-column">
-                <img src="logo-maloon.png" alt="Maloon Services Logo" style="height:60px; width:auto; margin-bottom: 15px;">
+                <img src="logo-maloon.png" alt="Maloon Services Logo" style="height:120px; width:auto; margin-bottom: 15px;">
                 <p class="tagline">save money. go green. make a difference.</p>
               </div>
               <div class="footer-column">
