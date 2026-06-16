@@ -185,11 +185,8 @@ class ComponentInjector {
         <nav class="main-nav">
           <div class="nav-container">
             <div class="logo">
-              <img src="logo-maloon.png" alt="Maloon Cleaning Service Logo" style="height:40px; width:auto;">
-              <div class="logo-text">
-                <div class="company-name">Maloon Cleaning Service</div>
-                <div class="tagline">Professional Cleaning</div>
-              </div>
+              <img src="logo-maloon.png" alt="Maloon Cleaning Service Logo" style="height:140px; width:auto;">
+              
             </div>
             <ul class="nav-menu">
               <li class="menu-item"><a href="index.html" class="active">Home</a></li>
