@@ -13,8 +13,8 @@
     /* Supporting Colors */
     --white: #ffffff;
     --sunlight-white: #fafafa;  /* High-end linen feel */
-    --text-primary: #1b5e20;
-    --text-secondary: #2e7d32;
+    --text-primary: #e2fce4;
+    --text-secondary: #3c9941;
     --text-muted: #558b2f;
 
     /* The Sparkle */
@@ -206,7 +206,7 @@ p {
     position: absolute;
     top: 100%;
     left: 0;
-    background: white;
+    background: var(--deep-pine);
     border: 1px solid var(--sage-soft);
     border-radius: var(--radius-card);
     padding: 8px;
@@ -248,10 +248,11 @@ p {
 }
 
 .dropdown-cta {
-    background: var(--fresh-mint);
+    background: #37823b;
     color: var(--forest-anchor);
     font-weight: 600;
     text-align: center;
+    border: #1b5e20;
 }
 
 .dropdown-cta:hover {
