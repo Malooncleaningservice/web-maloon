@@ -14,6 +14,8 @@
 .sticky-bar {
     background: var(--deep-pine);
     width: 100%;
+    height: 0;
+    overflow: hidden;
     transform: translateY(-100%);
     opacity: 0;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -25,6 +27,7 @@
 }
 
 .sticky-bar.is-visible {
+    height: auto;
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;

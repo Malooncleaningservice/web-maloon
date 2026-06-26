@@ -427,11 +427,16 @@ class HeroComponent {
         subtitle: 'Get a Free Quote for Professional Cleaning in Columbus, OH',
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
-      'residential': {
-        title: 'Residential Cleaning Services',
-        subtitle: 'Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.',
-        background_url: 'https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-      },
+       'residential': {
+         title: 'Residential Cleaning Services',
+         subtitle: 'Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.',
+         background_url: 'https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+       },
+       'homes': {
+         title: 'Residential Cleaning Services',
+         subtitle: 'Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.',
+         background_url: 'https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+       },
       'locations': {
         title: 'Our Service Areas',
         subtitle: 'Serving Businesses & Homes Throughout Central Ohio',
@@ -496,13 +501,20 @@ class CTAComponent {
         whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
         background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
-      'residential': {
-        title: 'Ready for a Spotless Home?',
-        phone: '6145551234',
-        phone_formatted: '614-555-1234',
-        whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
-        background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-      },
+       'residential': {
+         title: 'Ready for a Spotless Home?',
+         phone: '6145551234',
+         phone_formatted: '614-555-1234',
+         whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
+         background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+       },
+       'homes': {
+         title: 'Ready for a Spotless Home?',
+         phone: '6145551234',
+         phone_formatted: '614-555-1234',
+         whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
+         background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+       },
       'locations': {
         title: 'Ready for a Cleaner Space?',
         phone: '6145551234',

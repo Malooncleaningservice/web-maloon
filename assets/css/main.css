@@ -478,11 +478,11 @@ p {
     letter-spacing: 0.5px;
 }
 
-.footer-column p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
+ .footer-column p {
+     color: rgba(255, 255, 255, 0.85);
+     font-size: 0.95rem;
+     line-height: 1.6;
+ }
 
 .footer-divider {
     height: 2px;
@@ -1483,14 +1483,14 @@ p {
     color: var(--text-secondary);
 }
 
-/* --- Final CTA with Sparkle Warm --- */
-.final-cta {
-    background: linear-gradient(135deg, var(--forest-anchor) 0%, var(--deep-pine) 100%);
-    padding: 5rem 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
+ /* --- Final CTA with Sparkle Warm --- */
+ .final-cta {
+     background: linear-gradient(135deg, var(--forest-anchor) 0%, var(--deep-pine) 100%);
+     padding: 7rem 0;
+     text-align: center;
+     position: relative;
+     overflow: hidden;
+ }
 
 .final-cta::before {
     content: '';
@@ -1520,12 +1520,12 @@ p {
     margin-right: auto;
 }
 
-.cta-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
+ .cta-buttons {
+     display: flex;
+     justify-content: center;
+     gap: 24px;
+     flex-wrap: wrap;
+ }
 
 .btn-cta-sparkle {
     background: var(--sparkle-warm);
@@ -1937,11 +1937,27 @@ body:has(.hero-split) .sidebar-wrapper {
 
 /* ===== 9. SIDEBAR ===== */
 
-.sidebar-wrapper {
-    display: flex;
-    min-height: 100vh;
-    background: var(--fresh-mint);
+/* Hide sidebar on specific pages */
+body:has(#residential-hero-placeholder) .sidebar,
+body:has(#business-hero-placeholder) .sidebar,
+body:has(#about-hero-placeholder) .sidebar,
+body:has(#services-hero-placeholder) .sidebar {
+    display: none !important;
 }
+
+body:has(#residential-hero-placeholder) .main-content,
+body:has(#business-hero-placeholder) .main-content,
+body:has(#about-hero-placeholder) .main-content,
+body:has(#services-hero-placeholder) .main-content {
+    margin-left: 0 !important;
+    max-width: 100% !important;
+}
+
+.sidebar-wrapper {
+     display: flex;
+     min-height: 100vh;
+     background: var(--fresh-mint);
+ }
 
 .main-content {
     flex: 1;
@@ -2349,15 +2365,19 @@ body:has(.faq-section) .main-content {
 }
 
 /* ===============================================
-   HERO BACKGROUND BRIGHTNESS ENHANCEMENT
-   =============================================== */
+    HERO BACKGROUND BRIGHTNESS ENHANCEMENT
+    =============================================== */
 
 .hero[style*="background"] {
-    background-size: cover !important;
-    background-position: center !important;
-    filter: brightness(1.15) contrast(1.05);
+     background-size: cover !important;
+     background-position: center !important;
+     filter: brightness(1.35) contrast(1.08);
+ }
+
+.cta-section[style*="background"] {
+     filter: brightness(1.35) contrast(1.08) !important;
 }
 
-.final-cta-section {
-    filter: brightness(1.15) contrast(1.05);
-}
+ .final-cta-section {
+     filter: brightness(1.35) contrast(1.08);
+ }
