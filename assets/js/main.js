@@ -430,12 +430,12 @@ class HeroComponent {
        'residential': {
          title: 'Residential Cleaning Services',
          subtitle: 'Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.',
-         background_url: 'https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+         background_url: 'assets/vitaly-gariev-0rhc6d7o6T8-unsplash.jpg'
        },
        'homes': {
          title: 'Residential Cleaning Services',
          subtitle: 'Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.',
-         background_url: 'https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+         background_url: 'assets/vitaly-gariev-0rhc6d7o6T8-unsplash.jpg'
        },
       'locations': {
         title: 'Our Service Areas',
@@ -450,11 +450,16 @@ class HeroComponent {
     const data = this.getData(pageName);
     if (!data) return;
 
-    await ComponentInjector.injectComponent(
-      placeholder.id,
-      'assets/components/hero.html',
-      () => data
-    );
+    const heroHTML = `
+      <div class="hero" style="background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), url('${data.background_url}'); background-size: cover; background-position: center; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+        <div class="hero-content">
+          <h1>${data.title}</h1>
+          <h2>${data.subtitle}</h2>
+        </div>
+      </div>
+    `;
+    
+    placeholder.innerHTML = heroHTML;
   }
 }
 
@@ -573,12 +578,94 @@ class Navbar {
   static setupMobileMenu() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
+    const mobileOverlay = document.querySelector('.mobile-overlay');
 
     if (mobileMenuToggle && navMenu) {
       Utils.addEventListener(mobileMenuToggle, 'click', () => {
-        navMenu.classList.toggle('active');
+        const isActive = navMenu.classList.contains('active');
+        
+        if (isActive) {
+          // Close menu
+          navMenu.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('menu-open');
+          
+          // Hide overlay after delay
+          if (mobileOverlay) {
+            setTimeout(() => {
+              mobileOverlay.classList.remove('active');
+              mobileOverlay.setAttribute('aria-hidden', 'true');
+            }, 300);
+          }
+        } else {
+          // Open menu
+          navMenu.classList.add('active');
+          mobileMenuToggle.classList.add('active');
+          mobileMenuToggle.setAttribute('aria-expanded', 'true');
+          document.body.classList.add('menu-open');
+          
+          // Show overlay
+          if (mobileOverlay) {
+            mobileOverlay.classList.add('active');
+            mobileOverlay.setAttribute('aria-hidden', 'false');
+          }
+        }
       });
     }
+
+    // Close menu when clicking overlay
+    if (mobileOverlay) {
+      Utils.addEventListener(mobileOverlay, 'click', () => {
+        navMenu.classList.remove('active');
+        mobileMenuToggle.classList.remove('active');
+        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('menu-open');
+        mobileOverlay.classList.remove('active');
+        mobileOverlay.setAttribute('aria-hidden', 'true');
+      });
+    }
+
+    // Handle mobile dropdown toggles
+    this.setupMobileDropdowns();
+  }
+
+  static setupMobileDropdowns() {
+    const dropdownToggles = document.querySelectorAll('.has-dropdown > a');
+    
+    dropdownToggles.forEach(toggle => {
+      // Remove existing listeners to prevent duplicates
+      Utils.addEventListener(toggle, 'click', (e) => {
+        // Only handle dropdowns on mobile
+        if (!Utils.isDesktop()) {
+          e.preventDefault();
+          const parentItem = toggle.closest('.has-dropdown');
+          const dropdown = parentItem.querySelector('.dropdown-menu');
+          
+          if (dropdown) {
+            // Toggle current dropdown
+            const isOpen = parentItem.classList.contains('open');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.has-dropdown.open').forEach(item => {
+              if (item !== parentItem) {
+                item.classList.remove('open');
+                item.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+              }
+            });
+            
+            // Toggle current
+            if (isOpen) {
+              parentItem.classList.remove('open');
+              toggle.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+            } else {
+              parentItem.classList.add('open');
+              toggle.querySelector('.dropdown-arrow').style.transform = 'rotate(180deg)';
+            }
+          }
+        }
+      });
+    });
   }
 
   static setupNavigationLinks() {
