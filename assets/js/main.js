@@ -9,7 +9,7 @@ const CONFIG = {
   DEFAULT_BRAND: {
     name: "Maloon Cleaning Service",
     tagline: "Professional Cleaning",
-    slogan: "save money. go green. make a difference."
+    slogan: "We make a difference."
   },
   DEFAULT_CONTACT: {
     phone: "614-555-1234",
@@ -264,7 +264,7 @@ class ComponentInjector {
             <div class="footer-grid">
               <div class="footer-column">
                 <img src="logo-maloon.png" alt="Maloon Services Logo" style="height:120px; width:auto; margin-bottom: 15px;">
-                <p class="tagline">save money. go green. make a difference.</p>
+                <p class="tagline">We make a difference.</p>
               </div>
               <div class="footer-column">
                 <h3>Address</h3>

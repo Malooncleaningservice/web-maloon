@@ -1,41 +1,25 @@
 /* Main CSS Stylesheet - Pristine Freshness Theme v2.0 */
+
 /* 1. THE DESIGN SYSTEM (ROOT) */
 :root {
     /* --- The Atmospheric Palette --- */
     /* Primary Greens */
-    --fresh-mint: #f0f7f0;
+    --fresh-mint: #f0f7f0;      /* Airy, light background */
+    --sage-soft: #c8e6c9;       /* Subtle texture and borders */
+    --leaf-green: #4caf50;      /* The Pulse: Primary action */
+    --forest-anchor: #2e7d32;   /* The Weight: Subheaders, secondary actions */
+    --deep-pine: #1b5e20;       /* The Foundation: Headings, primary text */
 
-    /* Airy, light background */
-    --sage-soft: #c8e6c9;
-
-    /* Subtle texture and borders */
-    --leaf-green: #4caf50;
-
-    /* The Pulse: Primary action */
-    --forest-anchor: #2e7d32;
-
-    /* The Weight: Subheaders, secondary actions */
-    --deep-pine: #1b5e20;
-
-    /* The Foundation: Headings, primary text */
     /* Supporting Colors */
     --white: #ffffff;
-    --sunlight-white: #fafafa;
+    --sunlight-white: #fafafa;  /* High-end linen feel */
+    --text-primary: #2c3e2e;    /* Dark charcoal for main text - high contrast */
+    --text-secondary: #3c9941;  /* Forest green for secondary text */
+    --text-muted: #7a8a7c;      /* Muted gray-green for less important text */
 
-    /* High-end linen feel */
-    --text-primary: #2c3e2e;
-
-    /* Dark charcoal for main text - high contrast */
-    --text-secondary: #3c9941;
-
-    /* Forest green for secondary text */
-    --text-muted: #7a8a7c;
-
-    /* Muted gray-green for less important text */
     /* The Sparkle */
-    --sparkle-warm: #ffb74d;
+    --sparkle-warm: #ffb74d;    /* Sunlight/Polish accent */
 
-    /* Sunlight/Polish accent */
     /* --- Atmospheric Gradients --- */
     --gradient-fresh: linear-gradient(135deg, #f0f7f0 0%, #e8f5e9 100%);
     --gradient-sunlight: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
@@ -48,12 +32,8 @@
     --elevation-3: 0 24px 48px rgba(27, 94, 32, 0.16);
 
     /* --- Organic Geometry --- */
-    --radius-organic: 24px;
-
-    /* Large containers/blobs */
-    --radius-card: 16px;
-
-    /* Standard cards/buttons */
+    --radius-organic: 24px;     /* Large containers/blobs */
+    --radius-card: 16px;        /* Standard cards/buttons */
     --radius-sm: 8px;
 
     /* --- Spacing & Layout --- */
@@ -61,18 +41,18 @@
     --container-padding: 18px;
     --section-padding: 5rem 0;
 
-    /* --- Motion & Transitions --- */
-    --transition-standard: all 0.3s ease;
-    --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-fast: all 0.15s ease;
-    --transition-pulse: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    --transition-shimmer: all 2s linear infinite;
+     /* --- Motion & Transitions --- */
+     --transition-standard: all 0.3s ease;
+     --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+     --transition-fast: all 0.15s ease;
+     --transition-pulse: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+     --transition-shimmer: all 2s linear infinite;
 
-    /* --- Micro-Interaction Effects --- */
-    --glow-leaf: 0 0 15px rgba(76, 175, 80, 0.3);
-    --glow-sage: 0 0 10px rgba(200, 230, 201, 0.2);
-    --shimmer-effect: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-}
+     /* --- Micro-Interaction Effects --- */
+     --glow-leaf: 0 0 15px rgba(76, 175, 80, 0.3);
+     --glow-sage: 0 0 10px rgba(200, 230, 201, 0.2);
+     --shimmer-effect: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+ }
 
 /* 2. BASE STYLES */
 * {
@@ -104,14 +84,10 @@ html {
 body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     color: var(--text-primary);
-    line-height: 1.8;
-
-    /* Increased for airiness */
+    line-height: 1.8; /* Increased for airiness */
     background: var(--gradient-sunlight);
     overflow-x: hidden;
-    font-size: 17px;
-
-    /* Slightly larger for premium feel */
+    font-size: 17px; /* Slightly larger for premium feel */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -130,7 +106,7 @@ img {
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 24px var(--container-padding);
+    padding: 0 var(--container-padding);
 }
 
 /* --- Atmospheric Decorations (Blobs) --- */
@@ -161,10 +137,7 @@ body::after {
 }
 
 /* 3. TYPOGRAPHY HIERARCHY */
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
     color: var(--deep-pine);
     line-height: 1.2;
 }
@@ -187,16 +160,12 @@ h3 {
 }
 
 p {
-    /* margin-bottom: 1.5rem */
+    margin-bottom: 1.5rem;
     color: var(--text-secondary);
-    font-size: -3px;
-    background-position: center top;
-    top: 32px;
-    bottom: 32px;
-    right: 32px;
 }
 
 /* 4. COMPONENTS */
+
 /* --- Navigation --- */
 .main-nav {
     position: sticky;
@@ -232,8 +201,7 @@ p {
     color: #e2fce4;
 }
 
-.menu-item a:hover,
-.menu-item a.active {
+.menu-item a:hover, .menu-item a.active {
     color: var(--leaf-green);
 }
 
@@ -310,9 +278,7 @@ p {
 }
 
 /* --- Buttons --- */
-.btn,
-.cta-button,
-.hero-button {
+.btn, .cta-button, .hero-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -324,23 +290,19 @@ p {
     border: none;
 }
 
-.btn-primary,
-.hero-button,
-.cta-button {
+.btn-primary, .hero-button, .cta-button {
     background: var(--forest-anchor);
     color: var(--white);
     box-shadow: var(--elevation-1);
 }
 
-.btn-primary:hover,
-.hero-button:hover {
+.btn-primary:hover, .hero-button:hover {
     background: var(--deep-pine);
     transform: translateY(-4px);
     box-shadow: var(--elevation-2);
 }
 
-.btn-secondary,
-.whatsapp-cta {
+.btn-secondary, .whatsapp-cta {
     background: var(--leaf-green);
     color: var(--white);
     box-shadow: var(--elevation-1);
@@ -376,10 +338,7 @@ p {
 }
 
 /* --- Cards & Panes (Glassmorphism) --- */
-.service-card,
-.feature-item,
-.sustainability-item,
-.card {
+.service-card, .feature-item, .sustainability-item, .card {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
     border: 1px solid var(--sage-soft);
@@ -390,23 +349,15 @@ p {
     color: var(--text-primary);
 }
 
-.service-card h3,
-.feature-item h3,
-.sustainability-item h3,
-.card h3 {
+.service-card h3, .feature-item h3, .sustainability-item h3, .card h3 {
     color: var(--deep-pine);
 }
 
-.service-card p,
-.feature-item p,
-.sustainability-item p,
-.card p {
+.service-card p, .feature-item p, .sustainability-item p, .card p {
     color: var(--text-primary);
 }
 
-.service-card:hover,
-.feature-item:hover,
-.sustainability-item:hover {
+.service-card:hover, .feature-item:hover, .sustainability-item:hover {
     transform: translateY(-8px);
     box-shadow: var(--elevation-2);
     border-color: var(--leaf-green);
@@ -466,8 +417,7 @@ p {
     font-weight: bold;
 }
 
-.info-box,
-.highlight-box {
+.info-box, .highlight-box {
     padding: 2.5rem;
     border-radius: var(--radius-organic);
     background: var(--gradient-fresh);
@@ -528,11 +478,11 @@ p {
     letter-spacing: 0.5px;
 }
 
-.footer-column p {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
+ .footer-column p {
+     color: rgba(255, 255, 255, 0.85);
+     font-size: 0.95rem;
+     line-height: 1.6;
+ }
 
 .footer-divider {
     height: 2px;
@@ -540,16 +490,13 @@ p {
     margin-bottom: 1.5rem;
 }
 
-.address-info,
-.contact-info {
+.address-info, .contact-info {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.address-info i,
-.contact-info i,
-.contact-item i {
+.address-info i, .contact-info i, .contact-item i {
     color: var(--leaf-green);
     margin-right: 0.75rem;
     font-size: 1.1rem;
@@ -574,8 +521,6 @@ p {
     color: rgba(255, 255, 255, 0.8);
     font-style: italic;
     font-size: 0.9rem;
-    align-items: center;
-    justify-content: center;
 }
 
 .social-icon {
@@ -597,9 +542,7 @@ p {
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
     .nav-menu {
-        display: none;
-
-        /* To be handled by JS toggle */
+        display: none; /* To be handled by JS toggle */
     }
 
     .hero {
@@ -648,7 +591,7 @@ p {
 
 /* --- Our Story Section --- */
 .our-story {
-    padding: 3rem 0;
+    padding: 8rem 0;
 }
 
 /* --- Testimonials Section --- */
@@ -728,48 +671,23 @@ p {
 
 /* --- Micro-Interaction Animations --- */
 @keyframes pulse {
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: -100% 0;
-    }
-
-    100% {
-        background-position: 200% 0;
-    }
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
 }
 
 @keyframes breathe {
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.4;
-        transform: scale(1.02);
-    }
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.02); }
 }
 
 @keyframes glowPulse {
-    0%,
-    100% {
-        box-shadow: var(--elevation-1);
-    }
-
-    50% {
-        box-shadow: var(--elevation-2), var(--glow-leaf);
-    }
+    0%, 100% { box-shadow: var(--elevation-1); }
+    50% { box-shadow: var(--elevation-2), var(--glow-leaf); }
 }
 
 /* --- Enhanced Component Classes --- */
@@ -783,13 +701,11 @@ p {
 }
 
 /* Card with Enhanced Hover Effects */
-.service-card.enhanced,
-.feature-item.enhanced {
+.service-card.enhanced, .feature-item.enhanced {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.service-card.enhanced:hover,
-.feature-item.enhanced:hover {
+.service-card.enhanced:hover, .feature-item.enhanced:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: var(--elevation-3), var(--glow-leaf);
     border-color: var(--leaf-green);
@@ -951,6 +867,7 @@ p {
 /* ===============================================
    LANDING PAGE REDESIGN - NEW COMPONENTS
    =============================================== */
+
 /* --- Sticky Quote Bar --- */
 .sticky-quote-bar {
     position: fixed;
@@ -1566,14 +1483,14 @@ p {
     color: var(--text-secondary);
 }
 
-/* --- Final CTA with Sparkle Warm --- */
-.final-cta {
-    background: linear-gradient(135deg, var(--forest-anchor) 0%, var(--deep-pine) 100%);
-    padding: 7rem 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
+ /* --- Final CTA with Sparkle Warm --- */
+ .final-cta {
+     background: linear-gradient(135deg, var(--forest-anchor) 0%, var(--deep-pine) 100%);
+     padding: 7rem 0;
+     text-align: center;
+     position: relative;
+     overflow: hidden;
+ }
 
 .final-cta::before {
     content: '';
@@ -1603,12 +1520,12 @@ p {
     margin-right: auto;
 }
 
-.cta-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-}
+ .cta-buttons {
+     display: flex;
+     justify-content: center;
+     gap: 24px;
+     flex-wrap: wrap;
+ }
 
 .btn-cta-sparkle {
     background: var(--sparkle-warm);
@@ -1852,27 +1769,22 @@ body:has(.hero-split) .sidebar-wrapper {
 /* ===============================================
    SOCIAL PROOF TICKER
    =============================================== */
+
 .social-ticker {
+    background: var(--white);
     padding: 1rem 0;
     border-bottom: 1px solid var(--sage-soft);
     overflow: hidden;
     position: relative;
-    background-color: #ffffff;
 }
 
 .social-ticker__inner {
     display: flex;
+    align-items: center;
     gap: 2rem;
-
-    /* max-width: var(--max-width) */
-    margin: 0;
-    padding: 0px var(--container-padding);
-    background-image: linear-gradient(90deg, rgb(60, 153, 65) 5%, rgba(4, 10, 4, 0) 26%, rgba(1, 3, 1, 0) 75%, rgb(60, 153, 65) 96%);
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
-    top: 0px;
-    position: inherit;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
 }
 
 .social-ticker__label {
@@ -1883,8 +1795,6 @@ body:has(.hero-split) .sidebar-wrapper {
     letter-spacing: 0.05em;
     white-space: nowrap;
     flex-shrink: 0;
-    text-shadow: 0px 0px;
-    background-color: rgba(0, 0, 0, 0);
 }
 
 .social-ticker__items {
@@ -1897,7 +1807,7 @@ body:has(.hero-split) .sidebar-wrapper {
 }
 
 .social-ticker__item {
-    font-size: var(--text-secondary);
+    font-size: 14px;
     color: var(--text-secondary);
     white-space: nowrap;
     display: flex;
@@ -1910,7 +1820,7 @@ body:has(.hero-split) .sidebar-wrapper {
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--leaf-green);
+    background: var(--text-secondar);
     display: inline-block;
 }
 
@@ -1918,7 +1828,6 @@ body:has(.hero-split) .sidebar-wrapper {
     0% {
         transform: translateX(0);
     }
-
     100% {
         transform: translateX(-50%);
     }
@@ -1941,6 +1850,7 @@ body:has(.hero-split) .sidebar-wrapper {
 /* ===============================================
    AREAS LIST (Alternative to Pills)
    =============================================== */
+
 .areas-list {
     list-style: none;
     display: grid;
@@ -1986,6 +1896,7 @@ body:has(.hero-split) .sidebar-wrapper {
 /* ===============================================
    SECTION SPACING UTILITIES
    =============================================== */
+
 .section-spacing {
     padding: 5rem 0;
 }
@@ -2025,6 +1936,7 @@ body:has(.hero-split) .sidebar-wrapper {
 }
 
 /* ===== 9. SIDEBAR ===== */
+
 /* Hide sidebar on specific pages */
 body:has(#residential-hero-placeholder) .sidebar,
 body:has(#business-hero-placeholder) .sidebar,
@@ -2042,10 +1954,10 @@ body:has(#services-hero-placeholder) .main-content {
 }
 
 .sidebar-wrapper {
-    display: flex;
-    min-height: 100vh;
-    background: var(--fresh-mint);
-}
+     display: flex;
+     min-height: 100vh;
+     background: var(--fresh-mint);
+ }
 
 .main-content {
     flex: 1;
@@ -2187,6 +2099,7 @@ body:has(#services-hero-placeholder) .main-content {
 /* ===============================================
    CONTACT FORM STYLING
    =============================================== */
+
 .contact-form-section {
     background: white;
     padding: 5rem 0;
@@ -2357,6 +2270,7 @@ body:has(#services-hero-placeholder) .main-content {
 /* ===============================================
    FAQ PAGE STYLING
    =============================================== */
+
 .faq-section {
     background: white;
     padding: 5rem 0;
@@ -2453,16 +2367,17 @@ body:has(.faq-section) .main-content {
 /* ===============================================
     HERO BACKGROUND BRIGHTNESS ENHANCEMENT
     =============================================== */
+
 .hero[style*="background"] {
-    background-size: cover !important;
-    background-position: center !important;
-    filter: brightness(1.35) contrast(1.08);
-}
+     background-size: cover !important;
+     background-position: center !important;
+     filter: brightness(1.35) contrast(1.08);
+ }
 
 .cta-section[style*="background"] {
-    filter: brightness(1.35) contrast(1.08) !important;
+     filter: brightness(1.35) contrast(1.08) !important;
 }
 
-.final-cta-section {
-    filter: brightness(1.35) contrast(1.08);
-}
+ .final-cta-section {
+     filter: brightness(1.35) contrast(1.08);
+ }

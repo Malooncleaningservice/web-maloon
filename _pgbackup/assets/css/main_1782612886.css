@@ -130,7 +130,7 @@ img {
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 24px var(--container-padding);
+    padding: 0 var(--container-padding);
 }
 
 /* --- Atmospheric Decorations (Blobs) --- */
@@ -648,7 +648,7 @@ p {
 
 /* --- Our Story Section --- */
 .our-story {
-    padding: 3rem 0;
+    padding: 8rem 0;
 }
 
 /* --- Testimonials Section --- */
