@@ -587,6 +587,7 @@ class Navbar {
         if (isActive) {
           // Close menu
           navMenu.classList.remove('active');
+          navMenu.classList.remove('open');
           mobileMenuToggle.classList.remove('active');
           mobileMenuToggle.setAttribute('aria-expanded', 'false');
           document.body.classList.remove('menu-open');
@@ -601,6 +602,7 @@ class Navbar {
         } else {
           // Open menu
           navMenu.classList.add('active');
+          navMenu.classList.add('open');
           mobileMenuToggle.classList.add('active');
           mobileMenuToggle.setAttribute('aria-expanded', 'true');
           document.body.classList.add('menu-open');
@@ -618,6 +620,7 @@ class Navbar {
     if (mobileOverlay) {
       Utils.addEventListener(mobileOverlay, 'click', () => {
         navMenu.classList.remove('active');
+        navMenu.classList.remove('open');
         mobileMenuToggle.classList.remove('active');
         mobileMenuToggle.setAttribute('aria-expanded', 'false');
         document.body.classList.remove('menu-open');
@@ -674,6 +677,7 @@ class Navbar {
         const navMenu = document.querySelector('.nav-menu');
         if (navMenu) {
           navMenu.classList.remove('active');
+          navMenu.classList.remove('open');
         }
       });
     });
