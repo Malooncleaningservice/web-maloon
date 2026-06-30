@@ -178,7 +178,6 @@ class ComponentInjector {
     if (template) {
       placeholder.innerHTML = template;
       this.populateNavbar();
-      Navbar.init();
     } else {
       // Fallback navbar
       placeholder.innerHTML = `
@@ -200,7 +199,6 @@ class ComponentInjector {
         </nav>
       `;
       this.populateNavbar();
-      Navbar.init();
     }
   }
 

@@ -770,7 +770,7 @@ body.menu-open {
 }
 
 /* --- Responsive Design --- */
-@media (max-width: 768px) {
+@media (max-width: 920px) {
     .mobile-menu-toggle {
         display: flex;
     }
@@ -1880,7 +1880,7 @@ body.menu-open {
 }
 
 /* --- Mobile Responsive Adjustments --- */
-@media (max-width: 768px) {
+@media (max-width: 920px) {
     .sticky-quote-bar {
         padding: 8px 15px;
     }
