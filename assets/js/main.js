@@ -225,25 +225,28 @@ class ComponentInjector {
   }
 
   static async injectSidebar() {
+    // Try explicit placeholder first, then inject into .sidebar-wrapper
     const placeholder = document.getElementById('sidebar-placeholder');
-    if (!placeholder) return;
+    const wrapper = document.querySelector('.sidebar-wrapper');
+    if (!placeholder && !wrapper) return;
 
     const template = await Utils.fetchHTML('assets/components/sidebar.html');
-    if (template) {
-      placeholder.innerHTML = template;
-      Sidebar.init();
-    } else {
-      // Fallback sidebar
-      placeholder.innerHTML = `
-        <div class="sidebar">
-          <div class="sidebar-content">
-            <div class="sidebar-header"><h3>Quick Navigation</h3></div>
-            <nav class="sidebar-nav"><ul class="sidebar-menu"></ul></nav>
-          </div>
+    const sidebarHTML = template || `
+      <div class="sidebar">
+        <div class="sidebar-content">
+          <div class="sidebar-header"><h3>Quick Navigation</h3></div>
+          <nav class="sidebar-nav"><ul class="sidebar-menu"></ul></nav>
         </div>
-      `;
-      Sidebar.init();
+      </div>
+    `;
+
+    if (placeholder) {
+      placeholder.innerHTML = sidebarHTML;
+    } else if (wrapper && !wrapper.querySelector('.sidebar')) {
+      wrapper.insertAdjacentHTML('beforeend', sidebarHTML);
     }
+
+    Sidebar.init();
   }
 
   static async injectFooter() {
@@ -568,114 +571,76 @@ class ServiceAreasComponent {
 class Navbar {
   static init() {
     this.setupMobileMenu();
-    this.setupNavigationLinks();
     this.setupActiveLink();
     this.setupDropdowns();
   }
 
   static setupMobileMenu() {
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const navMenu = document.querySelector('.nav-menu');
-    const mobileOverlay = document.querySelector('.mobile-overlay');
+    const navTier2 = document.querySelector('.nav-tier-2');
+    const navTier3 = document.querySelector('.nav-tier-3');
 
-    if (mobileMenuToggle && navMenu) {
-      Utils.addEventListener(mobileMenuToggle, 'click', () => {
-        const isActive = navMenu.classList.contains('active');
-        
-        if (isActive) {
-          // Close menu
-          navMenu.classList.remove('active');
-          navMenu.classList.remove('open');
-          mobileMenuToggle.classList.remove('active');
-          mobileMenuToggle.setAttribute('aria-expanded', 'false');
-          document.body.classList.remove('menu-open');
-          
-          // Hide overlay after delay
-          if (mobileOverlay) {
-            setTimeout(() => {
-              mobileOverlay.classList.remove('active');
-              mobileOverlay.setAttribute('aria-hidden', 'true');
-            }, 300);
-          }
-        } else {
-          // Open menu
-          navMenu.classList.add('active');
-          navMenu.classList.add('open');
-          mobileMenuToggle.classList.add('active');
-          mobileMenuToggle.setAttribute('aria-expanded', 'true');
-          document.body.classList.add('menu-open');
-          
-          // Show overlay
-          if (mobileOverlay) {
-            mobileOverlay.classList.add('active');
-            mobileOverlay.setAttribute('aria-hidden', 'false');
-          }
+    if (!navTier2 || !navTier3) return;
+
+    const TIER_HIDE_THRESHOLD = 150;
+    let lastScrollY = window.scrollY;
+    let tier2Visible = true;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (!Utils.isDesktop()) {
+        if (currentScrollY > TIER_HIDE_THRESHOLD && tier2Visible) {
+          // Hide Tier 2, show Tier 3
+          navTier2.classList.add('hidden');
+          navTier3.classList.remove('hidden');
+          tier2Visible = false;
+        } else if (currentScrollY <= TIER_HIDE_THRESHOLD && !tier2Visible) {
+          // Show Tier 2, hide Tier 3
+          navTier2.classList.remove('hidden');
+          navTier3.classList.add('hidden');
+          tier2Visible = true;
         }
-      });
-    }
+      }
 
-    // Close menu when clicking overlay
-    if (mobileOverlay) {
-      Utils.addEventListener(mobileOverlay, 'click', () => {
-        navMenu.classList.remove('active');
-        navMenu.classList.remove('open');
-        mobileMenuToggle.classList.remove('active');
-        mobileMenuToggle.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('menu-open');
-        mobileOverlay.classList.remove('active');
-        mobileOverlay.setAttribute('aria-hidden', 'true');
-      });
-    }
+      lastScrollY = currentScrollY;
+    };
 
-    // Handle mobile dropdown toggles
+    Utils.addEventListener(window, 'scroll', Utils.debounce(handleScroll, 30));
+    handleScroll(); // initial check
+
+    // Handle mobile dropdown accordions in Tier 2
     this.setupMobileDropdowns();
+
+    // Handle resize — reset hidden state
+    Utils.addEventListener(window, 'resize', Utils.debounce(() => {
+      if (Utils.isDesktop()) {
+        navTier2.classList.remove('hidden');
+        navTier3.classList.add('hidden');
+        tier2Visible = true;
+      } else {
+        handleScroll();
+      }
+    }, 100));
   }
 
   static setupMobileDropdowns() {
-    const dropdownToggles = document.querySelectorAll('.has-dropdown > a');
-    
+    const dropdownToggles = document.querySelectorAll('.nav-tier-2 .has-dropdown > a');
+
     dropdownToggles.forEach(toggle => {
-      // Remove existing listeners to prevent duplicates
       Utils.addEventListener(toggle, 'click', (e) => {
-        // Only handle dropdowns on mobile
         if (!Utils.isDesktop()) {
           e.preventDefault();
           const parentItem = toggle.closest('.has-dropdown');
-          const dropdown = parentItem.querySelector('.dropdown-menu');
-          
-          if (dropdown) {
-            // Toggle current dropdown
-            const isOpen = parentItem.classList.contains('open');
-            
-            // Close all other dropdowns
-            document.querySelectorAll('.has-dropdown.open').forEach(item => {
-              if (item !== parentItem) {
-                item.classList.remove('open');
-                item.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
-              }
-            });
-            
-            // Toggle current
-            if (isOpen) {
-              parentItem.classList.remove('open');
-              toggle.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
-            } else {
-              parentItem.classList.add('open');
-              toggle.querySelector('.dropdown-arrow').style.transform = 'rotate(180deg)';
-            }
-          }
-        }
-      });
-    });
-  }
 
-  static setupNavigationLinks() {
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-      Utils.addEventListener(link, 'click', () => {
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu) {
-          navMenu.classList.remove('active');
-          navMenu.classList.remove('open');
+          // Close all other dropdowns
+          document.querySelectorAll('.nav-tier-2 .has-dropdown.open').forEach(item => {
+            if (item !== parentItem) {
+              item.classList.remove('open');
+            }
+          });
+
+          // Toggle current
+          parentItem.classList.toggle('open');
         }
       });
     });
@@ -694,7 +659,7 @@ class Navbar {
   static setupDropdowns() {
     if (!Utils.isDesktop()) return;
 
-    document.querySelectorAll('.menu-item.has-dropdown').forEach(item => {
+    document.querySelectorAll('.nav-tier-2 .menu-item.has-dropdown').forEach(item => {
       const dropdown = item.querySelector('.dropdown-menu');
 
       if (dropdown) {
@@ -715,47 +680,92 @@ class Navbar {
 class Sidebar {
   static init() {
     this.populateLinks();
+    this.populateMobileSectionStrip();
     this.setupNavigation();
     this.setupScrollSpy();
   }
 
-    static populateLinks() {
-        const currentPage = Utils.getCurrentPage();
-        const sidebarContainer = document.getElementById('page-sidebar-menu');
+  static populateLinks() {
+    const currentPage = Utils.getCurrentPage();
+    const sidebarContainer = document.getElementById('page-sidebar-menu');
 
-        if (!sidebarContainer) return;
+    if (!sidebarContainer) return;
 
-        sidebarContainer.innerHTML = '';
+    sidebarContainer.innerHTML = '';
 
-        let sidebarItems = this.getSidebarItemsForPage(currentPage);
+    let sidebarItems = this.getSidebarItemsForPage(currentPage);
 
-        if (sidebarItems.length === 0) {
-            const sidebarEl = document.querySelector('.sidebar');
-            if (sidebarEl) sidebarEl.style.display = 'none';
-            return;
-        }
-
-        sidebarItems.forEach((item, index) => {
-            const sidebarItem = document.createElement('div');
-            sidebarItem.className = 'sidebar-item';
-            sidebarItem.dataset.sectionId = item.id;
-
-            const sidebarDot = document.createElement('div');
-            sidebarDot.className = 'sidebar-dot';
-
-            const sidebarText = document.createElement('div');
-            sidebarText.className = 'sidebar-text';
-            sidebarText.textContent = item.text;
-
-            const link = document.createElement('a');
-            link.href = `#${item.id}`;
-            link.appendChild(sidebarDot);
-            link.appendChild(sidebarText);
-
-            sidebarItem.appendChild(link);
-            sidebarContainer.appendChild(sidebarItem);
-        });
+    if (sidebarItems.length === 0) {
+      const sidebarEl = document.querySelector('.sidebar');
+      if (sidebarEl) sidebarEl.style.display = 'none';
+      return;
     }
+
+    sidebarItems.forEach((item, index) => {
+      const sidebarItem = document.createElement('div');
+      sidebarItem.className = 'sidebar-item';
+      sidebarItem.dataset.sectionId = item.id;
+
+      const sidebarDot = document.createElement('div');
+      sidebarDot.className = 'sidebar-dot';
+
+      const sidebarText = document.createElement('div');
+      sidebarText.className = 'sidebar-text';
+      sidebarText.textContent = item.text;
+
+      const link = document.createElement('a');
+      link.href = `#${item.id}`;
+      link.appendChild(sidebarDot);
+      link.appendChild(sidebarText);
+
+      sidebarItem.appendChild(link);
+      sidebarContainer.appendChild(sidebarItem);
+    });
+  }
+
+  static populateMobileSectionStrip() {
+    const strip = document.getElementById('mobile-section-strip');
+    if (!strip) return;
+
+    const currentPage = Utils.getCurrentPage();
+    const items = this.getSidebarItemsForPage(currentPage);
+
+    strip.innerHTML = '';
+
+    if (items.length === 0) {
+      const tier3 = document.getElementById('nav-tier-3');
+      if (tier3) tier3.style.display = 'none';
+      return;
+    }
+
+    items.forEach((item) => {
+      const pill = document.createElement('a');
+      pill.className = 'section-pill';
+      pill.href = `#${item.id}`;
+      pill.dataset.sectionId = item.id;
+
+      const dot = document.createElement('span');
+      dot.className = 'pill-dot';
+      pill.appendChild(dot);
+
+      const text = document.createTextNode(item.text);
+      pill.appendChild(text);
+
+      // Handle tap — smooth scroll
+      Utils.addEventListener(pill, 'click', (e) => {
+        e.preventDefault();
+        const targetElement = document.getElementById(item.id);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - CONFIG.SCROLL_OFFSET,
+            behavior: 'smooth'
+          });
+        }
+      });
+
+      strip.appendChild(pill);
+    });
+  }
 
   static getSidebarItemsForPage(pageName) {
     const content = ContentManager.getContent();
@@ -765,19 +775,62 @@ class Sidebar {
       if (items.length > 0) return items;
     }
 
-    // Fallback to hardcoded items
+    // Fallback to hardcoded items matching content.json sidebar data
     switch(pageName) {
       case 'index.html':
         return [
           { id: 'home-hero-placeholder', text: 'Overview' },
           { id: 'services-overview', text: 'Services' },
-          { id: 'services-overview', text: 'How it works' },
-          { id: 'services-overview', text: 'Service areas' },
-          { id: 'services-overview', text: 'Sustainability' },
-          { id: 'services-overview', text: 'Why choose us' },
-          { id: 'final-cta', text: 'Get a quote' }
+          { id: 'final-cta', text: 'Get a Quote' }
         ];
-      // Additional cases would follow...
+      case 'about.html':
+        return [
+          { id: 'about-hero-placeholder', text: 'Overview' },
+          { id: 'company-overview', text: 'Our Story' },
+          { id: 'mission-section', text: 'Our Mission' },
+          { id: 'testimonials-section', text: 'Testimonials' },
+          { id: 'about-cta-placeholder', text: 'Get a Quote' }
+        ];
+      case 'business.html':
+        return [
+          { id: 'business-hero-placeholder', text: 'Overview' },
+          { id: 'commercial-overview', text: 'Commercial Cleaning' },
+          { id: 'industries-section', text: 'Industries We Serve' },
+          { id: 'disinfection-section', text: 'Disinfection' },
+          { id: 'maintenance-section', text: 'Maintenance' },
+          { id: 'business-cta-placeholder', text: 'Get a Quote' }
+        ];
+      case 'residential.html':
+        return [
+          { id: 'residential-hero-placeholder', text: 'Overview' },
+          { id: 'residential-overview', text: 'Our Services' },
+          { id: 'regular-cleaning', text: 'Regular Cleaning' },
+          { id: 'deep-cleaning', text: 'Deep Cleaning' },
+          { id: 'move-in-out', text: 'Move-In / Move-Out' },
+          { id: 'residential-cta-placeholder', text: 'Get a Quote' }
+        ];
+      case 'services.html':
+        return [
+          { id: 'services-hero-placeholder', text: 'Overview' },
+          { id: 'services-overview', text: 'Services Overview' },
+          { id: 'ongoing-maintenance', text: 'Maintenance' },
+          { id: 'services-cta-placeholder', text: 'Get a Quote' }
+        ];
+      case 'locations.html':
+        return [
+          { id: 'locations-hero-placeholder', text: 'Overview' },
+          { id: 'locations-why-choose-placeholder', text: 'Why Choose Us' }
+        ];
+      case 'contact.html':
+        return [
+          { id: 'contact-hero-placeholder', text: 'Overview' },
+          { id: 'contactForm', text: 'Quote Form' },
+          { id: 'contact-service-areas-placeholder', text: 'Service Areas' }
+        ];
+      case 'faq.html':
+        return [
+          { id: 'faq-section', text: 'FAQ' }
+        ];
       default:
         return [];
     }
@@ -823,18 +876,44 @@ class Sidebar {
   }
 
   static updateActiveLink(activeId) {
+    // Desktop sidebar
     document.querySelectorAll('#page-sidebar-menu a').forEach(link => {
       const linkId = link.getAttribute('href').substring(1);
       if (linkId === activeId) {
         link.classList.add('active');
-        link.querySelector('.sidebar-dot').classList.add('active');
-        link.querySelector('.sidebar-text').classList.add('active');
+        const dot = link.querySelector('.sidebar-dot');
+        const text = link.querySelector('.sidebar-text');
+        if (dot) dot.classList.add('active');
+        if (text) text.classList.add('active');
       } else {
         link.classList.remove('active');
-        link.querySelector('.sidebar-dot').classList.remove('active');
-        link.querySelector('.sidebar-text').classList.remove('active');
+        const dot = link.querySelector('.sidebar-dot');
+        const text = link.querySelector('.sidebar-text');
+        if (dot) dot.classList.remove('active');
+        if (text) text.classList.remove('active');
       }
     });
+
+    // Mobile Tier 3 section strip
+    const strip = document.getElementById('mobile-section-strip');
+    if (strip) {
+      // Only scroll pill into view when active section actually changes
+      if (this._lastActivePillId !== activeId) {
+        this._lastActivePillId = activeId;
+        const activePill = strip.querySelector(`.section-pill[data-section-id="${activeId}"]`);
+        if (activePill) {
+          activePill.classList.add('active');
+          activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+      // Update active class without re-scrolling
+      strip.querySelectorAll('.section-pill').forEach(pill => {
+        if (pill.dataset.sectionId !== activeId) {
+          pill.classList.remove('active');
+        }
+      });
+    }
+
     this.updateScrollProgress();
   }
 
@@ -857,8 +936,10 @@ class Sidebar {
       if (scrollPosition >= sectionTop - 100) {
         const link = document.querySelector(`#page-sidebar-menu a[href="#${sectionId}"]`);
         if (link) {
-          link.querySelector('.sidebar-dot').classList.add('done');
-          link.querySelector('.sidebar-text').classList.add('done');
+          const dot = link.querySelector('.sidebar-dot');
+          const text = link.querySelector('.sidebar-text');
+          if (dot) dot.classList.add('done');
+          if (text) text.classList.add('done');
         }
       }
     });
@@ -878,21 +959,36 @@ class StickyBarManager {
 
     const handleScroll = () => {
       const heroBottom = hero.offsetTop + hero.offsetHeight;
-      
+      const isDesktop = Utils.isDesktop();
+
       if (window.scrollY > heroBottom - 100) {
         stickyBar.classList.add('visible');
-        mainNav.style.transform = 'translateY(-100%)';
-        mainNav.style.opacity = '0';
+        // Hide main nav on desktop only (use visibility, NOT transform)
+        if (isDesktop) {
+          mainNav.style.opacity = '0';
+          mainNav.style.pointerEvents = 'none';
+        }
       } else {
         stickyBar.classList.remove('visible');
-        mainNav.style.transform = 'translateY(0)';
-        mainNav.style.opacity = '1';
+        if (isDesktop) {
+          mainNav.style.opacity = '1';
+          mainNav.style.pointerEvents = '';
+        }
       }
     };
 
     const debouncedScroll = Utils.debounce(handleScroll, 10);
     Utils.addEventListener(window, 'scroll', debouncedScroll);
-    
+
+    // Also handle resize — reset inline styles on mobile
+    Utils.addEventListener(window, 'resize', Utils.debounce(() => {
+      if (!Utils.isDesktop()) {
+        mainNav.style.opacity = '';
+        mainNav.style.pointerEvents = '';
+      }
+      handleScroll();
+    }, 100));
+
     // Initial check
     handleScroll();
   }

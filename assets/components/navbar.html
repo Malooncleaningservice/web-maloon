@@ -1,55 +1,60 @@
 <nav class="main-nav">
-    <div class="nav-container">
+    <!-- Tier 1: Logo + Quote Button (always visible) -->
+    <div class="nav-tier-1">
         <div class="logo">
-            <img src="logo-maloon.png" alt="Maloon Cleaning Service Logo" style="height:140px; width:auto;">
+            <img src="logo-maloon.png" alt="Maloon Cleaning Service Logo" class="logo-img">
         </div>
-        <ul class="nav-menu">
-            <li class="menu-item"><a href="index.html">Home</a></li>
-            <li class="menu-item has-dropdown">
-                <a href="business.html" aria-expanded="false">For Businesses <span class="dropdown-arrow">▾</span></a>
-                <div class="dropdown-menu" id="business-dropdown">
-                    <a href="business.html#commercial-overview">Commercial Cleaning</a>
-                    <a href="business.html#industries-section">Industries We Serve</a>
-                    <a href="business.html#disinfection-section">Disinfection Services</a>
-                    <a href="business.html#maintenance-section">Ongoing Maintenance</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="contact.html" class="dropdown-cta">Get a Business Quote</a>
-                </div>
-            </li>
-            <li class="menu-item has-dropdown">
-                <a href="residential.html" aria-expanded="false">For Homes <span class="dropdown-arrow">▾</span></a>
-                <div class="dropdown-menu" id="homes-dropdown">
-                    <a href="residential.html#regular-cleaning">Regular Cleaning</a>
-                    <a href="residential.html#deep-cleaning">Deep Cleaning</a>
-                    <a href="residential.html#move-in-out">Move-In / Move-Out</a>
-                    <a href="residential.html#kitchen-bathroom">Kitchen & Bathroom</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="contact.html" class="dropdown-cta">Get a Home Quote</a>
-                </div>
-            </li>
-            <li class="menu-item has-dropdown">
-                <a href="about.html" aria-expanded="false">About <span class="dropdown-arrow">▾</span></a>
-                <div class="dropdown-menu" id="trust-dropdown">
-                    <a href="about.html">Our Company</a>
-                    <a href="about.html#mission-section">Why Choose Us</a>
-                    <a href="about.html#testimonials-section">Testimonials</a>
-                    <a href="locations.html">Service Areas</a>
-                </div>
-            </li>
-            <li class="menu-item"><a href="contact.html">Contact</a></li>
-            <li class="menu-item"><a href="faq.html">FAQ</a></li>
-            <li class="menu-item"><a href="articles.html">Articles</a></li>
-            <li class="menu-item mobile-cta-item">
-                <a href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." class="dropdown-cta mobile-cta">Get a Free Quote</a>
-            </li>
-        </ul>
         <a href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." class="cta-button desktop-cta">Get a Free Quote</a>
-        <button class="mobile-menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
+        <a href="https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote." class="cta-button mobile-cta">Get Quote</a>
+    </div>
+
+    <!-- Tier 2: Main Navigation Links (hides on scroll) -->
+    <div class="nav-tier-2">
+        <div class="nav-strip-scroll">
+            <ul class="nav-menu">
+                <li class="menu-item"><a href="index.html">Home</a></li>
+                <li class="menu-item has-dropdown">
+                    <a href="business.html" aria-expanded="false">For Businesses <span class="dropdown-arrow">▾</span></a>
+                    <div class="dropdown-menu" id="business-dropdown">
+                        <a href="business.html#commercial-overview">Commercial Cleaning</a>
+                        <a href="business.html#industries-section">Industries We Serve</a>
+                        <a href="business.html#disinfection-section">Disinfection Services</a>
+                        <a href="business.html#maintenance-section">Ongoing Maintenance</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="contact.html" class="dropdown-cta">Get a Business Quote</a>
+                    </div>
+                </li>
+                <li class="menu-item has-dropdown">
+                    <a href="residential.html" aria-expanded="false">For Homes <span class="dropdown-arrow">▾</span></a>
+                    <div class="dropdown-menu" id="homes-dropdown">
+                        <a href="residential.html#regular-cleaning">Regular Cleaning</a>
+                        <a href="residential.html#deep-cleaning">Deep Cleaning</a>
+                        <a href="residential.html#move-in-out">Move-In / Move-Out</a>
+                        <a href="residential.html#kitchen-bathroom">Kitchen & Bathroom</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="contact.html" class="dropdown-cta">Get a Home Quote</a>
+                    </div>
+                </li>
+                <li class="menu-item has-dropdown">
+                    <a href="about.html" aria-expanded="false">About <span class="dropdown-arrow">▾</span></a>
+                    <div class="dropdown-menu" id="trust-dropdown">
+                        <a href="about.html">Our Company</a>
+                        <a href="about.html#mission-section">Why Choose Us</a>
+                        <a href="about.html#testimonials-section">Testimonials</a>
+                        <a href="locations.html">Service Areas</a>
+                    </div>
+                </li>
+                <li class="menu-item"><a href="contact.html">Contact</a></li>
+                <li class="menu-item"><a href="faq.html">FAQ</a></li>
+                <li class="menu-item"><a href="articles.html">Articles</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tier 3: Page Section Subs (mobile only, appears when Tier 2 hides) -->
+    <div class="nav-tier-3 hidden" id="nav-tier-3">
+        <div class="section-strip" id="mobile-section-strip">
+            <!-- Populated by main.js from sidebar data -->
+        </div>
     </div>
 </nav>
-<!-- Mobile Overlay -->
-<div class="mobile-overlay" aria-hidden="true"></div>
