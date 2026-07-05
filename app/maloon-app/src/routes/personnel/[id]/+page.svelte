@@ -128,7 +128,7 @@
 		style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;"
 	>
 		<div style="width: 90vw; height: 90vh; background: #fff; border-radius: 8px; overflow: hidden; position: relative;">
-			{if isPdf(worker.w9FileUrl)}
+			{#if isPdf(worker.w9FileUrl)}
 				<iframe src={worker.w9FileUrl} style="width: 100%; height: 100%; border: none;" title="W-9 PDF"></iframe>
 			{:else if isImage(worker.w9FileUrl)}
 				<img src={worker.w9FileUrl} alt="W-9" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
