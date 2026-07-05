@@ -581,41 +581,36 @@ class Navbar {
 
     if (!navTier2 || !navTier3) return;
 
-    const TIER_HIDE_THRESHOLD = 150;
-    let lastScrollY = window.scrollY;
+    const TIER_HIDE_THRESHOLD = 300;
+    const TIER_REAPPEAR_THRESHOLD = 10;
+    const DELTA_GATE = 30;
+    let lastToggleY = window.scrollY;
     let tier2Visible = true;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const delta = Math.abs(currentScrollY - lastToggleY);
 
-      if (!Utils.isDesktop()) {
+      if (!Utils.isDesktop() && delta > DELTA_GATE) {
         if (currentScrollY > TIER_HIDE_THRESHOLD && tier2Visible) {
-          // Hide Tier 2, show Tier 3
           navTier2.classList.add('hidden');
-          navTier3.classList.remove('hidden');
           tier2Visible = false;
-        } else if (currentScrollY <= TIER_HIDE_THRESHOLD && !tier2Visible) {
-          // Show Tier 2, hide Tier 3
+          lastToggleY = currentScrollY;
+        } else if (currentScrollY <= TIER_REAPPEAR_THRESHOLD && !tier2Visible) {
           navTier2.classList.remove('hidden');
-          navTier3.classList.add('hidden');
           tier2Visible = true;
+          lastToggleY = currentScrollY;
         }
       }
-
-      lastScrollY = currentScrollY;
     };
 
     Utils.addEventListener(window, 'scroll', Utils.debounce(handleScroll, 30));
     handleScroll(); // initial check
 
-    // Handle mobile dropdown accordions in Tier 2
-    this.setupMobileDropdowns();
-
     // Handle resize — reset hidden state
     Utils.addEventListener(window, 'resize', Utils.debounce(() => {
       if (Utils.isDesktop()) {
         navTier2.classList.remove('hidden');
-        navTier3.classList.add('hidden');
         tier2Visible = true;
       } else {
         handleScroll();
@@ -657,23 +652,10 @@ class Navbar {
   }
 
   static setupDropdowns() {
+    // Desktop dropdowns are handled entirely by CSS :hover.
+    // No JS mouseenter/mouseleave needed — those would fight the CSS
+    // transitions and cause the dropdown to collapse prematurely.
     if (!Utils.isDesktop()) return;
-
-    document.querySelectorAll('.nav-tier-2 .menu-item.has-dropdown').forEach(item => {
-      const dropdown = item.querySelector('.dropdown-menu');
-
-      if (dropdown) {
-        Utils.addEventListener(item, 'mouseenter', () => {
-          dropdown.style.opacity = '1';
-          dropdown.style.visibility = 'visible';
-        });
-
-        Utils.addEventListener(item, 'mouseleave', () => {
-          dropdown.style.opacity = '0';
-          dropdown.style.visibility = 'hidden';
-        });
-      }
-    });
   }
 }
 
@@ -732,11 +714,8 @@ class Sidebar {
 
     strip.innerHTML = '';
 
-    if (items.length === 0) {
-      const tier3 = document.getElementById('nav-tier-3');
-      if (tier3) tier3.style.display = 'none';
-      return;
-    }
+    // Never set inline display styles — CSS media queries control Tier 3 visibility.
+    // For pages with no sidebar items, leave pills empty but let the bar render.
 
     items.forEach((item) => {
       const pill = document.createElement('a');
@@ -831,6 +810,10 @@ class Sidebar {
         return [
           { id: 'faq-section', text: 'FAQ' }
         ];
+      case 'articles.html':
+        return [
+          { id: 'articles-section', text: 'Articles' }
+        ];
       default:
         return [];
     }
@@ -875,6 +858,17 @@ class Sidebar {
     });
   }
 
+  static syncTier3Scroll() {
+    const strip = document.getElementById('mobile-section-strip');
+    if (!strip) return;
+
+    const activePill = strip.querySelector('.section-pill.active');
+    if (!activePill) return;
+
+    const pillCenter = activePill.offsetLeft - (strip.offsetWidth / 2) + (activePill.offsetWidth / 2);
+    strip.scrollTo({ left: Math.max(0, pillCenter), behavior: 'smooth' });
+  }
+
   static updateActiveLink(activeId) {
     // Desktop sidebar
     document.querySelectorAll('#page-sidebar-menu a').forEach(link => {
@@ -894,24 +888,24 @@ class Sidebar {
       }
     });
 
-    // Mobile Tier 3 section strip
+    // Mobile Tier 3 section strip — update active pill and auto-scroll the strip container
     const strip = document.getElementById('mobile-section-strip');
     if (strip) {
-      // Only scroll pill into view when active section actually changes
+      // Remove active from all pills first, then set on the matching one
+      strip.querySelectorAll('.section-pill').forEach(pill => {
+        pill.classList.remove('active');
+      });
+
       if (this._lastActivePillId !== activeId) {
         this._lastActivePillId = activeId;
         const activePill = strip.querySelector(`.section-pill[data-section-id="${activeId}"]`);
         if (activePill) {
           activePill.classList.add('active');
-          activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          // Scroll the strip container (not the viewport) so the pill is centered
+          const pillCenter = activePill.offsetLeft - (strip.offsetWidth / 2) + (activePill.offsetWidth / 2);
+          strip.scrollTo({ left: Math.max(0, pillCenter), behavior: 'smooth' });
         }
       }
-      // Update active class without re-scrolling
-      strip.querySelectorAll('.section-pill').forEach(pill => {
-        if (pill.dataset.sectionId !== activeId) {
-          pill.classList.remove('active');
-        }
-      });
     }
 
     this.updateScrollProgress();
@@ -952,42 +946,24 @@ class Sidebar {
 class StickyBarManager {
   static init() {
     const stickyBar = document.getElementById('sticky-quote-bar');
-    const mainNav = document.querySelector('.main-nav');
-    const hero = document.querySelector('.hero-split');
 
-    if (!stickyBar || !mainNav || !hero) return;
+    if (!stickyBar) return;
 
     const handleScroll = () => {
-      const heroBottom = hero.offsetTop + hero.offsetHeight;
-      const isDesktop = Utils.isDesktop();
+      const heroSection = document.querySelector('.hero-split') || document.querySelector('.hero-home') || document.querySelector('.hero');
+      if (!heroSection) return;
+
+      const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
 
       if (window.scrollY > heroBottom - 100) {
         stickyBar.classList.add('visible');
-        // Hide main nav on desktop only (use visibility, NOT transform)
-        if (isDesktop) {
-          mainNav.style.opacity = '0';
-          mainNav.style.pointerEvents = 'none';
-        }
       } else {
         stickyBar.classList.remove('visible');
-        if (isDesktop) {
-          mainNav.style.opacity = '1';
-          mainNav.style.pointerEvents = '';
-        }
       }
     };
 
     const debouncedScroll = Utils.debounce(handleScroll, 10);
     Utils.addEventListener(window, 'scroll', debouncedScroll);
-
-    // Also handle resize — reset inline styles on mobile
-    Utils.addEventListener(window, 'resize', Utils.debounce(() => {
-      if (!Utils.isDesktop()) {
-        mainNav.style.opacity = '';
-        mainNav.style.pointerEvents = '';
-      }
-      handleScroll();
-    }, 100));
 
     // Initial check
     handleScroll();

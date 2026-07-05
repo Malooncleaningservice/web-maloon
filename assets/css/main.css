@@ -108,7 +108,7 @@ body {
 
     /* Increased for airiness */
     background: var(--gradient-sunlight);
-    overflow-x: hidden;
+    overflow-x: clip;
     font-size: 17px;
 
     /* Slightly larger for premium feel */
@@ -202,7 +202,6 @@ p {
     position: sticky;
     top: 0;
     z-index: 1000;
-    contain: layout style;
     background: linear-gradient(90deg, #1b5e20 0%, #81c784 100%);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -239,14 +238,6 @@ p {
 .nav-strip-scroll {
     max-width: var(--max-width);
     margin: 0 auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.nav-strip-scroll::-webkit-scrollbar {
-    display: none;
 }
 
 .nav-menu {
@@ -365,6 +356,7 @@ p {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    scroll-behavior: smooth;
     display: flex;
     gap: 6px;
 }
@@ -741,6 +733,17 @@ p {
         max-height: 200px;
         opacity: 1;
         overflow: hidden;
+    }
+
+    .nav-strip-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .nav-strip-scroll::-webkit-scrollbar {
+        display: none;
     }
 
     .nav-tier-2.hidden {

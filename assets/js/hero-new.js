@@ -82,7 +82,7 @@
     ───────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', async () => {
         await Promise.all([
-            initStickyBar(),
+            // initStickyBar() disabled — main.js handles sticky-quote-bar injection
             initHomeHero(),
             initTransformStrip(),
         ]);

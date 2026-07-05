@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Business {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quotes     Quote[]
+  jobs       Job[]
+  workers    Worker[]
+  lineItems  LineItem[]
+  settings   Json?
+}
+
+model Quote {
+  id             String   @id @default(cuid())
+  businessId     String
+  business       Business @relation(fields: [businessId], references: [id])
+  clientName     String?
+  clientEmail    String?
+  clientPhone    String?
+  address        String?
+  squareFootage  Float    @default(0)
+  ratePerSqFt    Float    @default(0.15)
+  workerCount    Int      @default(1)
+  status         String   @default("draft") // draft, sent, accepted, rejected
+  notes          String?
+  total          Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  quoteLineItems QuoteLineItem[]
+  quoteAddons    QuoteAddon[]
+  job            Job?
+}
+
+model LineItem {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id])
+  name        String
+  description String?
+  basePrice   Float    @default(0)
+  hasSizeMod  Boolean  @default(false)   // e.g. "Bathroom" → Small/Med/Large
+  sizeSmall   Float?
+  sizeMedium  Float?
+  sizeLarge   Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QuoteLineItem {
+  id        String   @id @default(cuid())
+  quoteId   String
+  quote     Quote    @relation(fields: [quoteId], references: [id])
+  name      String
+  price     Float
+  size      String?  // Small, Medium, Large (if applicable)
+  quantity  Int      @default(1)
+}
+
+model QuoteAddon {
+  id      String @id @default(cuid())
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id])
+  name    String
+  price   Float
+}
+
+model Job {
+  id            String   @id @default(cuid())
+  businessId    String
+  business      Business @relation(fields: [businessId], references: [id])
+  quoteId       String?  @unique
+  quote         Quote?   @relation(fields: [quoteId], references: [id])
+  clientName    String
+  clientPhone   String?
+  clientEmail   String?
+  address       String
+  status        String   @default("pending") // pending, in_progress, completed, cancelled
+  scheduledDate DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sections        JobSection[]
+  startWithTasks  StartWithTask[]
+  assignments     JobAssignment[]
+}
+
+model JobSection {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id])
+  name      String   // e.g. "Kitchen", "Bathroom 1F", "Break Room"
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks JobTask[]
+}
+
+model JobTask {
+  id            String   @id @default(cuid())
+  sectionId     String
+  section       JobSection @relation(fields: [sectionId], references: [id])
+  description   String
+  sortOrder     Int      @default(0)
+  completed     Boolean  @default(false)
+  requiredPhoto Boolean  @default(false)
+  comment       String?
+  completedBy   String?  // workerId
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  photos TaskPhoto[]
+}
+
+model TaskPhoto {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      JobTask  @relation(fields: [taskId], references: [id])
+  url       String
+  takenAt   DateTime @default(now())
+  takenBy   String?  // workerId
+}
+
+model StartWithTask {
+  id          String   @id @default(cuid())
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id])
+  description String
+  sortOrder   Int      @default(0)
+  completed   Boolean  @default(false)
+  completedBy String?
+  completedAt DateTime?
+}
+
+model Worker {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  role       String   @default("worker") // worker, supervisor, admin
+  status     String   @default("active") // active, inactive
+  notes      String?
+
+  // W-9 info
+  w9Uploaded   Boolean  @default(false)
+  w9FileName   String?
+  w9FileUrl    String?
+  w9ParsedName String?
+  w9ParsedTin  String?
+  w9ParsedAddress String?
+  w9Reviewed   Boolean  @default(false)
+  w9ReviewedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments JobAssignment[]
+}
+
+model JobAssignment {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id])
+  workerId  String
+  worker    Worker   @relation(fields: [workerId], references: [id])
+  assignedAt DateTime @default(now())
+}
