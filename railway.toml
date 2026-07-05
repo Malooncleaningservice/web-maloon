@@ -1,0 +1,6 @@
+[build]
+  root = "app/maloon-app"
+
+[deploy]
+  startCommand = "node build"
+  buildCommand = "npm ci && npx prisma generate && npm run build"
