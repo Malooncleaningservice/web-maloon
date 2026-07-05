@@ -95,3 +95,11 @@ Business, Quote, QuoteLineItem, QuoteAddon, LineItem, Job, JobSection, JobTask, 
 - [ ] White-label branding per business
 - [ ] Analytics dashboard (jobs completed, revenue, worker hours)
 - [ ] Mobile app via Capacitor or PWA
+
+---
+
+## Deployment Notes
+
+- **`railway.toml`** at the repo root (`web-maloon/railway.toml`) is **critical** — it tells Railway to build from `app/maloon-app/` instead of the repo root
+- Without it, Railway auto-detects the static HTML site at the root and serves the public website instead of the Staff Portal
+- The public site (`maloonservices.com`) links to the portal via a "🔐 Staff Portal" button in `assets/components/footer.html`

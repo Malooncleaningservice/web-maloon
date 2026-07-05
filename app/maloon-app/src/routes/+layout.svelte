@@ -6,7 +6,7 @@
 
 <div class="app-shell">
 	<header class="top-nav">
-		<a href="/" class="logo">Maloon Services</a>
+		<a href="/" class="logo">Maloon Service</a>
 		<nav>
 			<a href="/quotes">Quotes</a>
 			<a href="/jobs">Jobs</a>

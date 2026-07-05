@@ -9,6 +9,27 @@
 | **Railway Dashboard** | https://railway.app → project `discerning-nourishment` |
 | **Aiven Database Console** | https://console.aiven.io |
 
+> **⚠️ Critical:** The Staff Portal link lives in the footer of `maloonservices.com` (`assets/components/footer.html`). If the footer link breaks, users on the public site have no way to reach the portal.
+
+---
+
+## Project Structure (Important!)
+
+The repo has two separate sites:
+
+```
+web-maloon/
+├── index.html              ← Public marketing site (maloonservices.com)
+├── assets/                 ← Public site assets
+├── railway.toml            ← Tells Railway to build from app/maloon-app/
+└── app/maloon-app/         ← Staff Portal (SvelteKit + Prisma + MariaDB)
+    ├── package.json
+    ├── prisma/
+    └── src/
+```
+
+Without `railway.toml` at the repo root, Railway auto-detects the static HTML site and serves that instead of the Staff Portal. **Do not delete `railway.toml`** — it tells Railway to build from the `app/maloon-app/` subdirectory.
+
 ---
 
 ## Local Development
@@ -43,7 +64,7 @@ npm run preview   # test production build locally
 
 ## Deploying Updates
 
-The app is deployed on Railway. Any push to GitHub does **not** auto-deploy — you must manually trigger it.
+The Staff Portal is deployed on Railway from the `app/maloon-app/` subdirectory. Any push to GitHub does **not** auto-deploy — you must manually trigger it.
 
 ### Method 1: Railway CLI (recommended)
 
@@ -52,7 +73,7 @@ cd ~/Documents/web-maloon/app/maloon-app
 railway up --detach
 ```
 
-This uploads the project, builds it on Railway, and deploys.
+This uploads the project, builds it on Railway (using `railway.toml` at the repo root for build config), and deploys.
 
 ### Method 2: Railway Dashboard
 
@@ -151,7 +172,7 @@ import('@prisma/client').then(({PrismaClient})=>{
       const items=[{name:'Bathroom',basePrice:35,hasSizeMod:true,sizeSmall:25,sizeMedium:35,sizeLarge:50},{name:'Kitchen',basePrice:40,hasSizeMod:true,sizeSmall:30,sizeMedium:40,sizeLarge:60},{name:'Break Room',basePrice:35,hasSizeMod:false},{name:'Office Area',basePrice:30,hasSizeMod:false},{name:'Hallway / Corridor',basePrice:20,hasSizeMod:false},{name:'Lobby / Reception',basePrice:35,hasSizeMod:false},{name:'Window Cleaning',basePrice:50,hasSizeMod:true,sizeSmall:40,sizeMedium:50,sizeLarge:80},{name:'Floor Waxing',basePrice:75,hasSizeMod:true,sizeSmall:50,sizeMedium:75,sizeLarge:120},{name:'Carpet Cleaning',basePrice:60,hasSizeMod:true,sizeSmall:40,sizeMedium:60,sizeLarge:100}];
       p.business.findFirst().then(async b=>{
         let bid=b?.id;
-        if(!bid){const nb=await p.business.create({data:{name:'Maloon Services',slug:'maloon-services'}});bid=nb.id;}
+        if(!bid){const nb=await p.business.create({data:{name:'Maloon Service',slug:'maloon-services'}});bid=nb.id;}
         await p.lineItem.deleteMany({where:{businessId:bid}});
         for(const i of items)await p.lineItem.create({data:{businessId:bid,...i}});
         console.log('Seeded',items.length,'items');
@@ -176,6 +197,12 @@ import('@prisma/client').then(({PrismaClient})=>{
 ---
 
 ## Troubleshooting
+
+### Staff Portal shows the public website instead of the app
+This means Railway is serving the static HTML at the repo root instead of the SvelteKit app. Check that:
+- `railway.toml` exists at the repo root and has `root = "app/maloon-app"` under `[build]`
+- The deploy was triggered from `app/maloon-app/` with `railway up --detach`
+- Re-deploy after fixing: `git add -A && git commit -m "fix" && git push && cd app/maloon-app && railway up --detach`
 
 ### App shows "Internal Error"
 Check Railway logs: `railway logs` — usually a database connection issue.

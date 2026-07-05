@@ -1,7 +1,7 @@
 # Content Reorganization Summary
 
 ## Overview
-Transformed the Maloon Services website content to align with the **"Fresh Market Flyer"** design philosophy - making information scannable, informational, and easy to digest at a glance.
+Transformed the Maloon Service website content to align with the **"Fresh Market Flyer"** design philosophy - making information scannable, informational, and easy to digest at a glance.
 
 ---
 

@@ -584,7 +584,7 @@
   "pages": {
     "index": {
       "hero": {
-        "title": "Maloon Services<br>Columbus, OH",
+        "title": "Maloon Service<br>Columbus, OH",
         "subtitle": "Professional Janitorial Services for Businesses & Homes",
         "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
       },
@@ -595,7 +595,7 @@
     },
     "about": {
       "hero": {
-        "title": "About Maloon Services",
+        "title": "About Maloon Service",
         "subtitle": "Columbus, OH's Trusted Commercial & Residential Cleaning Company",
         "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
       },
@@ -636,7 +636,7 @@
       "instagram": "#",
       "linkedin": "#",
       "hero": {
-        "title": "Contact Maloon Services",
+        "title": "Contact Maloon Service",
         "subtitle": "Get a Free Quote for Professional Cleaning in Columbus, OH",
         "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
       },

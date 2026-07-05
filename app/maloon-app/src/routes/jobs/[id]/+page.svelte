@@ -2,13 +2,14 @@
 	import '../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-
 	let jobId = $state('');
-	let job = $state<{clientName?: string; address?: string; status?: string; scheduledDate?: string | null; total?: number}>({});
-	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean}>}>>([]);
+	let job = $state<{id?: string; quoteId?: string; clientName?: string; address?: string; status?: string; scheduledDate?: string | null; total?: number}>({});
+	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean; photos?: Array<{id: string; url: string; takenAt: string}>}>}>>([]);
 	let startWithTasks = $state<Array<{id: string; description: string; completed: boolean}>>([]);
 	let loading = $state(true);
 	let converting = $state(false);
+	let uploadingPhotoForTask = $state<string | null>(null);
+	let showingPhotoUrl = $state<string | null>(null);
 
 	let newSectionName = $state('');
 	let newTaskDesc = $state('');
@@ -28,7 +29,7 @@
 			sections = (data.sections ?? []).map((s: any) => ({
 				...s,
 				expanded: false,
-				tasks: (s.tasks ?? []).map((t: any) => ({ ...t, completed: t.completed ?? false })),
+				tasks: (s.tasks ?? []).map((t: any) => ({ ...t, completed: t.completed ?? false, photos: t.photos ?? [] })),
 			}));
 			startWithTasks = (data.startWithTasks ?? []).map((sw: any) => ({ ...sw, completed: sw.completed ?? false }));
 		} catch (e) {
@@ -62,7 +63,7 @@
 			});
 			const task = await res.json();
 			sections = sections.map(s => {
-				if (s.id === sectionId) return { ...s, tasks: [...s.tasks, { ...task, completed: false }] };
+				if (s.id === sectionId) return { ...s, tasks: [...s.tasks, { ...task, completed: false, photos: [] }] };
 				return s;
 			});
 			newTaskDesc = '';
@@ -110,29 +111,70 @@
 	}
 
 	async function convertQuoteToJob() {
+		if (!job.quoteId) return;
 		converting = true;
 		try {
-			await fetch(`/api/jobs/${jobId}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ status: 'pending' }),
-			});
-			job = { ...job, status: 'pending' };
+			const res = await fetch(`/api/quotes/${job.quoteId}/convert`, { method: 'POST' });
+			if (!res.ok) throw new Error(await res.text());
+			alert('Job created from quote!');
+			await loadJob();
 		} catch (e) {
-			console.error(e);
+			console.error('Conversion failed', e);
+			alert('Failed to convert quote to job.');
 		} finally {
 			converting = false;
 		}
 	}
 
-	function completedCount(section: any) {
-		return section.tasks.filter((t: any) => t.completed).length;
+	async function uploadTaskPhoto(sectionId: string, taskId: string, file: File) {
+		uploadingPhotoForTask = taskId;
+		try {
+			const formData = new FormData();
+			formData.append('file', file);
+			const uploadRes = await fetch(`/api/upload?type=task-photo&taskId=${taskId}`, {
+				method: 'POST',
+				body: formData,
+			});
+			if (!uploadRes.ok) throw new Error(await uploadRes.text());
+			await loadJob();
+		} catch (e) {
+			console.error('Photo upload failed', e);
+			alert('Failed to upload photo.');
+		} finally {
+			uploadingPhotoForTask = null;
+		}
+	}
+
+	function handlePhotoFile(sectionId: string, taskId: string, event: Event) {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			uploadTaskPhoto(sectionId, taskId, file);
+		}
+		// Reset input so same file can be re-uploaded
+		input.value = '';
+	}
+
+	function completedCount(section: { tasks: Array<{completed: boolean}> }) {
+		return section.tasks.filter((t) => t.completed).length;
 	}
 </script>
 
 <a href="/jobs" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 12px; display: inline-block;">
 	← Back to Jobs
 </a>
+
+{#if showingPhotoUrl}
+	<div
+		style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+		onclick={() => showingPhotoUrl = null}
+		onkeydown={(e) => e.key === 'Escape' && (showingPhotoUrl = null)}
+		role="button"
+		tabindex="0"
+	>
+		<img src={showingPhotoUrl} alt="Task photo" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
+	</div>
+{/if}
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -142,13 +184,13 @@
 	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
 		<h2 style="font-size: 1.3rem;">{job.clientName ?? 'Job'} — {job.address ?? 'No address'}</h2>
 		<div style="display: flex; align-items: center; gap: 8px;">
-			{#if job.quoteId}
-				<span class="badge badge-quote">QUOTE</span>
+			{#if job.quoteId && job.status === 'quote'}
+				<span class="badge badge-quote">FROM QUOTE</span>
 				<button class="btn btn-success" onclick={convertQuoteToJob} disabled={converting}>
-					{converting ? 'Converting...' : '✓ Convert to Job'}
+					{converting ? 'Converting...' : '🔨 Convert to Job'}
 				</button>
-			{:else}
-				<span class="badge badge-pending">{job.status}</span>
+			{:else if job.status}
+				<span class="badge badge-{job.status === 'completed' ? 'complete' : job.status === 'in_progress' ? 'active' : 'pending'}">{job.status.replace('_', ' ')}</span>
 			{/if}
 		</div>
 	</div>
@@ -179,12 +221,33 @@
 			</summary>
 			<div class="section-body">
 				{#each section.tasks as task}
-					<div class="task-row">
-						<input id="t-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleTask(section.id, task.id, e.currentTarget.checked)} />
-						<label for="t-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; cursor: pointer;">
-							{task.description}
-						</label>
-						{#if task.requiredPhoto}<span class="badge badge-pending">📷 required</span>{/if}
+					<div class="task-row" style="flex-wrap: wrap;">
+						<div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
+							<input id="t-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleTask(section.id, task.id, e.currentTarget.checked)} />
+							<label for="t-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; cursor: pointer;">
+								{task.description}
+							</label>
+							{#if task.requiredPhoto}<span class="badge badge-pending" style="font-size: 0.7rem;">📷 required</span>{/if}
+						</div>
+						<div style="display: flex; align-items: center; gap: 8px;">
+							<!-- Upload photo button -->
+							<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.75rem; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px;">
+								📎 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Photo'}
+								<input type="file" accept="image/*" style="display: none;" onchange={(e) => handlePhotoFile(section.id, task.id, e)} disabled={uploadingPhotoForTask === task.id} />
+							</label>
+							<!-- Existing photos -->
+							{#if task.photos && task.photos.length > 0}
+								{#each task.photos as photo}
+									<button
+										class="btn btn-sm"
+										style="padding: 2px 6px; font-size: 0.7rem; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px; cursor: pointer;"
+										onclick={() => showingPhotoUrl = photo.url}
+									>
+										🖼 View
+									</button>
+								{/each}
+							{/if}
+						</div>
 					</div>
 				{/each}
 

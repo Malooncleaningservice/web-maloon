@@ -62,7 +62,7 @@ app/maloon-app/
 
 ### Business
 - `id`, `name`, `slug`
-- Top-level tenant — one "Maloon Services" auto-created on first API call
+- Top-level tenant — one "Maloon Service" auto-created on first API call
 - Future SaaS: one row per customer business
 
 ### Quote
@@ -135,7 +135,7 @@ Prisma 7 requires a driver adapter for direct database connections. We use `@pri
 All frontend pages originally used hardcoded placeholder data with `$state()`. They've been updated to fetch from API routes on mount (`onMount → fetch → parse JSON → assign to reactive state`).
 
 ### Single Business for MVP
-All API endpoints auto-create "Maloon Services" as the first business if none exists. This keeps the MVP simple — future multi-tenant SaaS will require auth and tenant scoping.
+All API endpoints auto-create "Maloon Service" as the first business if none exists. This keeps the MVP simple — future multi-tenant SaaS will require auth and tenant scoping.
 
 ### Cascade Deletes
 - Deleting a Job → removes sections, tasks, task photos, start-with tasks, assignments

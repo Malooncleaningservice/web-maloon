@@ -1,5 +1,5 @@
 /**
- * Main JavaScript file for Maloon Services
+ * Main JavaScript file for Maloon Service
  * Improved version with better organization, performance, and maintainability
  */
 
@@ -264,7 +264,7 @@ class ComponentInjector {
           <div class="container">
             <div class="footer-grid">
               <div class="footer-column">
-                <img src="logo-maloon.png" alt="Maloon Services Logo" style="height:120px; width:auto; margin-bottom: 15px;">
+                <img src="logo-maloon.png" alt="Maloon Service Logo" style="height:120px; width:auto; margin-bottom: 15px;">
                 <p class="tagline">We make a difference.</p>
               </div>
               <div class="footer-column">
@@ -305,7 +305,7 @@ class ComponentInjector {
                 <a href="privacy.html">Privacy Policy</a>
               </div>
               <div class="copyright">
-                <p>© <span id="year"></span> Maloon Services. All rights reserved.</p>
+                <p>© <span id="year"></span> Maloon Service. All rights reserved.</p>
               </div>
             </div>
           </div>
@@ -404,12 +404,12 @@ class HeroComponent {
   static getData(pageName) {
     const heroData = {
       'index': {
-        title: 'Maloon Services<br>Columbus, OH',
+        title: 'Maloon Service<br>Columbus, OH',
         subtitle: 'Professional Janitorial Services for Businesses & Homes',
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
       'about': {
-        title: 'About Maloon Services',
+        title: 'About Maloon Service',
         subtitle: 'Columbus, OH\'s Trusted Commercial & Residential Cleaning Company',
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
@@ -424,7 +424,7 @@ class HeroComponent {
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
       'contact': {
-        title: 'Contact Maloon Services',
+        title: 'Contact Maloon Service',
         subtitle: 'Get a Free Quote for Professional Cleaning in Columbus, OH',
         background_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
@@ -480,7 +480,7 @@ class CTAComponent {
         background_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
       },
       'about': {
-        title: 'Experience the Maloon Services Difference',
+        title: 'Experience the Maloon Service Difference',
         phone: '6145551234',
         phone_formatted: '614-555-1234',
         whatsapp_url: 'https://wa.me/16144830226?text=Hello%20Maloon%20Services!%20I%27d%20like%20a%20cleaning%20quote.',
@@ -1130,7 +1130,7 @@ class MaloonApp {
       FormManager.init();
       ScrollManager.init();
 
-      console.log('Maloon Services application initialized successfully');
+      console.log('Maloon Service application initialized successfully');
     } catch (error) {
       console.error('Application initialization failed:', error);
     }
