@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import type { RequestEvent } from '@sveltejs/kit';
 import { prisma } from '$lib/prisma';
 
 // POST /api/upload?type=w9|task-photo&workerId=...&taskId=...
-export const POST: RequestHandler = async ({ request, url }) => {
+export const POST = async ({ request, url }: RequestEvent) => {
 	const formData = await request.formData();
 	const file = formData.get('file') as File | null;
 
