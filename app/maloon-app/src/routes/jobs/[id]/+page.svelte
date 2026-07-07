@@ -184,12 +184,10 @@
 	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
 		<h2 style="font-size: 1.3rem;">{job.clientName ?? 'Job'} — {job.address ?? 'No address'}</h2>
 		<div style="display: flex; align-items: center; gap: 8px;">
-			{#if job.quoteId && job.status === 'quote'}
+			{#if job.quoteId}
 				<span class="badge badge-quote">FROM QUOTE</span>
-				<button class="btn btn-success" onclick={convertQuoteToJob} disabled={converting}>
-					{converting ? 'Converting...' : '🔨 Convert to Job'}
-				</button>
-			{:else if job.status}
+			{/if}
+			{#if job.status}
 				<span class="badge badge-{job.status === 'completed' ? 'complete' : job.status === 'in_progress' ? 'active' : 'pending'}">{job.status.replace('_', ' ')}</span>
 			{/if}
 		</div>

@@ -22,7 +22,7 @@
 				isQuote: !!j.quoteId,
 				clientName: j.clientName ?? 'Unknown',
 				address: j.address ?? '',
-				total: j.total ?? j.quote?.total ?? 0,
+				total: j.quote?.total ?? undefined,
 			}));
 		} catch {
 			console.log('API not available, using placeholder data');
@@ -39,10 +39,11 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					clientName: newJob.clientName,
+					clientPhone: newJob.phone || undefined,
+					clientEmail: newJob.email || undefined,
 					address: newJob.address,
 					scheduledDate: newJob.scheduledDate || undefined,
 					notes: newJob.notes || undefined,
-					total: 0,
 				}),
 			});
 			showNewJob = false;
@@ -114,7 +115,11 @@
 						<p class="text-secondary">{job.address}</p>
 					</div>
 					<div style="text-align: right;">
-						<div class="fw-bold" style="font-size: 1.1rem;">${job.total.toFixed(2)}</div>
+						{#if job.total != null}
+							<div class="fw-bold" style="font-size: 1.1rem;">${job.total.toFixed(2)}</div>
+						{:else}
+							<div class="fw-bold text-secondary" style="font-size: 1.1rem;">—</div>
+						{/if}
 						{#if job.scheduledDate}
 							<span class="text-secondary">📅 {job.scheduledDate}</span>
 						{/if}

@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ params }) => {
 	let businessId = business?.id;
 	if (!businessId) {
 		const newBusiness = await prisma.business.create({
-			data: { name: 'Maloon Services', slug: 'maloon-services' }
+			data: { name: 'Maloon Service', slug: 'maloon-services' }
 		});
 		businessId = newBusiness.id;
 	}

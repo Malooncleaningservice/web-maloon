@@ -33,6 +33,15 @@ const ADMIN_ROUTES = [
 	'/api/profile-changes',
 ];
 
+// Protected API routes (upload, etc.) — require auth but allow workers too
+const PROTECTED_API_ROUTES = [
+	'/api/upload',
+];
+
+function isProtectedApiRoute(pathname: string): boolean {
+	return PROTECTED_API_ROUTES.some(r => pathname.startsWith(r));
+}
+
 function isPublic(pathname: string): boolean {
 	return PUBLIC_ROUTES.some(r => pathname.startsWith(r));
 }

@@ -384,7 +384,7 @@
 			{#each worker.assignments as a}
 				<a href="/jobs/{a.job.id}" style="text-decoration: none; color: inherit;">
 					<div class="task-row" style="cursor: pointer;">
-						<span class="task-desc">{a.job.name || 'Unnamed Job'}</span>
+						<span class="task-desc">{a.job.clientName || 'Unnamed Job'}</span>
 						{#if a.job.scheduledDate}<span class="text-secondary">📅 {a.job.scheduledDate}</span>{/if}
 						<span class="badge badge-pending">{a.job.status}</span>
 					</div>
