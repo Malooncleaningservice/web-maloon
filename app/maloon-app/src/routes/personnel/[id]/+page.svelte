@@ -9,6 +9,7 @@
 		email: string; phone: string; notes?: string;
 		w9Uploaded: boolean; w9Reviewed: boolean;
 		w9FileName?: string; w9FileUrl?: string; w9ParsedName?: string; w9ParsedTin?: string; w9ParsedAddress?: string;
+		user?: { id: string; email: string | null; identifierToken: string | null } | null;
 		assignments?: Array<{job: {id: string; name: string; scheduledDate?: string; status: string}}>;
 	}>({
 		id: '', firstName: '', lastName: '', role: 'worker', status: 'active',
@@ -24,9 +25,19 @@
 	let uploadingW9 = $state(false);
 	let showingPdfViewer = $state(false);
 
+	// Password reset
+	let resettingPassword = $state(false);
+	let resetMessage = $state('');
+	let resetError = $state('');
+
+	// Pending profile changes
+	let profileChanges = $state<Array<{id: string; field: string; oldValue: string | null; newValue: string; status: string; requestedAt: string}>>([]);
+	let approvingId = $state('');
+
 	onMount(async () => {
 		workerId = $page.params.id;
 		await loadWorker();
+		await loadProfileChanges();
 	});
 
 	async function loadWorker() {
@@ -41,6 +52,13 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	async function loadProfileChanges() {
+		try {
+			const res = await fetch(`/api/profile-changes?workerId=${workerId}`);
+			if (res.ok) profileChanges = await res.json();
+		} catch { /* ignore */ }
 	}
 
 	function startEdit() {
@@ -107,6 +125,43 @@
 			alert('Failed to upload W-9.');
 		} finally {
 			uploadingW9 = false;
+		}
+	}
+
+	// --- Password reset ---
+	async function resetPassword() {
+		resettingPassword = true;
+		resetMessage = '';
+		resetError = '';
+		try {
+			const res = await fetch(`/api/workers/${workerId}/reset-password`, { method: 'POST' });
+			const data = await res.json();
+			if (res.ok) {
+				worker = { ...worker, user: { ...worker.user, identifierToken: data.identifierToken, id: worker.user?.id ?? '', email: worker.user?.email ?? null } };
+				resetMessage = data.message || 'A new access code has been generated.';
+			} else {
+				resetError = data.error || 'Failed to reset password';
+			}
+		} catch {
+			resetError = 'Network error';
+		} finally {
+			resettingPassword = false;
+		}
+	}
+
+	// --- Approve / reject profile change ---
+	async function handleChangeReview(changeId: string, status: 'approved' | 'rejected') {
+		approvingId = changeId;
+		try {
+			await fetch(`/api/profile-changes/${changeId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status })
+			});
+			profileChanges = profileChanges.map(c => c.id === changeId ? { ...c, status } : c);
+			if (status === 'approved') await loadWorker();
+		} catch { /* ignore */ } finally {
+			approvingId = '';
 		}
 	}
 
@@ -197,6 +252,85 @@
 			<p class="text-secondary">{worker.notes || 'No notes.'}</p>
 		{/if}
 	</div>
+
+	<!-- Account / Login Section -->
+	<div class="card">
+		<h3 style="font-size: 1rem; margin-bottom: 12px;">🔑 Account & Login</h3>
+		{#if worker.user}
+			<div class="row mb-2">
+				<div class="col">
+					<span class="text-secondary">Login Email</span><br>
+					{#if worker.user?.email}
+					{worker.user.email}
+				{:else}
+					<em>Not set yet — uses access code</em>
+				{/if}
+				</div>
+				<div class="col">
+					<span class="text-secondary">Access Code</span><br>
+					{#if worker.user.identifierToken}
+						<span style="font-family: monospace; font-weight: 600;">{worker.user.identifierToken}</span>
+					{:else}
+						<span class="text-secondary">—</span>
+					{/if}
+				</div>
+			</div>
+			{#if resetMessage}
+				<div style="background: #e6f4ea; color: var(--success); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+					{resetMessage}
+				</div>
+			{/if}
+			{#if resetError}
+				<div style="background: #fce8e6; color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+					{resetError}
+				</div>
+			{/if}
+			<button class="btn btn-outline btn-sm" onclick={resetPassword} disabled={resettingPassword}>
+				{resettingPassword ? 'Generating...' : '🔄 Reset Password / Generate New Code'}
+			</button>
+		{:else}
+			<p class="text-secondary">No login account linked to this worker.</p>
+		{/if}
+	</div>
+
+	<!-- Pending Profile Changes -->
+	{#if profileChanges.length > 0}
+		<div class="card">
+			<h3 style="font-size: 1rem; margin-bottom: 12px;">⏳ Pending Changes</h3>
+			{#each profileChanges.filter(c => c.status === 'pending') as change, i}
+				<div style="padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+					<div>
+						<strong>{change.field}</strong>
+						<span class="text-secondary"> → {change.newValue}</span>
+						{#if change.oldValue}<br /><span class="text-secondary">was: {change.oldValue}</span>{/if}
+					</div>
+					<div style="display: flex; gap: 6px;">
+						<button
+							class="btn btn-success btn-sm"
+							disabled={approvingId === change.id}
+							onclick={() => handleChangeReview(change.id, 'approved')}
+						>
+							{approvingId === change.id ? '...' : '✓ Approve'}
+						</button>
+						<button
+							class="btn btn-danger btn-sm"
+							disabled={approvingId === change.id}
+							onclick={() => handleChangeReview(change.id, 'rejected')}
+						>
+							✕ Reject
+						</button>
+					</div>
+				</div>
+			{/each}
+			<!-- Show recent resolved changes -->
+			{#each profileChanges.filter(c => c.status !== 'pending').slice(0, 5) as change}
+				<div style="padding: 6px 10px; font-size: 0.8rem; color: var(--text-secondary);">
+					{change.field} → {change.newValue}
+					<span class="badge {change.status === 'approved' ? 'badge-complete' : ''}">{change.status}</span>
+				</div>
+			{/each}
+		</div>
+	{/if}
 
 	<!-- W-9 Section -->
 	<div class="card">

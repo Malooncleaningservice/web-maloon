@@ -1,11 +1,15 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
+import { hashPassword, generateIdentifierToken } from '$lib/auth';
 import type { RequestHandler } from './$types';
 
 // GET /api/workers — list all workers
 export const GET: RequestHandler = async () => {
 	const workers = await prisma.worker.findMany({
-		include: { assignments: { include: { job: true } } },
+		include: {
+			assignments: { include: { job: true } },
+			user: { select: { id: true, email: true, identifierToken: true } }
+		},
 		orderBy: { lastName: 'asc' }
 	});
 	return json(workers);
@@ -24,17 +28,49 @@ export const POST: RequestHandler = async ({ request }) => {
 		businessId = newBusiness.id;
 	}
 
+	// Generate temp password and/or identifier token if creating login
+	let identifierToken: string | undefined;
+	let passwordHash: string | undefined;
+
+	if (data.createLogin) {
+		if (data.email) {
+			// Has email → create with temp password
+			const tempPassword = Math.random().toString(36).slice(2, 10) + 'A1!';
+			passwordHash = hashPassword(tempPassword);
+		} else {
+			// No email → create with identifier token
+			identifierToken = generateIdentifierToken();
+		}
+	}
+
 	const worker = await prisma.worker.create({
 		data: {
 			businessId,
 			firstName: data.firstName,
 			lastName: data.lastName,
-			email: data.email,
-			phone: data.phone,
+			email: data.email || null,
+			phone: data.phone || null,
 			role: data.role ?? 'worker',
 			notes: data.notes,
 		}
 	});
 
-	return json(worker, { status: 201 });
+	// Create user account if requested
+	if (data.createLogin && (data.email || identifierToken)) {
+		await prisma.user.create({
+			data: {
+				email: data.email || null,
+				passwordHash: passwordHash || null,
+				role: 'worker',
+				workerId: worker.id,
+				mustResetPassword: true,
+				identifierToken: identifierToken || null,
+			}
+		});
+	}
+
+	return json({
+		...worker,
+		identifierToken: identifierToken || undefined,
+	}, { status: 201 });
 };

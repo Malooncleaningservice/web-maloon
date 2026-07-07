@@ -172,6 +172,8 @@ model Worker {
   updatedAt DateTime @updatedAt
 
   assignments JobAssignment[]
+  user        User?           @relation
+  profileChanges ProfileChange[]
 }
 
 model JobAssignment {
@@ -181,4 +183,54 @@ model JobAssignment {
   workerId  String
   worker    Worker   @relation(fields: [workerId], references: [id])
   assignedAt DateTime @default(now())
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String?  @unique
+  passwordHash     String?
+  role             String   @default("worker") // admin, worker
+  workerId         String?  @unique
+  worker           Worker?  @relation(fields: [workerId], references: [id])
+  mustResetPassword Boolean  @default(false)
+  identifierToken  String?  @unique
+  displayName      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sessions        Session[]
+  notifications   Notification[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model ProfileChange {
+  id          String    @id @default(cuid())
+  workerId    String
+  worker      Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  field       String
+  oldValue    String?
+  newValue    String
+  status      String    @default("pending") // pending, approved, rejected
+  requestedBy String
+  reviewedBy  String?
+  requestedAt DateTime  @default(now())
+  reviewedAt  DateTime?
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

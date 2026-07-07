@@ -6,7 +6,10 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ params }) => {
 	const worker = await prisma.worker.findUnique({
 		where: { id: params.id },
-		include: { assignments: { include: { job: true } } }
+		include: {
+			assignments: { include: { job: true } },
+			user: { select: { id: true, email: true, identifierToken: true } }
+		}
 	});
 	if (!worker) return json({ error: 'Not found' }, { status: 404 });
 	return json(worker);
@@ -32,13 +35,22 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 			w9ParsedTin: data.w9ParsedTin,
 			w9ParsedAddress: data.w9ParsedAddress,
 			w9Reviewed: data.w9Reviewed,
-		}
+		},
+		include: { user: { select: { id: true, email: true, identifierToken: true } } }
 	});
 	return json(worker);
 };
 
 // DELETE /api/workers/[id] — delete a worker
 export const DELETE: RequestHandler = async ({ params }) => {
+	// Delete associated user first if exists
+	const worker = await prisma.worker.findUnique({
+		where: { id: params.id },
+		include: { user: true }
+	});
+	if (worker?.user) {
+		await prisma.user.delete({ where: { id: worker.user.id } });
+	}
 	await prisma.jobAssignment.deleteMany({ where: { workerId: params.id } });
 	await prisma.worker.delete({ where: { id: params.id } });
 	return json({ success: true });
