@@ -239,6 +239,7 @@
 		role="button"
 		tabindex="0"
 	>
+		<!-- svelte-ignore a11y_img_redundant_alt -->
 		<img src={showingPhotoUrl} alt="Task photo" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
 	</div>
 {/if}
@@ -316,7 +317,7 @@
 			<!-- Assigned Workers -->
 			{#if assignments.length > 0}
 				<div style="margin-bottom: 12px;">
-					<label class="text-secondary" style="font-size: 0.8rem;">Assigned</label>
+					<span class="text-secondary" style="font-size: 0.8rem;">Assigned</span>
 					{#each assignments as a}
 						<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
 							<span style="font-weight: 500;">{a.worker.firstName} {a.worker.lastName}</span>
@@ -368,7 +369,7 @@
 	<!-- Notes (if present) -->
 	{#if job.notes}
 		<div class="card" style="background: #fffbe6; border-left: 3px solid var(--warning);">
-			<label class="text-secondary" style="font-size: 0.8rem;">Job Notes</label>
+			<span class="text-secondary" style="font-size: 0.8rem;">Job Notes</span>
 			<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
 		</div>
 	{/if}

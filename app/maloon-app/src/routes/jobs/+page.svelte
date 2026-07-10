@@ -187,7 +187,7 @@
 						<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
 							<h3 style="font-size: 1rem; margin: 0;">{job.clientName}</h3>
 							{#if job.clientId && job.client}
-								<a href="/clients/{job.clientId}" class="text-secondary" style="font-size: 0.75rem; text-decoration: underline;" onclick="event.stopPropagation()">
+								<a href="/clients/{job.clientId}" class="text-secondary" style="font-size: 0.75rem; text-decoration: underline;" onclick={(e) => e.stopPropagation()}>
 									(client)
 								</a>
 							{/if}

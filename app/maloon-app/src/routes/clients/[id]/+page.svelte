@@ -119,20 +119,20 @@
 		<div class="card">
 			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
 				<div>
-					<label class="text-secondary" style="font-size: 0.8rem;">Phone</label>
+					<span class="text-secondary" style="font-size: 0.8rem;">Phone</span>
 					<p>{client.phone || '—'}</p>
 				</div>
 				<div>
-					<label class="text-secondary" style="font-size: 0.8rem;">Email</label>
+					<span class="text-secondary" style="font-size: 0.8rem;">Email</span>
 					<p>{client.email || '—'}</p>
 				</div>
 				<div style="grid-column: 1 / -1;">
-					<label class="text-secondary" style="font-size: 0.8rem;">Default Address</label>
+					<span class="text-secondary" style="font-size: 0.8rem;">Default Address</span>
 					<p>{client.address || '—'}</p>
 				</div>
 				{#if client.notes}
 					<div style="grid-column: 1 / -1;">
-						<label class="text-secondary" style="font-size: 0.8rem;">Notes</label>
+						<span class="text-secondary" style="font-size: 0.8rem;">Notes</span>
 						<p style="white-space: pre-wrap;">{client.notes}</p>
 					</div>
 				{/if}

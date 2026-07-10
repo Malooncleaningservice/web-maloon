@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.css';
+	import '../../app.css';
 	import { onMount } from 'svelte';
 
 	let selectedDate = $state(new Date().toISOString().slice(0, 10));

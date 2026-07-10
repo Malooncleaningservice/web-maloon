@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import './app.css';
+	import '../app.css';
 
 	let role = $state<string | null>(null);
 
