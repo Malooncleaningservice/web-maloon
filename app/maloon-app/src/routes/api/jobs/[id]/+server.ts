@@ -7,6 +7,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	const job = await prisma.job.findUnique({
 		where: { id: params.id },
 		include: {
+			client: true,
 			quote: true,
 			sections: {
 				orderBy: { sortOrder: 'asc' },
@@ -28,17 +29,23 @@ export const GET: RequestHandler = async ({ params }) => {
 // PATCH /api/jobs/[id] — update a job
 export const PATCH: RequestHandler = async ({ params, request }) => {
 	const data = await request.json();
+
+	const updateData: any = {};
+
+	if (data.clientName !== undefined) updateData.clientName = data.clientName;
+	if (data.clientPhone !== undefined) updateData.clientPhone = data.clientPhone;
+	if (data.clientEmail !== undefined) updateData.clientEmail = data.clientEmail;
+	if (data.clientId !== undefined) updateData.clientId = data.clientId;
+	if (data.address !== undefined) updateData.address = data.address;
+	if (data.status !== undefined) updateData.status = data.status;
+	if (data.notes !== undefined) updateData.notes = data.notes;
+	if (data.scheduledDate !== undefined) {
+		updateData.scheduledDate = data.scheduledDate ? new Date(data.scheduledDate) : null;
+	}
+
 	const job = await prisma.job.update({
 		where: { id: params.id },
-		data: {
-			clientName: data.clientName,
-			clientPhone: data.clientPhone,
-			clientEmail: data.clientEmail,
-			address: data.address,
-			scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : undefined,
-			status: data.status,
-			notes: data.notes,
-		}
+		data: updateData
 	});
 	return json(job);
 };

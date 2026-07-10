@@ -2,14 +2,26 @@
 	import '../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+
 	let jobId = $state('');
-	let job = $state<{id?: string; quoteId?: string; clientName?: string; address?: string; status?: string; scheduledDate?: string | null; total?: number}>({});
+	let job = $state<{
+		id?: string; quoteId?: string; clientId?: string; client?: {id: string; name: string} | null;
+		clientName?: string; address?: string; status?: string; scheduledDate?: string | null; total?: number; notes?: string;
+		assignments?: Array<{id: string; worker: {id: string; firstName: string; lastName: string}}>;
+	}>({});
 	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean; photos?: Array<{id: string; url: string; takenAt: string}>}>}>>([]);
 	let startWithTasks = $state<Array<{id: string; description: string; completed: boolean}>>([]);
 	let loading = $state(true);
-	let converting = $state(false);
 	let uploadingPhotoForTask = $state<string | null>(null);
 	let showingPhotoUrl = $state<string | null>(null);
+	let statusUpdating = $state(false);
+
+	// Worker assignment state
+	let allWorkers = $state<Array<{id: string; firstName: string; lastName: string; status: string}>>([]);
+	let assignments = $state<Array<{id: string; worker: {id: string; firstName: string; lastName: string}}>>([]);
+	let assigningWorkerId = $state('');
+	let assignSaving = $state(false);
+	let showAssignPanel = $state(false);
 
 	let newSectionName = $state('');
 	let newTaskDesc = $state('');
@@ -18,6 +30,7 @@
 	onMount(async () => {
 		jobId = $page.params.id;
 		await loadJob();
+		await loadWorkers();
 	});
 
 	async function loadJob() {
@@ -26,6 +39,7 @@
 			const res = await fetch(`/api/jobs/${jobId}`);
 			const data = await res.json();
 			job = data;
+			assignments = data.assignments ?? [];
 			sections = (data.sections ?? []).map((s: any) => ({
 				...s,
 				expanded: false,
@@ -39,6 +53,76 @@
 		}
 	}
 
+	async function loadWorkers() {
+		try {
+			const res = await fetch('/api/workers');
+			const data = await res.json();
+			allWorkers = data.filter((w: any) => w.status === 'active');
+		} catch (e) { /* ignore */ }
+	}
+
+	// --- Status management ---
+	async function updateStatus(newStatus: string) {
+		statusUpdating = true;
+		try {
+			await fetch(`/api/jobs/${jobId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status: newStatus }),
+			});
+			job = { ...job, status: newStatus };
+		} catch (e) {
+			console.error('Status update failed', e);
+			alert('Failed to update status.');
+		} finally {
+			statusUpdating = false;
+		}
+	}
+
+	// --- Worker assignment ---
+	async function assignWorker() {
+		if (!assigningWorkerId) return;
+		assignSaving = true;
+		try {
+			const res = await fetch(`/api/jobs/${jobId}/assign`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ workerId: assigningWorkerId }),
+			});
+			if (res.status === 409) {
+				const data = await res.json();
+				alert(`Conflict: Worker is already assigned to "${data.conflict?.clientName}" on this date.`);
+				return;
+			}
+			if (!res.ok) throw new Error(await res.text());
+			assigningWorkerId = '';
+			await loadJob();
+		} catch (e) {
+			console.error('Assignment failed', e);
+		} finally {
+			assignSaving = false;
+		}
+	}
+
+	async function removeAssignment(assignmentId: string) {
+		try {
+			await fetch(`/api/jobs/${jobId}/assign`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ assignmentId }),
+			});
+			await loadJob();
+		} catch (e) {
+			console.error('Failed to remove assignment', e);
+		}
+	}
+
+	function unassignedWorkers() {
+		const assignedIds = new Set(assignments.map(a => a.worker.id));
+		return allWorkers.filter(w => !assignedIds.has(w.id));
+	}
+
+	// --- Section / task management ---
 	async function addSection() {
 		if (!newSectionName.trim()) return;
 		try {
@@ -110,22 +194,6 @@
 		} catch (e) { console.error(e); }
 	}
 
-	async function convertQuoteToJob() {
-		if (!job.quoteId) return;
-		converting = true;
-		try {
-			const res = await fetch(`/api/quotes/${job.quoteId}/convert`, { method: 'POST' });
-			if (!res.ok) throw new Error(await res.text());
-			alert('Job created from quote!');
-			await loadJob();
-		} catch (e) {
-			console.error('Conversion failed', e);
-			alert('Failed to convert quote to job.');
-		} finally {
-			converting = false;
-		}
-	}
-
 	async function uploadTaskPhoto(sectionId: string, taskId: string, file: File) {
 		uploadingPhotoForTask = taskId;
 		try {
@@ -151,7 +219,6 @@
 		if (file) {
 			uploadTaskPhoto(sectionId, taskId, file);
 		}
-		// Reset input so same file can be re-uploaded
 		input.value = '';
 	}
 
@@ -181,17 +248,105 @@
 		<p class="text-secondary">Loading job...</p>
 	</div>
 {:else}
-	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-		<h2 style="font-size: 1.3rem;">{job.clientName ?? 'Job'} — {job.address ?? 'No address'}</h2>
+	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+		<div>
+			<h2 style="font-size: 1.3rem; margin: 0;">
+				{job.clientName ?? 'Job'} — {job.address ?? 'No address'}
+				{#if job.clientId && job.client}
+					<a href="/clients/{job.clientId}" style="font-size: 0.8rem; color: var(--primary); text-decoration: underline; margin-left: 8px;">view client</a>
+				{/if}
+			</h2>
+		</div>
 		<div style="display: flex; align-items: center; gap: 8px;">
 			{#if job.quoteId}
 				<span class="badge badge-quote">FROM QUOTE</span>
 			{/if}
 			{#if job.status}
-				<span class="badge badge-{job.status === 'completed' ? 'complete' : job.status === 'in_progress' ? 'active' : 'pending'}">{job.status.replace('_', ' ')}</span>
+				<span class="badge badge-{job.status === 'completed' ? 'complete' : job.status === 'in_progress' ? 'active' : 'pending'}">
+					{job.status.replace('_', ' ')}
+				</span>
 			{/if}
 		</div>
 	</div>
+
+	<!-- Status & Assignment Row -->
+	<div class="row mb-4" style="gap: 12px; flex-wrap: wrap;">
+		<!-- Status Buttons -->
+		<div style="display: flex; gap: 6px; align-items: center;">
+			{#if job.status === 'pending'}
+				<button class="btn btn-primary btn-sm" onclick={() => updateStatus('in_progress')} disabled={statusUpdating}>
+					▶ Start Job
+				</button>
+			{/if}
+			{#if job.status === 'in_progress'}
+				<button class="btn btn-success btn-sm" onclick={() => updateStatus('completed')} disabled={statusUpdating}>
+					✅ Mark Complete
+				</button>
+			{/if}
+			{#if job.status !== 'completed' && job.status !== 'cancelled'}
+				<button class="btn btn-outline btn-sm" onclick={() => updateStatus('cancelled')} disabled={statusUpdating}>
+					✕ Cancel
+				</button>
+			{/if}
+			{#if job.status === 'cancelled'}
+				<button class="btn btn-outline btn-sm" onclick={() => updateStatus('pending')} disabled={statusUpdating}>
+					↩ Reopen
+				</button>
+			{/if}
+		</div>
+
+		<!-- Worker Assignments -->
+		<div style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
+			{#if assignments.length > 0}
+				<span class="text-secondary" style="font-size: 0.85rem;">
+					👷 {assignments.map(a => `${a.worker.firstName} ${a.worker.lastName}`).join(', ')}
+				</span>
+			{/if}
+			<button class="btn btn-outline btn-sm" onclick={() => showAssignPanel = !showAssignPanel}>
+				{showAssignPanel ? 'Close' : 'Manage Workers'}
+			</button>
+		</div>
+	</div>
+
+	<!-- Worker Assignment Panel -->
+	{#if showAssignPanel}
+		<div class="card" style="background: #f8f9fa; margin-bottom: 16px;">
+			<h3 style="font-size: 0.95rem; margin-bottom: 8px;">Worker Assignment</h3>
+
+			<!-- Assigned Workers -->
+			{#if assignments.length > 0}
+				<div style="margin-bottom: 12px;">
+					<label class="text-secondary" style="font-size: 0.8rem;">Assigned</label>
+					{#each assignments as a}
+						<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
+							<span style="font-weight: 500;">{a.worker.firstName} {a.worker.lastName}</span>
+							<button class="btn btn-danger btn-sm" style="padding: 2px 8px; font-size: 0.7rem;"
+								onclick={() => removeAssignment(a.id)}>✕ Remove</button>
+						</div>
+					{/each}
+				</div>
+			{/if}
+
+			<!-- Assign New Worker -->
+			{#if unassignedWorkers().length > 0}
+				<div class="row" style="gap: 8px;">
+					<div class="col">
+						<select bind:value={assigningWorkerId}>
+							<option value="">— Select worker —</option>
+							{#each unassignedWorkers() as w}
+								<option value={w.id}>{w.firstName} {w.lastName}</option>
+							{/each}
+						</select>
+					</div>
+					<button class="btn btn-primary btn-sm" onclick={assignWorker} disabled={assignSaving || !assigningWorkerId}>
+						{assignSaving ? 'Assigning...' : 'Assign'}
+					</button>
+				</div>
+			{:else}
+				<p class="text-secondary" style="font-size: 0.85rem;">All active workers are assigned to this job.</p>
+			{/if}
+		</div>
+	{/if}
 
 	<!-- Start With Tasks -->
 	<div class="card">
@@ -209,6 +364,14 @@
 			<button class="btn btn-primary btn-sm" onclick={addStartWithTask}>+ Add</button>
 		</div>
 	</div>
+
+	<!-- Notes (if present) -->
+	{#if job.notes}
+		<div class="card" style="background: #fffbe6; border-left: 3px solid var(--warning);">
+			<label class="text-secondary" style="font-size: 0.8rem;">Job Notes</label>
+			<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
+		</div>
+	{/if}
 
 	<!-- Sections -->
 	{#each sections as section}
@@ -228,12 +391,10 @@
 							{#if task.requiredPhoto}<span class="badge badge-pending" style="font-size: 0.7rem;">📷 required</span>{/if}
 						</div>
 						<div style="display: flex; align-items: center; gap: 8px;">
-							<!-- Upload photo button -->
 							<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.75rem; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px;">
 								📎 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Photo'}
 								<input type="file" accept="image/*" style="display: none;" onchange={(e) => handlePhotoFile(section.id, task.id, e)} disabled={uploadingPhotoForTask === task.id} />
 							</label>
-							<!-- Existing photos -->
 							{#if task.photos && task.photos.length > 0}
 								{#each task.photos as photo}
 									<button
@@ -268,10 +429,5 @@
 	<div class="row mt-4">
 		<div class="col"><input placeholder="New section name (e.g. Break Room)..." bind:value={newSectionName} onkeydown={(e) => e.key === 'Enter' && addSection()} /></div>
 		<button class="btn btn-primary" onclick={addSection}>+ Add Section</button>
-	</div>
-
-	<div class="row mt-4" style="justify-content: flex-end; gap: 8px;">
-		<button class="btn btn-outline">Save Draft</button>
-		<button class="btn btn-success">✅ Submit Job</button>
 	</div>
 {/if}

@@ -5,7 +5,11 @@ import type { RequestHandler } from './$types';
 // GET /api/quotes — list all quotes
 export const GET: RequestHandler = async () => {
 	const quotes = await prisma.quote.findMany({
-		include: { quoteLineItems: true, quoteAddons: true },
+		include: {
+			client: { select: { id: true, name: true } },
+			quoteLineItems: true,
+			quoteAddons: true
+		},
 		orderBy: { createdAt: 'desc' }
 	});
 	return json(quotes);
@@ -26,12 +30,26 @@ export const POST: RequestHandler = async ({ request }) => {
 		businessId = newBusiness.id;
 	}
 
+	let clientName = data.clientName;
+	let clientPhone = data.clientPhone;
+	let address = data.address;
+
+	if (data.clientId) {
+		const client = await prisma.client.findUnique({ where: { id: data.clientId } });
+		if (client) {
+			clientName = data.clientName || client.name;
+			clientPhone = data.clientPhone || client.phone || undefined;
+			address = data.address || client.address || undefined;
+		}
+	}
+
 	const quote = await prisma.quote.create({
 		data: {
 			businessId,
-			clientName: data.clientName,
-			clientPhone: data.clientPhone,
-			address: data.address,
+			clientId: data.clientId ?? null,
+			clientName,
+			clientPhone,
+			address,
 			squareFootage: data.squareFootage ?? 0,
 			ratePerSqFt: data.ratePerSqFt ?? 0.15,
 			workerCount: data.workerCount ?? 1,

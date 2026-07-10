@@ -26,6 +26,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		data: {
 			businessId,
 			quoteId: quote.id,
+			clientId: quote.clientId,
 			clientName: quote.clientName ?? 'Unknown Client',
 			clientPhone: quote.clientPhone,
 			clientEmail: quote.clientEmail,

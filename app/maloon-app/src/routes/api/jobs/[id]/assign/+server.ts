@@ -13,9 +13,43 @@ export const GET: RequestHandler = async ({ params }) => {
 
 // POST /api/jobs/[id]/assign — assign a worker to a job
 export const POST: RequestHandler = async ({ params, request }) => {
-	const { workerId } = await request.json();
+	const { workerId, scheduledDate } = await request.json();
+
+	const job = await prisma.job.findUnique({ where: { id: params.id }, select: { scheduledDate: true } });
+	const assignmentDate = scheduledDate ? new Date(scheduledDate) : job?.scheduledDate;
+
+	if (assignmentDate) {
+		const date = new Date(assignmentDate);
+		date.setHours(0, 0, 0, 0);
+		const nextDay = new Date(date);
+		nextDay.setDate(nextDay.getDate() + 1);
+
+		const conflict = await prisma.jobAssignment.findFirst({
+			where: {
+				workerId,
+				jobId: { not: params.id },
+				job: {
+					scheduledDate: { gte: date, lt: nextDay },
+					status: { not: 'cancelled' }
+				}
+			},
+			include: { job: { select: { clientName: true, scheduledDate: true } } }
+		});
+
+		if (conflict) {
+			return json({
+				error: 'Worker already assigned to another job on this date',
+				conflict: conflict.job
+			}, { status: 409 });
+		}
+	}
+
 	const assignment = await prisma.jobAssignment.create({
-		data: { jobId: params.id, workerId }
+		data: {
+			jobId: params.id,
+			workerId,
+			scheduledDate: assignmentDate ?? undefined,
+		}
 	});
 	return json(assignment, { status: 201 });
 };

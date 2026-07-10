@@ -94,6 +94,8 @@
 					{#if user.role === 'admin'}
 						<a href="/quotes">Quotes</a>
 						<a href="/jobs">Jobs</a>
+						<a href="/dispatch">Dispatch</a>
+						<a href="/clients">Clients</a>
 						<a href="/personnel">Personnel</a>
 					{:else}
 						<a href="/worker">Dashboard</a>

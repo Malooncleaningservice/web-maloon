@@ -6,12 +6,19 @@
 	// --- Tabs ---
 	let activeTab = $state<'new' | 'saved'>('new');
 
+	// --- Clients ---
+	let clients = $state<Array<{id: string; name: string; phone: string | null; email: string | null; address: string | null}>>([]);
+
 	// --- Saved quotes ---
 	let quotes = $state<Array<{id: string; clientName: string; clientPhone?: string; address?: string; squareFootage: number; total: number; status: string; quoteLineItems: Array<any>; quoteAddons: Array<any>; createdAt: string}>>([]);
 	let loadingQuotes = $state(true);
 	let convertingId = $state<string | null>(null);
 
+	// --- Query string param: ?edit=quoteId ---
+	let editingId = $state<string | null>(null);
+
 	// --- New quote form state ---
+	let selectedClientId = $state('');
 	let clientName = $state('');
 	let clientPhone = $state('');
 	let address = $state('');
@@ -24,7 +31,7 @@
 	let lineItemCatalog = $state<Array<{id: string; name: string; basePrice: number; hasSizeMod: boolean; sizeSmall?: number; sizeMedium?: number; sizeLarge?: number}>>([]);
 
 	onMount(async () => {
-		await loadQuotes();
+		await Promise.all([loadQuotes(), loadClients()]);
 		try {
 			const res = await fetch('/api/line-items');
 			const items = await res.json();
@@ -53,6 +60,15 @@
 		}
 	});
 
+	async function loadClients() {
+		try {
+			const res = await fetch('/api/clients');
+			if (res.ok) clients = await res.json();
+		} catch (e) {
+			console.error('Failed to load clients', e);
+		}
+	}
+
 	async function loadQuotes() {
 		loadingQuotes = true;
 		try {
@@ -62,6 +78,51 @@
 			console.error('Failed to load quotes', e);
 		} finally {
 			loadingQuotes = false;
+		}
+	}
+
+	function onClientSelect(event: Event) {
+		const select = event.target as HTMLSelectElement;
+		const id = select.value;
+		selectedClientId = id;
+		if (id) {
+			const client = clients.find(c => c.id === id);
+			if (client) {
+				clientName = client.name;
+				clientPhone = client.phone || '';
+				address = client.address || '';
+			}
+		}
+	}
+
+	async function editQuote(quoteId: string) {
+		try {
+			const res = await fetch(`/api/quotes/${quoteId}`);
+			if (!res.ok) throw new Error('Not found');
+			const q = await res.json();
+			editingId = q.id;
+			clientName = q.clientName || '';
+			clientPhone = q.clientPhone || '';
+			address = q.address || '';
+			squareFootage = q.squareFootage || 0;
+			ratePerSqFt = q.ratePerSqFt || 0.15;
+			workerCount = q.workerCount || 1;
+			selectedItems = (q.quoteLineItems || []).map((li: any) => ({
+				id: li.id,
+				name: li.name,
+				price: li.price,
+				size: li.size || null,
+				quantity: li.quantity || 1,
+			}));
+			customItems = (q.quoteAddons || []).map((a: any) => ({
+				name: a.name,
+				price: a.price,
+			}));
+			activeTab = 'new';
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		} catch (e) {
+			console.error('Failed to load quote for editing', e);
+			alert('Failed to load quote.');
 		}
 	}
 
@@ -153,33 +214,40 @@
 	async function saveQuote() {
 		saving = true;
 		try {
-			const res = await fetch('/api/quotes', {
-				method: 'POST',
+			const body = {
+				clientId: selectedClientId || undefined,
+				clientName: clientName || 'New Client',
+				clientPhone,
+				address: address || 'TBD',
+				squareFootage,
+				ratePerSqFt,
+				workerCount,
+				status: 'draft',
+				total: grandTotal,
+				lineItems: selectedItems.map(i => ({
+					name: i.name,
+					price: i.price,
+					size: i.size,
+					quantity: i.quantity,
+				})),
+				addons: customItems.map(a => ({
+					name: a.name,
+					price: a.price,
+				})),
+			};
+
+			const method = editingId ? 'PATCH' : 'POST';
+			const url = editingId ? `/api/quotes/${editingId}` : '/api/quotes';
+
+			const res = await fetch(url, {
+				method,
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					clientName: clientName || 'New Client',
-					clientPhone,
-					address: address || 'TBD',
-					squareFootage,
-					ratePerSqFt,
-					workerCount,
-					status: 'draft',
-					total: grandTotal,
-					lineItems: selectedItems.map(i => ({
-						name: i.name,
-						price: i.price,
-						size: i.size,
-						quantity: i.quantity,
-					})),
-					addons: customItems.map(a => ({
-						name: a.name,
-						price: a.price,
-					})),
-				}),
+				body: JSON.stringify(body),
 			});
+
 			if (!res.ok) throw new Error(await res.text());
 			const quote = await res.json();
-			alert(`Quote saved! #${quote.id.slice(0, 8)} — $${grandTotal.toFixed(2)}`);
+			alert(`Quote ${editingId ? 'updated' : 'saved'}! #${quote.id.slice(0, 8)} — $${grandTotal.toFixed(2)}`);
 			resetForm();
 			await loadQuotes();
 		} catch (e) {
@@ -191,6 +259,8 @@
 	}
 
 	function resetForm() {
+		editingId = null;
+		selectedClientId = '';
 		clientName = ''; clientPhone = ''; address = '';
 		squareFootage = 0; ratePerSqFt = 0.15; workerCount = 1;
 		selectedItems = []; customItems = [];
@@ -202,7 +272,7 @@
 	<button
 		class="btn {activeTab === 'new' ? 'btn-primary' : 'btn-outline'}"
 		onclick={() => activeTab = 'new'}
-	>✚ New Quote</button>
+	>✚ {editingId ? 'Edit Quote' : 'New Quote'}</button>
 	<button
 		class="btn {activeTab === 'saved' ? 'btn-primary' : 'btn-outline'}"
 		onclick={() => activeTab = 'saved'}
@@ -251,10 +321,11 @@
 										{quote.status.toUpperCase()}
 									</span>
 								</td>
-								<td style="padding: 10px 12px;">
+								<td style="padding: 10px 12px; white-space: nowrap;">
 									{#if quote.status === 'accepted' || quote.status === 'rejected'}
 										<span class="text-secondary" style="font-size: 0.8rem;">✓ Done</span>
 									{:else}
+										<button class="btn btn-outline btn-sm" onclick={() => editQuote(quote.id)} style="margin-right: 4px;">Edit</button>
 										<button
 											class="btn btn-success btn-sm"
 											onclick={() => convertToJob(quote.id)}
@@ -275,7 +346,20 @@
 <!-- NEW QUOTE TAB -->
 {:else}
 	<div class="card">
-		<h2 style="margin-bottom: 12px;">New Quote</h2>
+		<h2 style="margin-bottom: 12px;">{editingId ? 'Edit Quote' : 'New Quote'}</h2>
+
+		<!-- Client Select -->
+		{#if clients.length > 0}
+			<div class="mb-4">
+				<label for="clientSelect">Select Client (optional)</label>
+				<select id="clientSelect" value={selectedClientId} onchange={onClientSelect}>
+					<option value="">— Type manually below —</option>
+					{#each clients as c}
+						<option value={c.id}>{c.name}{c.phone ? ` — ${c.phone}` : ''}</option>
+					{/each}
+				</select>
+			</div>
+		{/if}
 
 		<!-- Client Info -->
 		<div class="row mb-4">
@@ -395,7 +479,7 @@
 		<div class="row mt-4" style="justify-content: flex-end; gap: 8px;">
 			<button class="btn btn-outline" onclick={resetForm}>Reset</button>
 			<button class="btn btn-success" onclick={saveQuote} disabled={saving}>
-				{saving ? 'Saving...' : '💾 Save Quote'}
+				{saving ? 'Saving...' : editingId ? '💾 Update Quote' : '💾 Save Quote'}
 			</button>
 		</div>
 	</div>

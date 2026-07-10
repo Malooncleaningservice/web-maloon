@@ -24,13 +24,17 @@ const ADMIN_ROUTES = [
 	'/personnel',
 	'/quotes',
 	'/jobs',
+	'/clients',
+	'/dispatch',
 	'/api/workers',
 	'/api/jobs',
 	'/api/quotes',
+	'/api/clients',
 	'/api/line-items',
 	'/api/sections',
 	'/api/notifications',
 	'/api/profile-changes',
+	'/api/dashboard',
 ];
 
 // Protected API routes (upload, etc.) — require auth but allow workers too

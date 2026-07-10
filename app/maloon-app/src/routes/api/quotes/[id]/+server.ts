@@ -15,19 +15,23 @@ export const GET: RequestHandler = async ({ params }) => {
 // PATCH /api/quotes/[id] — update a quote
 export const PATCH: RequestHandler = async ({ params, request }) => {
 	const data = await request.json();
+
+	const updateData: any = {};
+
+	if (data.clientName !== undefined) updateData.clientName = data.clientName;
+	if (data.clientPhone !== undefined) updateData.clientPhone = data.clientPhone;
+	if (data.clientId !== undefined) updateData.clientId = data.clientId;
+	if (data.address !== undefined) updateData.address = data.address;
+	if (data.squareFootage !== undefined) updateData.squareFootage = data.squareFootage;
+	if (data.ratePerSqFt !== undefined) updateData.ratePerSqFt = data.ratePerSqFt;
+	if (data.workerCount !== undefined) updateData.workerCount = data.workerCount;
+	if (data.status !== undefined) updateData.status = data.status;
+	if (data.total !== undefined) updateData.total = data.total;
+	if (data.notes !== undefined) updateData.notes = data.notes;
+
 	const quote = await prisma.quote.update({
 		where: { id: params.id },
-		data: {
-			clientName: data.clientName,
-			clientPhone: data.clientPhone,
-			address: data.address,
-			squareFootage: data.squareFootage,
-			ratePerSqFt: data.ratePerSqFt,
-			workerCount: data.workerCount,
-			status: data.status,
-			total: data.total,
-			notes: data.notes,
-		},
+		data: updateData,
 		include: { quoteLineItems: true, quoteAddons: true }
 	});
 	return json(quote);
