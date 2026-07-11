@@ -23,7 +23,7 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 		const nextDay = new Date(date);
 		nextDay.setDate(nextDay.getDate() + 1);
 
-		const conflict = await prisma.jobAssignment.findFirst({
+		const conflicts = await prisma.jobAssignment.findMany({
 			where: {
 				workerId,
 				jobId: { not: params.id },
@@ -35,11 +35,28 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 			include: { job: { select: { clientName: true, scheduledDate: true } } }
 		});
 
-		if (conflict) {
-			return json({
-				error: 'Worker already assigned to another job on this date',
-				conflict: conflict.job
-			}, { status: 409 });
+		const jobTime = new Date(assignmentDate);
+		const hasTime = jobTime.getHours() > 0 || jobTime.getMinutes() > 0;
+
+		for (const c of conflicts) {
+			const conflictTime = c.job.scheduledDate ? new Date(c.job.scheduledDate) : null;
+			const conflictHasTime = conflictTime && (conflictTime.getHours() > 0 || conflictTime.getMinutes() > 0);
+
+			if (hasTime && conflictHasTime) {
+				const twoHours = 2 * 60 * 60 * 1000;
+				const diff = Math.abs(jobTime.getTime() - conflictTime!.getTime());
+				if (diff < twoHours) {
+					return json({
+						error: 'Worker has another job within 2 hours of this time',
+						conflict: c.job
+					}, { status: 409 });
+				}
+			} else {
+				return json({
+					error: 'Worker already assigned to another job on this date',
+					conflict: c.job
+				}, { status: 409 });
+			}
 		}
 	}
 
@@ -55,6 +72,15 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 
 export const DELETE: RequestHandler = apiHandler(async ({ params, request }) => {
 	const { assignmentId } = await request.json();
+
+	const assignment = await prisma.jobAssignment.findUnique({
+		where: { id: assignmentId },
+		select: { jobId: true }
+	});
+	if (!assignment || assignment.jobId !== params.id) {
+		return json({ error: 'Assignment not found' }, { status: 404 });
+	}
+
 	await prisma.jobAssignment.delete({ where: { id: assignmentId } });
 	return json({ success: true });
 });

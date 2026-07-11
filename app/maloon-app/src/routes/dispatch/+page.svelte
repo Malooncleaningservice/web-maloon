@@ -27,9 +27,10 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch(`/api/jobs?date=${selectedDate}`);
+			const res = await fetch(`/api/jobs?date=${selectedDate}&take=100`);
 			if (res.ok) {
-				jobs = await res.json();
+				const data = await res.json();
+				jobs = data.jobs ?? [];
 			} else {
 				error = 'Failed to load jobs for this date';
 			}

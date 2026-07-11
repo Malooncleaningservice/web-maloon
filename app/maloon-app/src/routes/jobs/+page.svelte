@@ -4,8 +4,11 @@
 
 	let jobs = $state<Array<{id: string; clientName: string; clientId: string | null; client?: {id: string; name: string} | null; address: string; status: string; scheduledDate: string | null; total: number; isQuote: boolean; assignments?: Array<{worker: {firstName: string; lastName: string}}>}>>([]);
 	let loading = $state(true);
+	let totalJobs = $state(0);
+	let hasMore = $state(false);
+	let pageSize = $state(50);
 	let showNewJob = $state(false);
-	let newJob = $state({ clientId: '', clientName: '', phone: '', email: '', address: '', scheduledDate: '', notes: '' });
+	let newJob = $state({ clientId: '', clientName: '', phone: '', email: '', address: '', scheduledDate: '', notes: '', total: '', isRecurring: false, recurrencePattern: '', recurrenceEndDate: '' });
 	let saving = $state(false);
 	let filterDate = $state('');
 	let filterStatus = $state('');
@@ -40,28 +43,36 @@
 		}
 	}
 
-	async function loadJobs() {
-		loading = true;
+	async function loadJobs(reset = true) {
+		if (reset) {
+			jobs = [];
+			loading = true;
+		}
 		error = '';
 		try {
 			let url = '/api/jobs';
 			const params = new URLSearchParams();
 			if (filterDate) params.set('date', filterDate);
 			if (filterStatus) params.set('status', filterStatus);
+			params.set('take', String(pageSize));
+			if (!reset) params.set('skip', String(jobs.length));
 			const qs = params.toString();
 			if (qs) url += '?' + qs;
 
 			const res = await fetch(url);
 			if (res.ok) {
 				const data = await res.json();
-				jobs = data.map((j: any) => ({
+				const mapped = data.jobs.map((j: any) => ({
 					...j,
 					isQuote: !!j.quoteId,
 					clientName: j.clientName ?? 'Unknown',
 					address: j.address ?? '',
-					total: j.quote?.total ?? undefined,
+					total: j.total ?? j.quote?.total ?? undefined,
 					assignments: j.assignments ?? [],
 				}));
+				jobs = reset ? mapped : [...jobs, ...mapped];
+				totalJobs = data.total;
+				hasMore = jobs.length < totalJobs;
 			} else {
 				error = 'Failed to load jobs';
 			}
@@ -86,10 +97,14 @@
 					address: newJob.address,
 					scheduledDate: newJob.scheduledDate || undefined,
 					notes: newJob.notes || undefined,
+					total: newJob.total ? parseFloat(newJob.total) : undefined,
+					isRecurring: newJob.isRecurring,
+					recurrencePattern: newJob.recurrencePattern || undefined,
+					recurrenceEndDate: newJob.recurrenceEndDate || undefined,
 				}),
 			});
 			showNewJob = false;
-			newJob = { clientId: '', clientName: '', phone: '', email: '', address: '', scheduledDate: '', notes: '' };
+			newJob = { clientId: '', clientName: '', phone: '', email: '', address: '', scheduledDate: '', notes: '', total: '', isRecurring: false, recurrencePattern: '', recurrenceEndDate: '' };
 			await loadJobs();
 		} catch (e) {
 			console.error('Create job failed', e);
@@ -168,10 +183,34 @@
 			<div class="col"><label for="cjPhone">Phone</label><input id="cjPhone" bind:value={newJob.phone} /></div>
 		</div>
 		<div class="mb-2"><label for="cjAddr">Address</label><input id="cjAddr" bind:value={newJob.address} /></div>
-		<div class="row mb-4">
+		<div class="row mb-2">
 			<div class="col"><label for="cjEmail">Email</label><input id="cjEmail" type="email" bind:value={newJob.email} /></div>
-			<div class="col"><label for="cjDate">Scheduled</label><input id="cjDate" type="date" bind:value={newJob.scheduledDate} /></div>
+			<div class="col"><label for="cjDate">Scheduled</label><input id="cjDate" type="datetime-local" bind:value={newJob.scheduledDate} /></div>
 		</div>
+		<div class="row mb-2">
+			<div class="col"><label for="cjTotal">Total ($)</label><input id="cjTotal" type="number" step="0.01" min="0" placeholder="0.00" bind:value={newJob.total} /></div>
+			<div class="col" style="display: flex; align-items: flex-end; gap: 8px;">
+				<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.85rem;">
+					<input type="checkbox" bind:checked={newJob.isRecurring} />
+					Recurring
+				</label>
+			</div>
+		</div>
+		{#if newJob.isRecurring}
+			<div class="row mb-2">
+				<div class="col">
+					<label for="cjPattern">Frequency</label>
+					<select id="cjPattern" bind:value={newJob.recurrencePattern}>
+						<option value="">— Select —</option>
+						<option value="weekly">Weekly</option>
+						<option value="biweekly">Biweekly</option>
+						<option value="fourWeekly">Every 4 Weeks</option>
+						<option value="monthly">Monthly</option>
+					</select>
+				</div>
+				<div class="col"><label for="cjEndDate">End Date</label><input id="cjEndDate" type="date" bind:value={newJob.recurrenceEndDate} /></div>
+			</div>
+		{/if}
 		<div class="mb-4"><label for="cjNotes">Notes</label><textarea id="cjNotes" bind:value={newJob.notes} rows="2"></textarea></div>
 		<button class="btn btn-success" onclick={createJob} disabled={saving}>
 			{saving ? 'Creating...' : 'Create Job'}
@@ -235,6 +274,18 @@
 	{#if jobs.length === 0}
 		<div class="card" style="text-align: center; padding: 40px;">
 			<p class="text-secondary">No jobs found. Create one or adjust filters.</p>
+		</div>
+	{/if}
+
+	{#if hasMore}
+		<div style="text-align: center; padding: 16px;">
+			<button class="btn btn-outline" onclick={() => loadJobs(false)}>
+				Load More ({totalJobs - jobs.length} remaining)
+			</button>
+		</div>
+	{:else if jobs.length > 0}
+		<div style="text-align: center; padding: 16px;">
+			<span class="text-secondary">Showing {jobs.length} of {totalJobs} jobs</span>
 		</div>
 	{/if}
 {/if}

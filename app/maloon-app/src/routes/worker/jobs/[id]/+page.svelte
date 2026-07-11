@@ -20,41 +20,54 @@
 
 	async function loadJob() {
 		try {
-			const res = await fetch(`/api/jobs/${jobId}`);
+			const res = await fetch(`/api/worker/jobs/${jobId}`);
 			if (res.ok) job = await res.json();
 		} catch { /* ignore */ }
 		loading = false;
 	}
 
 	async function toggleTask(taskId: string, completed: boolean, comment?: string) {
-		// Find the section that contains this task
-		for (const section of job.sections || []) {
-			const task = section.tasks?.find((t: any) => t.id === taskId);
-			if (task) {
-				await fetch(`/api/sections/${section.id}/tasks`, {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						taskId,
-						completed,
-						completedBy: user?.workerId,
-						comment: comment || undefined,
-					})
-				});
-				task.completed = completed;
-				task.comment = comment || task.comment;
-			}
+		const section = (job.sections || []).find((s: any) =>
+			(s.tasks || []).some((t: any) => t.id === taskId)
+		);
+		if (!section) return;
+
+		const task = section.tasks.find((t: any) => t.id === taskId);
+		const prevCompleted = task.completed;
+		const prevComment = task.comment;
+
+		task.completed = completed;
+		task.comment = comment || task.comment;
+
+		try {
+			const res = await fetch('/api/worker/tasks', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ taskId, completed, comment: comment || undefined })
+			});
+			if (!res.ok) throw new Error(await res.text());
+		} catch {
+			task.completed = prevCompleted;
+			task.comment = prevComment;
 		}
 	}
 
 	async function toggleStartWith(taskId: string, completed: boolean) {
-		await fetch(`/api/jobs/${jobId}/start-with`, {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ taskId, completed, completedBy: user?.workerId })
-		});
 		const task = job.startWithTasks?.find((t: any) => t.id === taskId);
+		const prevCompleted = task?.completed;
+
 		if (task) task.completed = completed;
+
+		try {
+			const res = await fetch('/api/worker/start-with', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ taskId, completed })
+			});
+			if (!res.ok) throw new Error(await res.text());
+		} catch {
+			if (task) task.completed = prevCompleted;
+		}
 	}
 
 	function statusColor(s: string) {

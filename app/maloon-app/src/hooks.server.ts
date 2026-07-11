@@ -37,13 +37,15 @@ const ADMIN_ROUTES = [
 	'/api/dashboard',
 ];
 
-// Protected API routes (upload, etc.) — require auth but allow workers too
-const PROTECTED_API_ROUTES = [
+// Worker-accessible API routes — allow both workers and admins
+const WORKER_API_ROUTES = [
+	'/api/worker',
+	'/api/auth/me',
 	'/api/upload',
 ];
 
-function isProtectedApiRoute(pathname: string): boolean {
-	return PROTECTED_API_ROUTES.some(r => pathname.startsWith(r));
+function isWorkerApiRoute(pathname: string): boolean {
+	return WORKER_API_ROUTES.some(r => pathname.startsWith(r));
 }
 
 function isPublic(pathname: string): boolean {
@@ -119,6 +121,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (event.locals.user.mustResetPassword && !pathname.startsWith('/api/auth/')) {
 		// Redirect to login where they'll see the setup form
 		throw redirect(302, '/login?setup=1');
+	}
+
+	// Worker API routes — accessible by any authenticated user
+	if (isWorkerApiRoute(pathname)) {
+		return resolve(event);
 	}
 
 	// Role-based access

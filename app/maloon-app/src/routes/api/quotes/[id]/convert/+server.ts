@@ -11,6 +11,11 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 
 	if (!quote) return json({ error: 'Quote not found' }, { status: 404 });
 
+	const existingJob = await prisma.job.findFirst({ where: { quoteId: params.id } });
+	if (existingJob) {
+		return json({ error: 'This quote has already been converted to a job', jobId: existingJob.id }, { status: 409 });
+	}
+
 	// Get or create business
 	const business = await prisma.business.findFirst();
 	let businessId = business?.id;
@@ -31,9 +36,9 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 			clientPhone: quote.clientPhone,
 			clientEmail: quote.clientEmail,
 			address: quote.address ?? '',
+			total: quote.total,
 			status: 'pending',
 			notes: quote.notes,
-			// Create a section for each line item group
 			sections: {
 				create: groupLineItems(quote.quoteLineItems, quote.quoteAddons)
 			}

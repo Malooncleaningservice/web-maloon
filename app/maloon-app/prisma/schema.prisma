@@ -107,15 +107,22 @@ model Job {
   clientPhone   String?
   clientEmail   String?
   address       String
+  total         Float    @default(0)
   status        String   @default("pending") // pending, in_progress, completed, cancelled
   scheduledDate DateTime?
   notes         String?
+  isRecurring           Boolean  @default(false)
+  recurrencePattern     String?  // weekly, biweekly, fourWeekly, monthly
+  recurrenceEndDate     DateTime?
+  recurringTemplateId   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   sections        JobSection[]
   startWithTasks  StartWithTask[]
   assignments     JobAssignment[]
+  childJobs       Job[]        @relation("RecurringJob")
+  parentJob       Job?         @relation("RecurringJob", fields: [recurringTemplateId], references: [id])
 }
 
 model JobSection {

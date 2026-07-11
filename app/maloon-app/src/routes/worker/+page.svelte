@@ -24,25 +24,9 @@
 
 	async function loadAssignedJobs() {
 		try {
-			// Use the jobs API with assignments filtered by worker
-			const res = await fetch('/api/jobs');
+			const res = await fetch('/api/worker/jobs');
 			if (res.ok) {
-				const allJobs = await res.json();
-				// Filter jobs where this worker is assigned
-				const workerJobs = allJobs.filter((j: any) =>
-					j.assignments?.some((a: any) => a.workerId === user?.workerId)
-				);
-				// For each job, load details to get sections/tasks
-				const detailedJobs = await Promise.all(
-					workerJobs.map(async (j: any) => {
-						try {
-							const dRes = await fetch(`/api/jobs/${j.id}`);
-							if (dRes.ok) return await dRes.json();
-						} catch { /* ignore */ }
-						return j;
-					})
-				);
-				jobs = detailedJobs;
+				jobs = await res.json();
 			}
 		} catch { /* ignore */ }
 	}

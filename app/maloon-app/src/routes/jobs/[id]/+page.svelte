@@ -6,7 +6,10 @@
 	let jobId = $state('');
 	let job = $state<{
 		id?: string; quoteId?: string; clientId?: string; client?: {id: string; name: string} | null;
-		clientName?: string; address?: string; status?: string; scheduledDate?: string | null; total?: number; notes?: string;
+		clientName?: string; address?: string; status?: string; scheduledDate?: string | null;
+		total?: number; notes?: string;
+		isRecurring?: boolean; recurrencePattern?: string; recurrenceEndDate?: string | null;
+		recurringTemplateId?: string | null;
 		assignments?: Array<{id: string; worker: {id: string; firstName: string; lastName: string}}>;
 	}>({});
 	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean; photos?: Array<{id: string; url: string; takenAt: string}>}>}>>([]);
@@ -22,6 +25,18 @@
 	let assigningWorkerId = $state('');
 	let assignSaving = $state(false);
 	let showAssignPanel = $state(false);
+
+	// Edit job fields
+	let showEditPanel = $state(false);
+	let editTotal = $state(0);
+	let editIsRecurring = $state(false);
+	let editRecurrencePattern = $state('');
+	let editRecurrenceEndDate = $state('');
+	let editSaving = $state(false);
+
+	// Recurring generation
+	let generating = $state(false);
+	let generateMessage = $state('');
 
 	let newSectionName = $state('');
 	let newTaskDesc = $state('');
@@ -117,6 +132,60 @@
 		}
 	}
 
+	// --- Job editing ---
+	function openEdit() {
+		editTotal = job.total ?? 0;
+		editIsRecurring = job.isRecurring ?? false;
+		editRecurrencePattern = job.recurrencePattern ?? '';
+		editRecurrenceEndDate = job.recurrenceEndDate?.slice(0, 10) ?? '';
+		showEditPanel = true;
+	}
+
+	async function saveEdit() {
+		editSaving = true;
+		try {
+			const res = await fetch(`/api/jobs/${jobId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					total: editTotal,
+					isRecurring: editIsRecurring,
+					recurrencePattern: editRecurrencePattern || null,
+					recurrenceEndDate: editRecurrenceEndDate || null,
+				}),
+			});
+			if (res.ok) {
+				showEditPanel = false;
+				await loadJob();
+			} else {
+				const err = await res.json();
+				alert(err.error || 'Failed to save');
+			}
+		} catch (e) {
+			console.error(e);
+		} finally {
+			editSaving = false;
+		}
+	}
+
+	async function generateRecurring() {
+		generating = true;
+		generateMessage = '';
+		try {
+			const res = await fetch(`/api/jobs/${jobId}/generate-recurring`, { method: 'POST' });
+			const data = await res.json();
+			if (res.ok) {
+				generateMessage = `Generated ${data.generated} job instances.`;
+				await loadJob();
+			} else {
+				generateMessage = data.error || 'Generation failed';
+			}
+		} catch (e) {
+			generateMessage = 'Failed to generate recurring jobs';
+		}
+		generating = false;
+	}
+
 	function unassignedWorkers() {
 		const assignedIds = new Set(assignments.map(a => a.worker.id));
 		return allWorkers.filter(w => !assignedIds.has(w.id));
@@ -156,6 +225,7 @@
 	}
 
 	async function toggleTask(sectionId: string, taskId: string, completed: boolean) {
+		const prevSections = sections.map(s => ({...s, tasks: s.tasks.map(t => ({...t}))}));
 		sections = sections.map(s => {
 			if (s.id === sectionId) return { ...s, tasks: s.tasks.map(t => t.id === taskId ? { ...t, completed } : t) };
 			return s;
@@ -166,7 +236,10 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ taskId, completed }),
 			});
-		} catch (e) { console.error(e); }
+		} catch (e) {
+			sections = prevSections;
+			console.error(e);
+		}
 	}
 
 	async function addStartWithTask() {
@@ -184,6 +257,7 @@
 	}
 
 	async function toggleStartWith(taskId: string, completed: boolean) {
+		const prevTasks = startWithTasks.map(t => ({...t}));
 		startWithTasks = startWithTasks.map(t => t.id === taskId ? { ...t, completed } : t);
 		try {
 			await fetch(`/api/jobs/${jobId}/start-with`, {
@@ -191,7 +265,10 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ taskId, completed }),
 			});
-		} catch (e) { console.error(e); }
+		} catch (e) {
+			startWithTasks = prevTasks;
+			console.error(e);
+		}
 	}
 
 	async function uploadTaskPhoto(sectionId: string, taskId: string, file: File) {
@@ -261,6 +338,12 @@
 		<div style="display: flex; align-items: center; gap: 8px;">
 			{#if job.quoteId}
 				<span class="badge badge-quote">FROM QUOTE</span>
+			{/if}
+			{#if job.isRecurring}
+				<span class="badge" style="background: #e8f0fe; color: var(--primary);">🔁 Recurring {job.recurrencePattern}</span>
+			{/if}
+			{#if job.recurringTemplateId}
+				<span class="badge badge-pending">📋 Generated</span>
 			{/if}
 			{#if job.status}
 				<span class="badge badge-{job.status === 'completed' ? 'complete' : job.status === 'in_progress' ? 'active' : 'pending'}">
@@ -346,6 +429,60 @@
 			{:else}
 				<p class="text-secondary" style="font-size: 0.85rem;">All active workers are assigned to this job.</p>
 			{/if}
+		</div>
+	{/if}
+
+	<!-- Job Edit & Recurrence Panel -->
+	<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+		{#if job.total != null && job.total > 0}
+			<span class="fw-bold" style="font-size: 1rem;">${job.total.toFixed(2)}</span>
+		{/if}
+		<button class="btn btn-outline btn-sm" onclick={openEdit}>✎ Edit Details</button>
+		{#if job.isRecurring}
+			<button class="btn btn-primary btn-sm" onclick={generateRecurring} disabled={generating}>
+				{generating ? 'Generating...' : '🔄 Generate Instances'}
+			</button>
+		{/if}
+	</div>
+	{#if generateMessage}
+		<div class="card" style="background: {generateMessage.startsWith('Generated') ? '#e8f5e9' : '#fef7e0'}; border-left: 3px solid {generateMessage.startsWith('Generated') ? 'var(--success)' : 'var(--warning)'}; margin-bottom: 12px; padding: 8px 12px;">
+			<p style="font-size: 0.85rem;">{generateMessage}</p>
+		</div>
+	{/if}
+
+	{#if showEditPanel}
+		<div class="card" style="background: #f8f9fa; margin-bottom: 16px;">
+			<h3 style="font-size: 0.95rem; margin-bottom: 8px;">Edit Job Details</h3>
+			<div class="row mb-2">
+				<div class="col"><label for="ejTotal">Total ($)</label><input id="ejTotal" type="number" step="0.01" min="0" bind:value={editTotal} /></div>
+				<div class="col" style="display: flex; align-items: flex-end; gap: 8px;">
+					<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.85rem;">
+						<input type="checkbox" bind:checked={editIsRecurring} />
+						Recurring
+					</label>
+				</div>
+			</div>
+			{#if editIsRecurring}
+				<div class="row mb-2">
+					<div class="col">
+						<label for="ejPattern">Frequency</label>
+						<select id="ejPattern" bind:value={editRecurrencePattern}>
+							<option value="">— Select —</option>
+							<option value="weekly">Weekly</option>
+							<option value="biweekly">Biweekly</option>
+							<option value="fourWeekly">Every 4 Weeks</option>
+							<option value="monthly">Monthly</option>
+						</select>
+					</div>
+					<div class="col"><label for="ejEndDate">End Date</label><input id="ejEndDate" type="date" bind:value={editRecurrenceEndDate} /></div>
+				</div>
+			{/if}
+			<div style="display: flex; gap: 8px;">
+				<button class="btn btn-primary btn-sm" onclick={saveEdit} disabled={editSaving}>
+					{editSaving ? 'Saving...' : 'Save'}
+				</button>
+				<button class="btn btn-outline btn-sm" onclick={() => showEditPanel = false}>Cancel</button>
+			</div>
 		</div>
 	{/if}
 

@@ -6,6 +6,8 @@ import { apiHandler } from '$lib/api-error';
 export const GET: RequestHandler = apiHandler(async ({ url }) => {
 	const dateParam = url.searchParams.get('date');
 	const statusParam = url.searchParams.get('status');
+	const skip = parseInt(url.searchParams.get('skip') ?? '0');
+	const take = parseInt(url.searchParams.get('take') ?? '50');
 
 	const where: any = {};
 
@@ -21,18 +23,22 @@ export const GET: RequestHandler = apiHandler(async ({ url }) => {
 		where.status = statusParam;
 	}
 
-	const jobs = await prisma.job.findMany({
-		where,
-		include: {
-			client: { select: { id: true, name: true } },
-			quote: { select: { id: true, total: true, status: true } },
-			sections: { include: { tasks: { include: { photos: true } } } },
-			startWithTasks: true,
-			assignments: { include: { worker: true } }
-		},
-		orderBy: { createdAt: 'desc' }
-	});
-	return json(jobs);
+	const [jobs, total] = await Promise.all([
+		prisma.job.findMany({
+			where,
+			include: {
+				client: { select: { id: true, name: true } },
+				quote: { select: { id: true, total: true, status: true } },
+				assignments: { include: { worker: true } }
+			},
+			orderBy: { createdAt: 'desc' },
+			skip,
+			take,
+		}),
+		prisma.job.count({ where }),
+	]);
+
+	return json({ jobs, total });
 });
 
 export const POST: RequestHandler = apiHandler(async ({ request }) => {
@@ -68,9 +74,13 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 			clientPhone: data.clientPhone,
 			clientEmail: data.clientEmail,
 			address,
+			total: data.total ?? 0,
 			scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
 			status: data.status ?? 'pending',
 			notes: data.notes,
+			isRecurring: data.isRecurring ?? false,
+			recurrencePattern: data.recurrencePattern,
+			recurrenceEndDate: data.recurrenceEndDate ? new Date(data.recurrenceEndDate) : null,
 		}
 	});
 
