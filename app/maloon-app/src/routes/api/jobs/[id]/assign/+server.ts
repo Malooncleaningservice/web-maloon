@@ -60,6 +60,27 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 		}
 	}
 
+	if (assignmentDate) {
+		const ad = new Date(assignmentDate);
+		const availability = await prisma.workerAvailability.findMany({
+			where: { workerId, dayOfWeek: ad.getDay() }
+		});
+		if (availability.length > 0) {
+			const minutes = ad.getHours() * 60 + ad.getMinutes();
+			const inWindow = availability.some(a => {
+				const [sh, sm] = a.startTime.split(':').map(Number);
+				const [eh, em] = a.endTime.split(':').map(Number);
+				return minutes >= (sh * 60 + sm) && minutes <= (eh * 60 + em);
+			});
+			if (!inWindow) {
+				return json({
+					error: 'Worker is not available at this time on this day',
+					availability
+				}, { status: 409 });
+			}
+		}
+	}
+
 	const assignment = await prisma.jobAssignment.create({
 		data: {
 			jobId: params.id,

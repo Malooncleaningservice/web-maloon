@@ -35,6 +35,7 @@ const ADMIN_ROUTES = [
 	'/api/notifications',
 	'/api/profile-changes',
 	'/api/dashboard',
+	'/api/dispatch',
 ];
 
 // Worker-accessible API routes — allow both workers and admins
