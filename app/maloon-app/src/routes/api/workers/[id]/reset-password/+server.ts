@@ -2,9 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { generateIdentifierToken, hashPassword } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/workers/[id]/reset-password — admin triggers password reset
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = apiHandler(async ({ params }) => {
 	const worker = await prisma.worker.findUnique({
 		where: { id: params.id },
 		include: { user: true }
@@ -30,4 +30,4 @@ export const POST: RequestHandler = async ({ params }) => {
 		identifierToken: token,
 		message: `A new access code has been generated: ${token}. Give this to the worker so they can log in and set a new password.`
 	});
-};
+});

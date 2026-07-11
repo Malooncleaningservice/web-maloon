@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/sections/[id]/tasks — add a task to a section
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 
 	const maxOrder = await prisma.jobTask.findFirst({
@@ -22,10 +22,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 	});
 
 	return json(task, { status: 201 });
-};
+});
 
-// PATCH /api/sections/[id]/tasks — update task completion
-export const PATCH: RequestHandler = async ({ request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 	// data: { taskId, completed, completedBy?, comment? }
 	const task = await prisma.jobTask.update({
@@ -38,4 +37,4 @@ export const PATCH: RequestHandler = async ({ request }) => {
 		}
 	});
 	return json(task);
-};
+});

@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/jobs/[id]/start-with — add a "start with" prep task
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 
 	const maxOrder = await prisma.startWithTask.findFirst({
@@ -21,10 +21,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 	});
 
 	return json(task, { status: 201 });
-};
+});
 
-// PATCH /api/jobs/[id]/start-with — update a start-with task
-export const PATCH: RequestHandler = async ({ request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 	const task = await prisma.startWithTask.update({
 		where: { id: data.taskId },
@@ -35,4 +34,4 @@ export const PATCH: RequestHandler = async ({ request }) => {
 		}
 	});
 	return json(task);
-};
+});

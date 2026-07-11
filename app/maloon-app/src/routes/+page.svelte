@@ -12,6 +12,7 @@
 		totalTasks: number; completedTasks: number; completionRate: number;
 		todayJobs: Array<any>; upcomingJobs: Array<any>;
 	} | null>(null);
+	let statsError = $state('');
 
 	onMount(async () => {
 		try {
@@ -35,8 +36,15 @@
 	async function loadStats() {
 		try {
 			const res = await fetch('/api/dashboard/stats');
-			if (res.ok) stats = await res.json();
-		} catch { /* ignore */ }
+			if (res.ok) {
+				stats = await res.json();
+				statsError = '';
+			} else {
+				statsError = 'Failed to load dashboard data';
+			}
+		} catch {
+			statsError = 'Could not connect to server';
+		}
 	}
 
 	function statusBadge(status: string) {
@@ -58,6 +66,12 @@
 	<div style="margin-bottom: 24px;">
 		<h1 style="font-size: 1.4rem; margin-bottom: 4px;">Dashboard</h1>
 		<p class="text-secondary">Cleaning service management</p>
+		{#if statsError}
+			<div class="card" style="border-left: 3px solid var(--danger); margin-top: 12px;">
+				<p style="color: var(--danger); font-weight: 600;">{statsError}</p>
+				<button class="btn btn-outline btn-sm" style="margin-top: 4px;" onclick={loadStats}>Retry</button>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Stats Cards -->

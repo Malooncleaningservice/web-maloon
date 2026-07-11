@@ -1,5 +1,5 @@
 import { validateSession } from '$lib/auth';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
 
 // ---------------------------------------------------------------------------
 // Public routes – no auth required
@@ -137,4 +137,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return resolve(event);
+};
+
+export const handleError: HandleServerError = async ({ error, event }) => {
+	const err = error instanceof Error ? error : new Error(String(error));
+	console.error('[handleError]', err.message, err.stack);
+
+	if (event.url.pathname.startsWith('/api/')) {
+		return {
+			message: err.message || 'Internal Server Error',
+			code: err.name ?? 'UNKNOWN',
+		};
+	}
+
+	return {
+		message: 'An unexpected error occurred',
+	};
 };

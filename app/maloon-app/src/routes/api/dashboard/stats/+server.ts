@@ -1,8 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = apiHandler(async () => {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 	const tomorrow = new Date(today);
@@ -98,4 +99,4 @@ export const GET: RequestHandler = async () => {
 		todayJobs,
 		upcomingJobs,
 	});
-};
+});

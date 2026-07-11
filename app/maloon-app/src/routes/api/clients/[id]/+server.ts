@@ -1,8 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = apiHandler(async ({ params }) => {
 	const client = await prisma.client.findUnique({
 		where: { id: params.id },
 		include: {
@@ -21,9 +22,9 @@ export const GET: RequestHandler = async ({ params }) => {
 	});
 	if (!client) return json({ error: 'Not found' }, { status: 404 });
 	return json(client);
-};
+});
 
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 	const client = await prisma.client.update({
 		where: { id: params.id },
@@ -36,9 +37,9 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 		}
 	});
 	return json(client);
-};
+});
 
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = apiHandler(async ({ params }) => {
 	await prisma.client.delete({ where: { id: params.id } });
 	return json({ success: true });
-};
+});

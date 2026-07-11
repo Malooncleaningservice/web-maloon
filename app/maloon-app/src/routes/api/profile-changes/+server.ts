@@ -2,9 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { createAdminNotification } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/profile-changes — request a profile field change (worker submits)
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = apiHandler(async ({ request, locals }) => {
 	if (!locals.user || !locals.user.workerId) {
 		return json({ error: 'Forbidden' }, { status: 403 });
 	}
@@ -35,10 +35,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	);
 
 	return json(change, { status: 201 });
-};
+});
 
-// GET /api/profile-changes — list pending changes (admin view)
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = apiHandler(async ({ locals, url }) => {
 	if (!locals.user || locals.user.role !== 'admin') {
 		return json([], { status: 403 });
 	}
@@ -56,4 +55,4 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		take: 100
 	});
 	return json(changes);
-};
+});

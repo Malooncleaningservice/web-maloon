@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/jobs — list all jobs, optional ?date= filter
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = apiHandler(async ({ url }) => {
 	const dateParam = url.searchParams.get('date');
 	const statusParam = url.searchParams.get('status');
 
@@ -33,10 +33,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		orderBy: { createdAt: 'desc' }
 	});
 	return json(jobs);
-};
+});
 
-// POST /api/jobs — create a new job
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 
 	// For MVP: get or create business
@@ -84,4 +83,4 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	return json(job, { status: 201 });
-};
+});

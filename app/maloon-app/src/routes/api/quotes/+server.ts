@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/quotes — list all quotes
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = apiHandler(async () => {
 	const quotes = await prisma.quote.findMany({
 		include: {
 			client: { select: { id: true, name: true } },
@@ -13,10 +13,9 @@ export const GET: RequestHandler = async () => {
 		orderBy: { createdAt: 'desc' }
 	});
 	return json(quotes);
-};
+});
 
-// POST /api/quotes — create a new quote
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 
 	// For MVP, hardcode businessId. Later this comes from auth.
@@ -74,4 +73,4 @@ export const POST: RequestHandler = async ({ request }) => {
 	});
 
 	return json(quote, { status: 201 });
-};
+});

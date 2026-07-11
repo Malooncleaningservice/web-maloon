@@ -2,9 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { hashPassword, generateIdentifierToken } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/workers — list all workers
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = apiHandler(async () => {
 	const workers = await prisma.worker.findMany({
 		include: {
 			assignments: { include: { job: true } },
@@ -13,10 +13,9 @@ export const GET: RequestHandler = async () => {
 		orderBy: { lastName: 'asc' }
 	});
 	return json(workers);
-};
+});
 
-// POST /api/workers — create a new worker
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 
 	const business = await prisma.business.findFirst();
@@ -73,4 +72,4 @@ export const POST: RequestHandler = async ({ request }) => {
 		...worker,
 		identifierToken: identifierToken || undefined,
 	}, { status: 201 });
-};
+});

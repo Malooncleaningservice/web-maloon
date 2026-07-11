@@ -1,8 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = apiHandler(async () => {
 	const clients = await prisma.client.findMany({
 		include: {
 			_count: { select: { quotes: true, jobs: true } }
@@ -10,9 +11,9 @@ export const GET: RequestHandler = async () => {
 		orderBy: { name: 'asc' }
 	});
 	return json(clients);
-};
+});
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 
 	const business = await prisma.business.findFirst();
@@ -36,4 +37,4 @@ export const POST: RequestHandler = async ({ request }) => {
 	});
 
 	return json(client, { status: 201 });
-};
+});

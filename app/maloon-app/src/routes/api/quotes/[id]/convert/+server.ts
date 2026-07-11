@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/quotes/[id]/convert — convert a quote into a job
-export const POST: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = apiHandler(async ({ params }) => {
 	const quote = await prisma.quote.findUnique({
 		where: { id: params.id },
 		include: { quoteLineItems: true, quoteAddons: true }
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ params }) => {
 	});
 
 	return json(job, { status: 201 });
-};
+});
 
 /** Group quote line items and add-ons into job sections with tasks */
 function groupLineItems(

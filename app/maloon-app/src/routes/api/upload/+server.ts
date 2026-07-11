@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
-import type { RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
 import { prisma } from '$lib/prisma';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/upload?type=w9|task-photo&workerId=...&taskId=...
-export const POST = async ({ request, url }: RequestEvent) => {
+export const POST: RequestHandler = apiHandler(async ({ request, url }: RequestEvent) => {
 	const formData = await request.formData();
 	const file = formData.get('file') as File | null;
 
@@ -43,6 +43,5 @@ export const POST = async ({ request, url }: RequestEvent) => {
 		return json({ success: true, photo });
 	}
 
-	// Generic upload — just return the data URL
 	return json({ success: true, url: dataUrl, fileName: file.name });
-};
+});

@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/notifications — list notifications for current user
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = apiHandler(async ({ locals }) => {
 	if (!locals.user) return json([]);
 	const list = await prisma.notification.findMany({
 		where: { userId: locals.user.id },
@@ -11,10 +11,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 		take: 50
 	});
 	return json(list);
-};
+});
 
-// POST /api/notifications/mark-all-read
-export const POST: RequestHandler = async ({ locals, request }) => {
+export const POST: RequestHandler = apiHandler(async ({ locals, request }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const data = await request.json();
 
@@ -27,4 +26,4 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	return json({ error: 'Unknown action' }, { status: 400 });
-};
+});

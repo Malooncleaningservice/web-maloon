@@ -1,18 +1,17 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/jobs/[id]/assign — get assignments for a job
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = apiHandler(async ({ params }) => {
 	const assignments = await prisma.jobAssignment.findMany({
 		where: { jobId: params.id },
 		include: { worker: true }
 	});
 	return json(assignments);
-};
+});
 
-// POST /api/jobs/[id]/assign — assign a worker to a job
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	const { workerId, scheduledDate } = await request.json();
 
 	const job = await prisma.job.findUnique({ where: { id: params.id }, select: { scheduledDate: true } });
@@ -52,11 +51,10 @@ export const POST: RequestHandler = async ({ params, request }) => {
 		}
 	});
 	return json(assignment, { status: 201 });
-};
+});
 
-// DELETE /api/jobs/[id]/assign — remove a worker assignment
-export const DELETE: RequestHandler = async ({ params, request }) => {
+export const DELETE: RequestHandler = apiHandler(async ({ params, request }) => {
 	const { assignmentId } = await request.json();
 	await prisma.jobAssignment.delete({ where: { id: assignmentId } });
 	return json({ success: true });
-};
+});

@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/workers/[id] — get a single worker
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = apiHandler(async ({ params }) => {
 	const worker = await prisma.worker.findUnique({
 		where: { id: params.id },
 		include: {
@@ -13,10 +13,9 @@ export const GET: RequestHandler = async ({ params }) => {
 	});
 	if (!worker) return json({ error: 'Not found' }, { status: 404 });
 	return json(worker);
-};
+});
 
-// PATCH /api/workers/[id] — update a worker
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 	const worker = await prisma.worker.update({
 		where: { id: params.id },
@@ -39,10 +38,9 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 		include: { user: { select: { id: true, email: true, identifierToken: true } } }
 	});
 	return json(worker);
-};
+});
 
-// DELETE /api/workers/[id] — delete a worker
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = apiHandler(async ({ params }) => {
 	// Delete associated user first if exists
 	const worker = await prisma.worker.findUnique({
 		where: { id: params.id },
@@ -54,4 +52,4 @@ export const DELETE: RequestHandler = async ({ params }) => {
 	await prisma.jobAssignment.deleteMany({ where: { workerId: params.id } });
 	await prisma.worker.delete({ where: { id: params.id } });
 	return json({ success: true });
-};
+});

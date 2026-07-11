@@ -9,6 +9,7 @@
 	let saving = $state(false);
 	let filterDate = $state('');
 	let filterStatus = $state('');
+	let error = $state('');
 
 	// Clients for the new job form picker
 	let clients = $state<Array<{id: string; name: string; phone: string | null; email: string | null; address: string | null}>>([]);
@@ -41,6 +42,7 @@
 
 	async function loadJobs() {
 		loading = true;
+		error = '';
 		try {
 			let url = '/api/jobs';
 			const params = new URLSearchParams();
@@ -50,17 +52,21 @@
 			if (qs) url += '?' + qs;
 
 			const res = await fetch(url);
-			const data = await res.json();
-			jobs = data.map((j: any) => ({
-				...j,
-				isQuote: !!j.quoteId,
-				clientName: j.clientName ?? 'Unknown',
-				address: j.address ?? '',
-				total: j.quote?.total ?? undefined,
-				assignments: j.assignments ?? [],
-			}));
+			if (res.ok) {
+				const data = await res.json();
+				jobs = data.map((j: any) => ({
+					...j,
+					isQuote: !!j.quoteId,
+					clientName: j.clientName ?? 'Unknown',
+					address: j.address ?? '',
+					total: j.quote?.total ?? undefined,
+					assignments: j.assignments ?? [],
+				}));
+			} else {
+				error = 'Failed to load jobs';
+			}
 		} catch {
-			console.log('API not available');
+			error = 'Could not connect to server';
 		} finally {
 			loading = false;
 		}
@@ -174,6 +180,12 @@
 {/if}
 
 <!-- Job List -->
+{#if error}
+	<div class="card" style="border-left: 3px solid var(--danger); margin-bottom: 16px;">
+		<p style="color: var(--danger); font-weight: 600;">{error}</p>
+		<button class="btn btn-outline btn-sm" style="margin-top: 4px;" onclick={loadJobs}>Retry</button>
+	</div>
+{/if}
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
 		<p class="text-secondary">Loading jobs...</p>

@@ -2,9 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { createAdminNotification } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// PATCH /api/profile-changes/[id] — approve or reject a change
-export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ params, request, locals }) => {
 	if (!locals.user || locals.user.role !== 'admin') {
 		return json({ error: 'Forbidden' }, { status: 403 });
 	}
@@ -51,4 +51,4 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 	});
 
 	return json(updated);
-};
+});

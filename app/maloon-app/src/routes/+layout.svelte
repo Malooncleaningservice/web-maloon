@@ -18,6 +18,7 @@
 	let unreadCount = $state(0);
 	let showNotifs = $state(false);
 	let loadingUser = $state(true);
+	let error = $state('');
 
 	onMount(async () => {
 		try {
@@ -29,7 +30,7 @@
 				}
 			}
 		} catch {
-			// not logged in
+			error = 'Could not connect to server. Please check your connection.';
 		} finally {
 			loadingUser = false;
 		}
@@ -83,6 +84,16 @@
 	<div class="app-shell">
 		<main style="text-align: center; padding: 80px 20px;">
 			<p class="text-secondary">Loading...</p>
+		</main>
+	</div>
+{:else if error && !user}
+	<div class="app-shell">
+		<main style="text-align: center; padding: 80px 20px;">
+			<div class="card" style="max-width: 400px; margin: 0 auto; border-left: 3px solid var(--danger);">
+				<p style="color: var(--danger); font-weight: 600;">Connection Error</p>
+				<p class="text-secondary">{error}</p>
+				<button class="btn btn-primary" style="margin-top: 12px;" onclick={() => { error = ''; loadingUser = true; window.location.reload(); }}>Retry</button>
+			</div>
 		</main>
 	</div>
 {:else}

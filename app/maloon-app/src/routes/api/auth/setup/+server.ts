@@ -2,9 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { hashPassword } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/auth/setup — complete first-time account setup
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = apiHandler(async ({ request, locals }) => {
 	if (!locals.user || !locals.user.mustResetPassword) {
 		return json({ error: 'Not allowed' }, { status: 403 });
 	}
@@ -36,4 +36,4 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	});
 
 	return json({ success: true });
-};
+});

@@ -2,8 +2,9 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { verifyPassword, createSession } from '$lib/auth';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = apiHandler(async ({ request, cookies }) => {
 	const data = await request.json();
 	const { email, password, identifierToken } = data;
 
@@ -58,4 +59,4 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	});
 
 	return json({ success: true, mustResetPassword: user.mustResetPassword });
-};
+});

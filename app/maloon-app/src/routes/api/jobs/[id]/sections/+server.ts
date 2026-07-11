@@ -1,9 +1,9 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// POST /api/jobs/[id]/sections — add a section to a job
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 
 	// Get current max sortOrder
@@ -22,10 +22,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
 	});
 
 	return json(section, { status: 201 });
-};
+});
 
-// PATCH /api/jobs/[id]/sections — reorder sections
-export const PATCH: RequestHandler = async ({ params, request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	const { sections } = await request.json();
 	// sections: [{ id, sortOrder }, ...]
 	for (const s of sections) {
@@ -35,4 +34,4 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 		});
 	}
 	return json({ success: true });
-};
+});

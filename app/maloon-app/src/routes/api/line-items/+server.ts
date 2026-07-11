@@ -1,18 +1,17 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { apiHandler } from '$lib/api-error';
 
-// GET /api/line-items — list all line items
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = apiHandler(async () => {
 	const items = await prisma.lineItem.findMany({
 		where: { isActive: true },
 		orderBy: { name: 'asc' }
 	});
 	return json(items);
-};
+});
 
-// POST /api/line-items — create a line item
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
 
 	const business = await prisma.business.findFirst();
@@ -37,4 +36,4 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 	});
 	return json(item, { status: 201 });
-};
+});

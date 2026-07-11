@@ -8,6 +8,7 @@
 	let allWorkers = $state<Array<{id: string; firstName: string; lastName: string; status: string}>>([]);
 	let assignWorker = $state<Record<string, string>>({});
 	let assigning = $state<Record<string, boolean>>({});
+	let error = $state('');
 
 	onMount(async () => {
 		await loadWorkers();
@@ -24,11 +25,16 @@
 
 	async function loadJobs() {
 		loading = true;
+		error = '';
 		try {
 			const res = await fetch(`/api/jobs?date=${selectedDate}`);
-			jobs = await res.json();
-		} catch (e) {
-			console.error('Failed to load jobs', e);
+			if (res.ok) {
+				jobs = await res.json();
+			} else {
+				error = 'Failed to load jobs for this date';
+			}
+		} catch {
+			error = 'Could not connect to server';
 		} finally {
 			loading = false;
 		}
@@ -112,6 +118,13 @@
 <h3 class="text-secondary" style="font-size: 1rem; margin-bottom: 16px;">
 	{formatDate(selectedDate)}
 </h3>
+
+{#if error}
+	<div class="card" style="border-left: 3px solid var(--danger); margin-bottom: 16px;">
+		<p style="color: var(--danger); font-weight: 600;">{error}</p>
+		<button class="btn btn-outline btn-sm" style="margin-top: 4px;" onclick={loadJobs}>Retry</button>
+	</div>
+{/if}
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
