@@ -21,7 +21,7 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 
 APP_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT_DIR="$(cd "$APP_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$APP_DIR/../.." && pwd)"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
