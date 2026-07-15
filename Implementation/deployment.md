@@ -121,11 +121,11 @@ Railway auto-detects the push and deploys within ~2-3 minutes.
 ### Method 3: Railway CLI (direct upload)
 
 ```bash
-cd ~/Documents/web-maloon/app/maloon-app
+cd ~/Documents/web-maloon
 railway up --detach
 ```
 
-Uploads the project directly to Railway, bypassing GitHub. Useful if GitHub auto-deploy is disabled.
+Uploads the full project to Railway directly. Must be run from the **repo root** (not `app/maloon-app`) so `railway.toml`'s `root = "app/maloon-app"` resolves correctly.
 
 ### Method 4: Railway Dashboard
 
