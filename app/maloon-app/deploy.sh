@@ -215,7 +215,7 @@ else
         if [[ "$DIRECT" == true ]]; then
             if command -v railway &> /dev/null; then
                 step "Deploying directly via railway up..."
-                run "cd '$APP_DIR' && railway up --detach"
+                run "cd '$ROOT_DIR' && railway up --detach"
                 ok "Railway up triggered"
             else
                 warn "Railway CLI not installed. Skipping --direct."
