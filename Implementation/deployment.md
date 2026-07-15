@@ -80,6 +80,7 @@ The script handles the full workflow: build verification → Prisma schema sync 
 | Flag | Effect |
 |---|---|
 | (none) | Full deploy: build → db push (prompts) → commit → push |
+| `--direct` | Also runs `railway up --detach` after git push |
 | `--skip-build` | Skip `npm run build` verification |
 | `--skip-db` | Skip `prisma db push` |
 | `--skip-push` | Skip git commit & push |
@@ -93,6 +94,9 @@ The script handles the full workflow: build verification → Prisma schema sync 
 ```bash
 # Full deploy (build, db push prompt, commit, push)
 ./deploy.sh
+
+# Full deploy + railway up direct trigger
+./deploy.sh --direct
 
 # Quick hotfix — skip build verification and DB push
 ./deploy.sh --skip-build --skip-db -m "Fix login redirect"

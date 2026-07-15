@@ -14,6 +14,7 @@ set -euo pipefail
 #   --skip-db          Skip database schema push (prisma db push)
 #   --skip-push        Skip git push (commit & push)
 #   --db-only          Only push database schema, skip git
+#   --direct           Also run `railway up --detach` after git push
 #   -m, --message MSG  Commit message (prompts if not provided)
 #   --dry-run          Show what would happen without executing
 #   -h, --help         Show this help
@@ -33,6 +34,7 @@ SKIP_BUILD=false
 SKIP_DB=false
 SKIP_PUSH=false
 DB_ONLY=false
+DIRECT=false
 DRY_RUN=false
 COMMIT_MSG=""
 
@@ -44,16 +46,18 @@ usage() {
     echo "  --skip-db          Skip database schema push"
     echo "  --skip-push        Skip git commit & push"
     echo "  --db-only          Only push database schema (skip git entirely)"
+    echo "  --direct           Also run \`railway up --detach\` after git push"
     echo "  -m, --message MSG  Commit message (required unless --skip-push or --db-only)"
     echo "  --dry-run          Print what would happen without executing"
     echo "  -h, --help         Show this help"
     echo ""
     echo "Examples:"
     echo "  ./deploy.sh                          # Full deploy: build, db push, commit, push"
+    echo "  ./deploy.sh --direct                 # Same + railway up for direct trigger"
     echo "  ./deploy.sh --skip-db                # Skip DB push, but build and push"
     echo "  ./deploy.sh --db-only               # Only push database schema"
     echo "  ./deploy.sh -m \"Fix login redirect\"  # Custom commit message"
-    echo "  ./deploy.sh --skip-build -m \"hotfix\"   # Skip build, quick push"
+    echo "  ./deploy.sh --skip-build -m \"hotfix\"  # Skip build, quick push"
     exit 0
 }
 
@@ -64,6 +68,7 @@ while [[ $# -gt 0 ]]; do
         --skip-db)    SKIP_DB=true ;;
         --skip-push)  SKIP_PUSH=true ;;
         --db-only)    DB_ONLY=true ;;
+        --direct)     DIRECT=true ;;
         --dry-run)    DRY_RUN=true ;;
         -m|--message)
             shift
@@ -160,6 +165,17 @@ if [[ -z "$CHANGES" ]]; then
                 step "Pushing to origin/$BRANCH..."
                 run "git push origin '$BRANCH'"
                 ok "Pushed to GitHub → Railway auto-deploys"
+
+                if [[ "$DIRECT" == true ]]; then
+                    if command -v railway &> /dev/null; then
+                        step "Deploying directly via railway up..."
+                        run "cd '$APP_DIR' && railway up --detach"
+                        ok "Railway up triggered"
+                    else
+                        warn "Railway CLI not installed. Skipping --direct."
+                        warn "Install with: npm i -g @railway/cli && railway link"
+                    fi
+                fi
             else
                 warn "Skipping push"
             fi
@@ -195,6 +211,17 @@ else
         run "git push origin '$BRANCH'"
 
         ok "Pushed to GitHub → Railway auto-deploys"
+
+        if [[ "$DIRECT" == true ]]; then
+            if command -v railway &> /dev/null; then
+                step "Deploying directly via railway up..."
+                run "cd '$APP_DIR' && railway up --detach"
+                ok "Railway up triggered"
+            else
+                warn "Railway CLI not installed. Skipping --direct."
+                warn "Install with: npm i -g @railway/cli && railway link"
+            fi
+        fi
     else
         warn "Skipping commit & push (--skip-push)"
     fi
