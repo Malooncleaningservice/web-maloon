@@ -64,22 +64,70 @@ npm run preview   # test production build locally
 
 ## Deploying Updates
 
-The Staff Portal is deployed on Railway from the `app/maloon-app/` subdirectory. Any push to GitHub does **not** auto-deploy — you must manually trigger it.
+The Staff Portal is deployed on Railway from the `app/maloon-app/` subdirectory. Railway is configured to **auto-deploy on push** from the `main` branch. A `git push` triggers the deploy pipeline automatically.
 
-### Method 1: Railway CLI (recommended)
+### Method 1: Deploy script (recommended)
+
+```bash
+cd ~/Documents/web-maloon/app/maloon-app
+./deploy.sh
+```
+
+The script handles the full workflow: build verification → Prisma schema sync (prompts) → commit → push to GitHub → Railway auto-deploys.
+
+**Options:**
+
+| Flag | Effect |
+|---|---|
+| (none) | Full deploy: build → db push (prompts) → commit → push |
+| `--skip-build` | Skip `npm run build` verification |
+| `--skip-db` | Skip `prisma db push` |
+| `--skip-push` | Skip git commit & push |
+| `--db-only` | Only run `npm run db:push` |
+| `-m "msg"` | Commit message (bypasses prompt) |
+| `--dry-run` | Print what would happen, make no changes |
+| `-h` | Show help |
+
+**Examples:**
+
+```bash
+# Full deploy (build, db push prompt, commit, push)
+./deploy.sh
+
+# Quick hotfix — skip build verification and DB push
+./deploy.sh --skip-build --skip-db -m "Fix login redirect"
+
+# Only sync the database schema
+./deploy.sh --db-only
+
+# Dry run to preview what will happen
+./deploy.sh --dry-run -m "Update dispatch page"
+```
+
+### Method 2: Manual git push
+
+```bash
+git add -A
+git commit -m "Description of changes"
+git push origin main
+```
+
+Railway auto-detects the push and deploys within ~2-3 minutes.
+
+### Method 3: Railway CLI (direct upload)
 
 ```bash
 cd ~/Documents/web-maloon/app/maloon-app
 railway up --detach
 ```
 
-This uploads the project, builds it on Railway (using `railway.toml` at the repo root for build config), and deploys.
+Uploads the project directly to Railway, bypassing GitHub. Useful if GitHub auto-deploy is disabled.
 
-### Method 2: Railway Dashboard
+### Method 4: Railway Dashboard
 
 1. Go to https://railway.app
 2. Open project `discerning-nourishment`
-3. Click "Deploy" → "Deploy from GitHub"
+3. Trigger a manual deploy
 
 ### Checking deployment status
 
@@ -142,13 +190,19 @@ mysql -h mysql-3fdcb96b-mcs.g.aivencloud.com \
 
 ### Running migrations
 
-After schema changes:
+After schema changes (`prisma/schema.prisma`):
 
 ```bash
 cd ~/Documents/web-maloon/app/maloon-app
-npx prisma db push          # push schema changes (no migration files)
-# OR
-npx prisma migrate dev      # create migration files + apply
+
+# Push schema to database (no migration files — recommended)
+npm run db:push
+
+# Or use the deploy script for DB-only
+./deploy.sh --db-only
+
+# OR create migration files + apply (for versioned migrations)
+npx prisma migrate dev
 ```
 
 ### Seeding line items
@@ -201,8 +255,7 @@ import('@prisma/client').then(({PrismaClient})=>{
 ### Staff Portal shows the public website instead of the app
 This means Railway is serving the static HTML at the repo root instead of the SvelteKit app. Check that:
 - `railway.toml` exists at the repo root and has `root = "app/maloon-app"` under `[build]`
-- The deploy was triggered from `app/maloon-app/` with `railway up --detach`
-- Re-deploy after fixing: `git add -A && git commit -m "fix" && git push && cd app/maloon-app && railway up --detach`
+- Re-deploy: `./deploy.sh -m "fix railway.toml"`
 
 ### App shows "Internal Error"
 Check Railway logs: `railway logs` — usually a database connection issue.

@@ -40,6 +40,7 @@
 
 	let newSectionName = $state('');
 	let newTaskDesc = $state('');
+	let newTaskRequiredPhoto = $state(false);
 	let addingTaskToSection = $state<string | null>(null);
 
 	onMount(async () => {
@@ -212,7 +213,7 @@
 			const res = await fetch(`/api/sections/${sectionId}/tasks`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ description: newTaskDesc, requiredPhoto: false }),
+				body: JSON.stringify({ description: newTaskDesc, requiredPhoto: newTaskRequiredPhoto }),
 			});
 			const task = await res.json();
 			sections = sections.map(s => {
@@ -220,6 +221,7 @@
 				return s;
 			});
 			newTaskDesc = '';
+			newTaskRequiredPhoto = false;
 			addingTaskToSection = null;
 		} catch (e) { console.error(e); }
 	}
@@ -235,6 +237,24 @@
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ taskId, completed }),
+			});
+		} catch (e) {
+			sections = prevSections;
+			console.error(e);
+		}
+	}
+
+	async function toggleRequiredPhoto(sectionId: string, taskId: string, requiredPhoto: boolean) {
+		const prevSections = sections.map(s => ({...s, tasks: s.tasks.map(t => ({...t}))}));
+		sections = sections.map(s => {
+			if (s.id === sectionId) return { ...s, tasks: s.tasks.map(t => t.id === taskId ? { ...t, requiredPhoto } : t) };
+			return s;
+		});
+		try {
+			await fetch(`/api/sections/${sectionId}/tasks`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ taskId, requiredPhoto }),
 			});
 		} catch (e) {
 			sections = prevSections;
@@ -526,7 +546,10 @@
 							<label for="t-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; cursor: pointer;">
 								{task.description}
 							</label>
-							{#if task.requiredPhoto}<span class="badge badge-pending" style="font-size: 0.7rem;">📷 required</span>{/if}
+							<label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.7rem;" title="Require photo to complete">
+								<input type="checkbox" checked={task.requiredPhoto} onchange={(e) => toggleRequiredPhoto(section.id, task.id, e.currentTarget.checked)} />
+								📷
+							</label>
 						</div>
 						<div style="display: flex; align-items: center; gap: 8px;">
 							<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.75rem; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px;">
@@ -551,8 +574,12 @@
 				{#if addingTaskToSection === section.id}
 					<div class="row mt-2">
 						<div class="col"><input placeholder="Task description..." bind:value={newTaskDesc} onkeydown={(e) => e.key === 'Enter' && addTask(section.id)} /></div>
+						<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap;">
+							<input type="checkbox" bind:checked={newTaskRequiredPhoto} />
+							📷 req
+						</label>
 						<button class="btn btn-primary btn-sm" onclick={() => addTask(section.id)}>Add</button>
-						<button class="btn btn-outline btn-sm" onclick={() => addingTaskToSection = null}>Cancel</button>
+						<button class="btn btn-outline btn-sm" onclick={() => { addingTaskToSection = null; newTaskRequiredPhoto = false; }}>Cancel</button>
 					</div>
 				{:else}
 					<button class="btn btn-outline btn-sm mt-2" onclick={() => addingTaskToSection = section.id}>

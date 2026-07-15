@@ -1,9 +1,12 @@
 import { prisma } from '$lib/prisma';
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { apiHandler } from '$lib/api-error';
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
-export const GET: RequestHandler = apiHandler(async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+	const user = locals.user;
+	if (!user) throw redirect(302, '/login');
+	if (user.role === 'worker') throw redirect(302, '/worker');
+
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 	const tomorrow = new Date(today);
@@ -16,6 +19,8 @@ export const GET: RequestHandler = apiHandler(async () => {
 		totalWorkers,
 		activeWorkers,
 		upcomingJobs,
+		todayJobs,
+		jobsNeedingAttention,
 	] = await Promise.all([
 		prisma.job.count({ where: { status: 'in_progress' } }),
 		prisma.job.count({ where: { status: 'pending' } }),
@@ -27,9 +32,7 @@ export const GET: RequestHandler = apiHandler(async () => {
 		}),
 		prisma.worker.count({ where: { status: 'active' } }),
 		prisma.jobAssignment.findMany({
-			where: {
-				job: { status: 'in_progress' }
-			},
+			where: { job: { status: 'in_progress' } },
 			select: { workerId: true },
 			distinct: ['workerId']
 		}),
@@ -49,18 +52,26 @@ export const GET: RequestHandler = apiHandler(async () => {
 			orderBy: { scheduledDate: 'asc' },
 			take: 10
 		}),
-	]);
-
-	const jobsNeedingAttention = await prisma.job.findMany({
-		where: { status: 'in_progress' },
-		include: {
-			sections: {
-				include: {
-					tasks: { select: { id: true, completed: true } }
+		prisma.job.findMany({
+			where: {
+				scheduledDate: { gte: today, lt: tomorrow }
+			},
+			include: {
+				assignments: { include: { worker: true } }
+			},
+			orderBy: { scheduledDate: 'asc' }
+		}),
+		prisma.job.findMany({
+			where: { status: 'in_progress' },
+			include: {
+				sections: {
+					include: {
+						tasks: { select: { id: true, completed: true } }
+					}
 				}
 			}
-		}
-	});
+		}),
+	]);
 
 	let totalTasks = 0;
 	let completedTasks = 0;
@@ -71,17 +82,7 @@ export const GET: RequestHandler = apiHandler(async () => {
 		}
 	}
 
-	const todayJobs = await prisma.job.findMany({
-		where: {
-			scheduledDate: { gte: today, lt: tomorrow }
-		},
-		include: {
-			assignments: { include: { worker: true } }
-		},
-		orderBy: { scheduledDate: 'asc' }
-	});
-
-	return json({
+	const stats = {
 		activeJobs,
 		pendingJobs,
 		completedToday,
@@ -90,7 +91,24 @@ export const GET: RequestHandler = apiHandler(async () => {
 		totalTasks,
 		completedTasks,
 		completionRate: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
-		todayJobs,
-		upcomingJobs,
-	});
-});
+		todayJobs: todayJobs.map(j => ({
+			...j,
+			scheduledDate: j.scheduledDate?.toISOString() ?? null,
+		})),
+		upcomingJobs: upcomingJobs.map(j => ({
+			...j,
+			scheduledDate: j.scheduledDate?.toISOString() ?? null,
+		})),
+	};
+
+	return {
+		user: {
+			id: user.id,
+			email: user.email,
+			role: user.role,
+			displayName: user.displayName,
+			worker: user.worker,
+		},
+		stats,
+	};
+};

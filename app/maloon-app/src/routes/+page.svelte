@@ -1,51 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import '../app.css';
 
-	let role = $state<string | null>(null);
-
-	// Dashboard stats
-	let stats = $state<{
-		activeJobs: number; pendingJobs: number; completedToday: number;
-		totalWorkers: number; workersOnJob: number;
-		totalTasks: number; completedTasks: number; completionRate: number;
-		todayJobs: Array<any>; upcomingJobs: Array<any>;
-	} | null>(null);
-	let statsError = $state('');
-
-	onMount(async () => {
-		try {
-			const res = await fetch('/api/auth/me');
-			if (res.ok) {
-				const user = await res.json();
-				role = user.role;
-				if (user.role === 'worker') {
-					await goto('/worker');
-				} else {
-					await loadStats();
-				}
-			} else {
-				await goto('/login');
-			}
-		} catch {
-			// Not logged in — hooks.server.ts will redirect
-		}
-	});
-
-	async function loadStats() {
-		try {
-			const res = await fetch('/api/dashboard/stats');
-			if (res.ok) {
-				stats = await res.json();
-				statsError = '';
-			} else {
-				statsError = 'Failed to load dashboard data';
-			}
-		} catch {
-			statsError = 'Could not connect to server';
-		}
-	}
+	let stats = $derived($page.data.stats);
+	let user = $derived($page.data.user);
 
 	function statusBadge(status: string) {
 		const map: Record<string, string> = {
@@ -62,16 +20,10 @@
 	}
 </script>
 
-{#if role === 'admin'}
+{#if user?.role === 'admin'}
 	<div style="margin-bottom: 24px;">
 		<h1 style="font-size: 1.4rem; margin-bottom: 4px;">Dashboard</h1>
 		<p class="text-secondary">Cleaning service management</p>
-		{#if statsError}
-			<div class="card" style="border-left: 3px solid var(--danger); margin-top: 12px;">
-				<p style="color: var(--danger); font-weight: 600;">{statsError}</p>
-				<button class="btn btn-outline btn-sm" style="margin-top: 4px;" onclick={loadStats}>Retry</button>
-			</div>
-		{/if}
 	</div>
 
 	<!-- Stats Cards -->

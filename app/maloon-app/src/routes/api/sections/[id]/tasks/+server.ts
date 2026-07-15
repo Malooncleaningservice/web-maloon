@@ -26,15 +26,21 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 
 export const PATCH: RequestHandler = apiHandler(async ({ request }) => {
 	const data = await request.json();
-	// data: { taskId, completed, completedBy?, comment? }
+	const updateData: Record<string, unknown> = {};
+
+	if ('completed' in data) {
+		updateData.completed = data.completed;
+		if (data.completed) {
+			updateData.completedBy = data.completedBy;
+			updateData.completedAt = new Date();
+		}
+	}
+	if ('comment' in data) updateData.comment = data.comment;
+	if ('requiredPhoto' in data) updateData.requiredPhoto = data.requiredPhoto;
+
 	const task = await prisma.jobTask.update({
 		where: { id: data.taskId },
-		data: {
-			completed: data.completed,
-			completedBy: data.completed ? data.completedBy : undefined,
-			completedAt: data.completed ? new Date() : undefined,
-			comment: data.comment,
-		}
+		data: updateData,
 	});
 	return json(task);
 });

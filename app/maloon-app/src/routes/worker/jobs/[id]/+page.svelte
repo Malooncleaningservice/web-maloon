@@ -6,6 +6,8 @@
 	let jobId = $state('');
 	let job = $state<any>(null);
 	let loading = $state(true);
+	let uploadingPhotoForTask = $state<string | null>(null);
+	let showingPhotoUrl = $state<string | null>(null);
 
 	let user = $state<{ id: string; workerId: string | null } | null>(null);
 
@@ -52,6 +54,32 @@
 		}
 	}
 
+	async function uploadTaskPhoto(taskId: string, file: File) {
+		uploadingPhotoForTask = taskId;
+		try {
+			const formData = new FormData();
+			formData.append('file', file);
+			const uploadRes = await fetch(`/api/upload?type=task-photo&taskId=${taskId}`, {
+				method: 'POST',
+				body: formData,
+			});
+			if (!uploadRes.ok) throw new Error(await uploadRes.text());
+			await loadJob();
+		} catch (e) {
+			console.error('Photo upload failed', e);
+			alert('Failed to upload photo.');
+		} finally {
+			uploadingPhotoForTask = null;
+		}
+	}
+
+	function handlePhotoFile(taskId: string, event: Event) {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) uploadTaskPhoto(taskId, file);
+		input.value = '';
+	}
+
 	async function toggleStartWith(taskId: string, completed: boolean) {
 		const task = job.startWithTasks?.find((t: any) => t.id === taskId);
 		const prevCompleted = task?.completed;
@@ -76,7 +104,25 @@
 		if (s === 'completed') return '#0d904f';
 		return '#5f6368';
 	}
+
+	function canComplete(task: any): boolean {
+		if (!task.requiredPhoto) return true;
+		return task.photos && task.photos.length > 0;
+	}
 </script>
+
+{#if showingPhotoUrl}
+	<div
+		style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+		onclick={() => showingPhotoUrl = null}
+		onkeydown={(e) => e.key === 'Escape' && (showingPhotoUrl = null)}
+		role="button"
+		tabindex="0"
+	>
+		<!-- svelte-ignore a11y_img_redundant_alt -->
+		<img src={showingPhotoUrl} alt="Task photo" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
+	</div>
+{/if}
 
 <a href="/worker" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 12px; display: inline-block;">
 	← Back to Dashboard
@@ -138,18 +184,56 @@
 				</summary>
 				<div class="section-body">
 					{#each section.tasks as task}
-						<div class="task-row" style="flex-wrap: wrap;">
-							<input
-								type="checkbox"
-								checked={task.completed}
-								onchange={() => toggleTask(task.id, !task.completed)}
-							/>
-							<span class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; opacity: {task.completed ? 0.6 : 1};">
-								{task.description}
-								{#if task.requiredPhoto}
-									<span style="color: var(--warning); font-size: 0.75rem;">📸 Photo required</span>
+						<div class="task-row" style="flex-wrap: wrap; align-items: flex-start;">
+							<div style="display: flex; align-items: flex-start; gap: 8px; flex: 1; min-width: 200px;">
+								{#if task.requiredPhoto && !canComplete(task)}
+									<input
+										type="checkbox"
+										checked={task.completed}
+										disabled
+										title="Photo required to complete this task"
+									/>
+								{:else}
+									<input
+										type="checkbox"
+										checked={task.completed}
+										onchange={() => toggleTask(task.id, !task.completed)}
+									/>
 								{/if}
-							</span>
+								<div>
+									<span class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; opacity: {task.completed ? 0.6 : 1};">
+										{task.description}
+									</span>
+									<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+										{#if task.requiredPhoto}
+											<span style="color: var(--danger); font-size: 0.7rem;">📸 (required)</span>
+										{:else}
+											<span style="color: var(--text-secondary); font-size: 0.7rem;">📸 (optional)</span>
+										{/if}
+										{#if task.requiredPhoto && !canComplete(task)}
+											<span style="color: var(--danger); font-size: 0.7rem;">— upload a photo to complete</span>
+										{/if}
+									</div>
+								</div>
+							</div>
+							<div style="display: flex; align-items: center; gap: 6px;">
+								<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.7rem; padding: 3px 7px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
+									📸 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Add Photo'}
+									<input type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={uploadingPhotoForTask === task.id} />
+								</label>
+								{#if task.photos && task.photos.length > 0}
+									<span style="color: var(--success); font-size: 0.75rem; white-space: nowrap;">{task.photos.length} photo{task.photos.length !== 1 ? 's' : ''}</span>
+									{#each task.photos as photo}
+										<button
+											class="btn btn-sm"
+											style="padding: 2px 6px; font-size: 0.65rem; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px; cursor: pointer; white-space: nowrap;"
+											onclick={() => showingPhotoUrl = photo.url}
+										>
+											🖼 View
+										</button>
+									{/each}
+								{/if}
+							</div>
 							{#if task.comment}
 								<span style="font-size: 0.75rem; color: var(--text-secondary); width: 100%; padding-left: 28px;">💬 {task.comment}</span>
 							{/if}

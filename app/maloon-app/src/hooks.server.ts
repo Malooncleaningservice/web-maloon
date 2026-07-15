@@ -118,8 +118,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		throw redirect(302, '/login');
 	}
 
-	// Force password reset before anything else
-	if (event.locals.user.mustResetPassword && !pathname.startsWith('/api/auth/')) {
+	// Force password reset before anything else (skip API routes)
+	if (event.locals.user.mustResetPassword && !pathname.startsWith('/api/')) {
 		// Redirect to login where they'll see the setup form
 		throw redirect(302, '/login?setup=1');
 	}
