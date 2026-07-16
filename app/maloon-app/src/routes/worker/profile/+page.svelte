@@ -164,38 +164,39 @@
 	<!-- Critical fields (name, tax info) — read-only with "request change" -->
 	<div class="card">
 		<h3 style="font-size: 1rem; margin-bottom: 12px;">Personal Information</h3>
-		<p class="text-secondary" style="margin-bottom: 16px; font-size: 0.8rem;">
-			Changes to these fields require admin approval. Pending changes are highlighted.
+		<p class="text-secondary" style="margin-bottom: 8px; font-size: 0.8rem;">
+			🔒 Fields with a lock need admin approval to change.
 		</p>
 
 		{#each ['firstName', 'lastName'] as field}
-			<div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
-				<div>
-					<span class="text-secondary" style="font-size: 0.8rem;">{formatFieldName(field)}</span><br>
-					<span style="font-weight: 500;">{worker[field] || '—'}</span>
-					{#if hasPendingChange(field)}
-						{@const pc = getPendingChange(field)}
-						<span class="badge badge-pending" style="margin-left: 8px;">⏳ Pending: "{pc?.newValue}"</span>
-					{/if}
-				</div>
-				{#if !hasPendingChange(field)}
-					{#if criticalFieldOpen === field}
-						<div style="display: flex; gap: 6px; align-items: center;">
-							<input
-								bind:value={criticalNewValue}
-								placeholder="New {formatFieldName(field)}"
-								style="width: auto; min-width: 150px; padding: 6px 10px; font-size: 0.85rem;"
-							/>
-							<button class="btn btn-primary btn-sm" onclick={() => requestChange(field, worker[field])} disabled={submittingChange}>
-								{submittingChange ? '...' : 'Submit'}
-							</button>
-							<button class="btn btn-outline btn-sm" onclick={() => criticalFieldOpen = ''}>Cancel</button>
-						</div>
-					{:else}
+			<div class="locked-field">
+				<div class="locked-row">
+					<div>
+						<span class="text-secondary" style="font-size: 0.8rem;">🔒 {formatFieldName(field)}</span><br>
+						<span style="font-weight: 500;">{worker[field] || '—'}</span>
+						{#if hasPendingChange(field)}
+							{@const pc = getPendingChange(field)}
+							<span class="badge badge-pending" style="margin-left: 8px;">⏳ Pending: "{pc?.newValue}"</span>
+						{/if}
+					</div>
+					{#if !hasPendingChange(field) && criticalFieldOpen !== field}
 						<button class="btn btn-outline btn-sm" onclick={() => { criticalFieldOpen = field; criticalNewValue = worker[field] || ''; }}>
 							✎ Request Change
 						</button>
 					{/if}
+				</div>
+				{#if !hasPendingChange(field) && criticalFieldOpen === field}
+					<div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+						<input
+							bind:value={criticalNewValue}
+							placeholder="New {formatFieldName(field)}"
+							style="flex: 1; min-width: 160px;"
+						/>
+						<button class="btn btn-primary" onclick={() => requestChange(field, worker[field])} disabled={submittingChange}>
+							{submittingChange ? '...' : 'Submit'}
+						</button>
+						<button class="btn btn-outline" onclick={() => criticalFieldOpen = ''}>Cancel</button>
+					</div>
 				{/if}
 			</div>
 		{/each}
@@ -205,37 +206,38 @@
 	<div class="card">
 		<h3 style="font-size: 1rem; margin-bottom: 12px;">📄 Tax Information (W-9)</h3>
 		<p class="text-secondary" style="margin-bottom: 8px; font-size: 0.8rem;">
-			Changes to tax info require admin approval.
+			🔒 Changes to tax info require admin approval.
 		</p>
 
 		{#each ['w9ParsedName', 'w9ParsedTin', 'w9ParsedAddress'] as field}
-			<div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
-				<div>
-					<span class="text-secondary" style="font-size: 0.8rem;">{formatFieldName(field)}</span><br>
-					<span style="font-weight: 500;">{worker[field] || '—'}</span>
-					{#if hasPendingChange(field)}
-						{@const pc = getPendingChange(field)}
-						<span class="badge badge-pending" style="margin-left: 8px;">⏳ Pending: "{pc?.newValue}"</span>
-					{/if}
-				</div>
-				{#if !hasPendingChange(field)}
-					{#if criticalFieldOpen === field}
-						<div style="display: flex; gap: 6px; align-items: center;">
-							<input
-								bind:value={criticalNewValue}
-								placeholder="New {formatFieldName(field)}"
-								style="width: auto; min-width: 150px; padding: 6px 10px; font-size: 0.85rem;"
-							/>
-							<button class="btn btn-primary btn-sm" onclick={() => requestChange(field, worker[field] || '')} disabled={submittingChange}>
-								{submittingChange ? '...' : 'Submit'}
-							</button>
-							<button class="btn btn-outline btn-sm" onclick={() => criticalFieldOpen = ''}>Cancel</button>
-						</div>
-					{:else}
+			<div class="locked-field">
+				<div class="locked-row">
+					<div>
+						<span class="text-secondary" style="font-size: 0.8rem;">🔒 {formatFieldName(field)}</span><br>
+						<span style="font-weight: 500;">{worker[field] || '—'}</span>
+						{#if hasPendingChange(field)}
+							{@const pc = getPendingChange(field)}
+							<span class="badge badge-pending" style="margin-left: 8px;">⏳ Pending: "{pc?.newValue}"</span>
+						{/if}
+					</div>
+					{#if !hasPendingChange(field) && criticalFieldOpen !== field}
 						<button class="btn btn-outline btn-sm" onclick={() => { criticalFieldOpen = field; criticalNewValue = worker[field] || ''; }}>
 							✎ Request Change
 						</button>
 					{/if}
+				</div>
+				{#if !hasPendingChange(field) && criticalFieldOpen === field}
+					<div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+						<input
+							bind:value={criticalNewValue}
+							placeholder="New {formatFieldName(field)}"
+							style="flex: 1; min-width: 160px;"
+						/>
+						<button class="btn btn-primary" onclick={() => requestChange(field, worker[field] || '')} disabled={submittingChange}>
+							{submittingChange ? '...' : 'Submit'}
+						</button>
+						<button class="btn btn-outline" onclick={() => criticalFieldOpen = ''}>Cancel</button>
+					</div>
 				{/if}
 			</div>
 		{/each}
@@ -249,7 +251,7 @@
 			<div class="col"><label for="wEmail">Email</label><input id="wEmail" type="email" bind:value={editEmail} /></div>
 		</div>
 		<div class="mb-4"><label for="wNotes">Notes</label><textarea id="wNotes" bind:value={editNotes} rows="2"></textarea></div>
-		<button class="btn btn-primary" onclick={saveProfile} disabled={saving}>
+		<button class="btn btn-primary btn-block" onclick={saveProfile} disabled={saving}>
 			{saving ? 'Saving...' : 'Save'}
 		</button>
 	</div>

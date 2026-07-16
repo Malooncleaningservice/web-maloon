@@ -8,11 +8,14 @@
 	let loading = $state(true);
 	let uploadingPhotoForTask = $state<string | null>(null);
 	let showingPhotoUrl = $state<string | null>(null);
+	let updatingStatus = $state(false);
+	let statusError = $state('');
+	let openSections = $state<Record<string, boolean>>({});
 
 	let user = $state<{ id: string; workerId: string | null } | null>(null);
 
 	onMount(async () => {
-		jobId = $page.params.id;
+		jobId = $page.params.id ?? '';
 		try {
 			const meRes = await fetch('/api/auth/me');
 			if (meRes.ok) user = await meRes.json();
@@ -25,7 +28,53 @@
 			const res = await fetch(`/api/worker/jobs/${jobId}`);
 			if (res.ok) job = await res.json();
 		} catch { /* ignore */ }
+		if (job && Object.keys(openSections).length === 0) {
+			let firstIncompleteFound = false;
+			for (const s of job.sections || []) {
+				const done = sectionDone(s);
+				if (!done && !firstIncompleteFound) {
+					openSections[s.id] = true;
+					firstIncompleteFound = true;
+				} else {
+					openSections[s.id] = !done;
+				}
+			}
+		}
 		loading = false;
+	}
+
+	function sectionDone(section: any): boolean {
+		return (section.tasks || []).length > 0 && section.tasks.every((t: any) => t.completed);
+	}
+
+	function progress(): { total: number; done: number } {
+		let total = 0, done = 0;
+		for (const s of job?.sections || []) {
+			for (const t of s.tasks || []) {
+				total++;
+				if (t.completed) done++;
+			}
+		}
+		for (const t of job?.startWithTasks || []) {
+			total++;
+			if (t.completed) done++;
+		}
+		return { total, done };
+	}
+
+	function missingPhotoCount(): number {
+		let n = 0;
+		for (const s of job?.sections || []) {
+			for (const t of s.tasks || []) {
+				if (t.requiredPhoto && (!t.photos || t.photos.length === 0)) n++;
+			}
+		}
+		return n;
+	}
+
+	function canFinish(): boolean {
+		const p = progress();
+		return p.total > 0 && p.done === p.total && missingPhotoCount() === 0;
 	}
 
 	async function toggleTask(taskId: string, completed: boolean, comment?: string) {
@@ -48,6 +97,11 @@
 				body: JSON.stringify({ taskId, completed, comment: comment || undefined })
 			});
 			if (!res.ok) throw new Error(await res.text());
+			if (completed && sectionDone(section)) {
+				openSections[section.id] = false;
+				const next = (job.sections || []).find((s: any) => !sectionDone(s));
+				if (next) openSections[next.id] = true;
+			}
 		} catch {
 			task.completed = prevCompleted;
 			task.comment = prevComment;
@@ -56,6 +110,8 @@
 
 	async function uploadTaskPhoto(taskId: string, file: File) {
 		uploadingPhotoForTask = taskId;
+		const task = (job.sections || []).flatMap((s: any) => s.tasks || []).find((t: any) => t.id === taskId);
+		const shouldAutoComplete = task && task.requiredPhoto && !task.completed;
 		try {
 			const formData = new FormData();
 			formData.append('file', file);
@@ -65,6 +121,9 @@
 			});
 			if (!uploadRes.ok) throw new Error(await uploadRes.text());
 			await loadJob();
+			if (shouldAutoComplete) {
+				await toggleTask(taskId, true);
+			}
 		} catch (e) {
 			console.error('Photo upload failed', e);
 			alert('Failed to upload photo.');
@@ -78,6 +137,20 @@
 		const file = input.files?.[0];
 		if (file) uploadTaskPhoto(taskId, file);
 		input.value = '';
+	}
+
+	function openCamera(taskId: string) {
+		const input = document.getElementById(`photo-input-${taskId}`) as HTMLInputElement | null;
+		input?.click();
+	}
+
+	function handleTaskTap(task: any) {
+		if (uploadingPhotoForTask) return;
+		if (!task.completed && task.requiredPhoto && (!task.photos || task.photos.length === 0)) {
+			openCamera(task.id);
+			return;
+		}
+		toggleTask(task.id, !task.completed);
 	}
 
 	async function toggleStartWith(taskId: string, completed: boolean) {
@@ -98,6 +171,28 @@
 		}
 	}
 
+	async function updateStatus(status: 'in_progress' | 'completed') {
+		updatingStatus = true;
+		statusError = '';
+		try {
+			const res = await fetch(`/api/worker/jobs/${jobId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status })
+			});
+			if (res.ok) {
+				job = { ...job, status };
+			} else {
+				const data = await res.json().catch(() => ({}));
+				statusError = data.error || 'Failed to update job status.';
+			}
+		} catch {
+			statusError = 'Network error.';
+		} finally {
+			updatingStatus = false;
+		}
+	}
+
 	function statusColor(s: string) {
 		if (s === 'pending') return '#e6a817';
 		if (s === 'in_progress') return '#1a73e8';
@@ -105,9 +200,18 @@
 		return '#5f6368';
 	}
 
-	function canComplete(task: any): boolean {
-		if (!task.requiredPhoto) return true;
-		return task.photos && task.photos.length > 0;
+	function mapsUrl(address: string): string {
+		return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+	}
+
+	function blockingSummary(): string {
+		const p = progress();
+		const remaining = p.total - p.done;
+		const photos = missingPhotoCount();
+		const parts: string[] = [];
+		if (remaining > 0) parts.push(`${remaining} task${remaining !== 1 ? 's' : ''} left`);
+		if (photos > 0) parts.push(`${photos} required photo${photos !== 1 ? 's' : ''} missing`);
+		return parts.join(' · ');
 	}
 </script>
 
@@ -124,23 +228,37 @@
 	</div>
 {/if}
 
-<a href="/worker" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 12px; display: inline-block;">
-	← Back to Dashboard
-</a>
-
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
 		<p class="text-secondary">Loading job...</p>
 	</div>
 {:else if job}
-	<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-		<div>
-			<h2 style="font-size: 1.3rem; margin-bottom: 4px;">{job.clientName}</h2>
-			<p class="text-secondary">{job.address}</p>
+	{@const p = progress()}
+	<div class="job-sticky-header">
+		<div style="display: flex; align-items: center; gap: 10px;">
+			<a href="/worker" aria-label="Back to jobs" style="color: var(--primary); text-decoration: none; font-size: 1.3rem; line-height: 1; padding: 4px 8px 4px 0;">←</a>
+			<div style="flex: 1; min-width: 0;">
+				<h2 style="font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{job.clientName}</h2>
+			</div>
+			<span class="badge" style="background: {statusColor(job.status)}20; color: {statusColor(job.status)};">
+				{job.status.replace('_', ' ').toUpperCase()}
+			</span>
 		</div>
-		<span class="badge" style="background: {statusColor(job.status)}20; color: {statusColor(job.status)}; font-size: 0.9rem; padding: 4px 12px;">
-			{job.status.replace('_', ' ').toUpperCase()}
-		</span>
+		{#if p.total > 0}
+			<div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+				<div class="progress-track" style="flex: 1;">
+					<div class="progress-fill" style="width: {p.done / p.total * 100}%"></div>
+				</div>
+				<span style="font-size: 0.75rem; font-weight: 600; white-space: nowrap;">{p.done}/{p.total}</span>
+			</div>
+		{/if}
+	</div>
+
+	<div style="margin-bottom: 16px;">
+		<a href={mapsUrl(job.address)} target="_blank" rel="noopener" class="address-link">📍 {job.address}</a>
+		{#if job.scheduledDate}
+			<p class="text-secondary" style="margin-top: 2px;">📅 {new Date(job.scheduledDate).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+		{/if}
 	</div>
 
 	{#if job.notes}
@@ -149,25 +267,27 @@
 		</div>
 	{/if}
 
-	{#if job.scheduledDate}
-		<p class="text-secondary mb-4">📅 Scheduled: {job.scheduledDate}</p>
+	{#if statusError}
+		<div style="background: #fce8e6; color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+			{statusError}
+		</div>
+	{/if}
+
+	{#if job.status === 'pending'}
+		<button class="btn btn-primary btn-block" style="margin-bottom: 16px;" onclick={() => updateStatus('in_progress')} disabled={updatingStatus}>
+			{updatingStatus ? 'Starting...' : '▶ Start Job'}
+		</button>
 	{/if}
 
 	<!-- Start-With Tasks (prep) -->
 	{#if job.startWithTasks?.length}
 		<div class="card" style="background: #e8f0fe;">
-			<h3 style="font-size: 1rem; margin-bottom: 12px;">🔑 Before You Start</h3>
+			<h3 style="font-size: 1rem; margin-bottom: 4px;">🔑 Before You Start</h3>
 			{#each job.startWithTasks as swt}
-				<div class="task-row">
-					<input
-						type="checkbox"
-						checked={swt.completed}
-						onchange={() => toggleStartWith(swt.id, !swt.completed)}
-					/>
-					<span class="task-desc" style="text-decoration: {swt.completed ? 'line-through' : 'none'}; opacity: {swt.completed ? 0.6 : 1};">
-						{swt.description}
-					</span>
-				</div>
+				<button class="wtask-row" onclick={() => toggleStartWith(swt.id, !swt.completed)}>
+					<span class="wcheck" class:done={swt.completed}>{swt.completed ? '✓' : ''}</span>
+					<span class="wtask-desc" class:done={swt.completed}>{swt.description}</span>
+				</button>
 			{/each}
 		</div>
 	{/if}
@@ -175,68 +295,49 @@
 	<!-- Sections & Tasks -->
 	{#if job.sections?.length}
 		{#each job.sections as section}
-			<details class="section-card" open>
+			<details class="section-card" open={openSections[section.id]} ontoggle={(e) => openSections[section.id] = (e.target as HTMLDetailsElement).open}>
 				<summary>
-					<span>{section.name}</span>
+					<span>
+						{#if sectionDone(section)}<span class="section-check">✓ </span>{/if}
+						{section.name}
+					</span>
 					<span class="text-secondary">
 						{section.tasks?.filter((t: any) => t.completed).length || 0}/{section.tasks?.length || 0}
 					</span>
 				</summary>
 				<div class="section-body">
 					{#each section.tasks as task}
-						<div class="task-row" style="flex-wrap: wrap; align-items: flex-start;">
-							<div style="display: flex; align-items: flex-start; gap: 8px; flex: 1; min-width: 200px;">
-								{#if task.requiredPhoto && !canComplete(task)}
-									<input
-										type="checkbox"
-										checked={task.completed}
-										disabled
-										title="Photo required to complete this task"
-									/>
-								{:else}
-									<input
-										type="checkbox"
-										checked={task.completed}
-										onchange={() => toggleTask(task.id, !task.completed)}
-									/>
+						{@const needsPhoto = task.requiredPhoto && (!task.photos || task.photos.length === 0)}
+						<button class="wtask-row" onclick={() => handleTaskTap(task)} disabled={uploadingPhotoForTask === task.id}>
+							<span class="wcheck" class:done={task.completed} class:camera={!task.completed && needsPhoto}>
+								{task.completed ? '✓' : !task.completed && needsPhoto ? '📸' : ''}
+							</span>
+							<span style="flex: 1;">
+								<span class="wtask-desc" class:done={task.completed} style="display: block;">{task.description}</span>
+								{#if uploadingPhotoForTask === task.id}
+									<span class="wtask-meta">Uploading photo...</span>
+								{:else if needsPhoto}
+									<span class="wtask-meta required">📸 Photo required — tap to take one</span>
+								{:else if task.requiredPhoto}
+									<span class="wtask-meta">📸 Photo added</span>
 								{/if}
-								<div>
-									<span class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; opacity: {task.completed ? 0.6 : 1};">
-										{task.description}
-									</span>
-									<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-										{#if task.requiredPhoto}
-											<span style="color: var(--danger); font-size: 0.7rem;">📸 (required)</span>
-										{:else}
-											<span style="color: var(--text-secondary); font-size: 0.7rem;">📸 (optional)</span>
-										{/if}
-										{#if task.requiredPhoto && !canComplete(task)}
-											<span style="color: var(--danger); font-size: 0.7rem;">— upload a photo to complete</span>
-										{/if}
-									</div>
-								</div>
-							</div>
-							<div style="display: flex; align-items: center; gap: 6px;">
-								<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.7rem; padding: 3px 7px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
-									📸 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Add Photo'}
-									<input type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={uploadingPhotoForTask === task.id} />
-								</label>
-								{#if task.photos && task.photos.length > 0}
-									<span style="color: var(--success); font-size: 0.75rem; white-space: nowrap;">{task.photos.length} photo{task.photos.length !== 1 ? 's' : ''}</span>
-									{#each task.photos as photo}
-										<button
-											class="btn btn-sm"
-											style="padding: 2px 6px; font-size: 0.65rem; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px; cursor: pointer; white-space: nowrap;"
-											onclick={() => showingPhotoUrl = photo.url}
-										>
-											🖼 View
-										</button>
-									{/each}
+								{#if task.comment}
+									<span class="wtask-meta" style="display: block;">💬 {task.comment}</span>
 								{/if}
-							</div>
-							{#if task.comment}
-								<span style="font-size: 0.75rem; color: var(--text-secondary); width: 100%; padding-left: 28px;">💬 {task.comment}</span>
-							{/if}
+							</span>
+						</button>
+						<input id="photo-input-{task.id}" type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={uploadingPhotoForTask === task.id} />
+						<div class="photo-thumbs">
+							{#each task.photos || [] as photo}
+								<button style="padding: 0; border: none; background: none; cursor: pointer;" onclick={() => showingPhotoUrl = photo.url} aria-label="View task photo">
+									<!-- svelte-ignore a11y_img_redundant_alt -->
+									<img src={photo.url} alt="Task photo" />
+								</button>
+							{/each}
+							<button class="add-photo-btn" onclick={() => openCamera(task.id)} disabled={uploadingPhotoForTask === task.id}>
+								<span class="icon">📸</span>
+								<span>{uploadingPhotoForTask === task.id ? '...' : (task.photos?.length ? 'Add' : 'Photo')}</span>
+							</button>
 						</div>
 					{/each}
 				</div>
@@ -245,6 +346,21 @@
 	{:else}
 		<div class="card" style="text-align: center; padding: 40px;">
 			<p class="text-secondary">No tasks defined for this job yet.</p>
+		</div>
+	{/if}
+
+	{#if job.status === 'in_progress'}
+		<div style="margin-top: 20px;">
+			{#if !canFinish()}
+				<p class="text-secondary" style="text-align: center; margin-bottom: 8px;">{blockingSummary()}</p>
+			{/if}
+			<button class="btn btn-success btn-block" onclick={() => updateStatus('completed')} disabled={updatingStatus || !canFinish()}>
+				{updatingStatus ? 'Finishing...' : '✓ Finish Job'}
+			</button>
+		</div>
+	{:else if job.status === 'completed'}
+		<div class="card" style="text-align: center; background: #e6f4ea; margin-top: 20px;">
+			<strong style="color: var(--success);">✓ Job completed — nice work!</strong>
 		</div>
 	{/if}
 {:else}

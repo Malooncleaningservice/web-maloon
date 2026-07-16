@@ -66,7 +66,7 @@
 	<div class="app-shell">
 		<header class="top-nav">
 			<a href="/" class="logo">Maloon Service</a>
-			<nav>
+			<nav class={user.role === 'admin' ? '' : 'worker-links'}>
 				{#if user.role === 'admin'}
 					<a href="/quotes">Quotes</a>
 					<a href="/jobs">Jobs</a>
