@@ -2,6 +2,7 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
+import { geocodeAddress } from '$lib/geo';
 
 export const GET: RequestHandler = apiHandler(async ({ url }) => {
 	const dateParam = url.searchParams.get('date');
@@ -65,6 +66,19 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 		}
 	}
 
+	// Geocode the address for the geofence check on photo uploads.
+	// Soft-fail: if Nominatim is down/unavailable, the job is still created
+	// with null lat/long; photo uploads will skip the geofence until coords exist.
+	let latitude: number | null = null;
+	let longitude: number | null = null;
+	if (address && address.trim().length >= 3) {
+		const coords = await geocodeAddress(address);
+		if (coords) {
+			latitude = coords.lat;
+			longitude = coords.lon;
+		}
+	}
+
 	const job = await prisma.job.create({
 		data: {
 			businessId,
@@ -74,6 +88,8 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 			clientPhone: data.clientPhone,
 			clientEmail: data.clientEmail,
 			address,
+			latitude,
+			longitude,
 			total: data.total ?? 0,
 			scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
 			status: data.status ?? 'pending',

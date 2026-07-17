@@ -70,6 +70,8 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 				clientPhone: template.clientPhone,
 				clientEmail: template.clientEmail,
 				address: template.address,
+				latitude: template.latitude,
+				longitude: template.longitude,
 				total: template.total,
 				status: 'pending',
 				scheduledDate: new Date(cursor),

@@ -12,6 +12,16 @@
 	let statusError = $state('');
 	let openSections = $state<Record<string, boolean>>({});
 
+	// Photo-upload error state, keyed by taskId. Replaces the generic alert().
+	let photoErrorForTask = $state<Record<string, string>>({});
+
+	// Whether we're currently acquiring GPS for a given task's upload.
+	let locatingForTask = $state<string | null>(null);
+
+	// Location-permission state, surfaced once per session.
+	// 'unknown' | 'granted' | 'denied' | 'unavailable'
+	let locationStatus = $state<'unknown' | 'granted' | 'denied' | 'unavailable'>('unknown');
+
 	let user = $state<{ id: string; workerId: string | null } | null>(null);
 
 	onMount(async () => {
@@ -20,8 +30,33 @@
 			const meRes = await fetch('/api/auth/me');
 			if (meRes.ok) user = await meRes.json();
 		} catch { /* ignore */ }
+		probeLocationAvailability();
 		await loadJob();
 	});
+
+	// Detect whether geolocation is available + whether permission is already granted.
+	// We don't actually request permission here — we wait until the worker tries to
+	// upload a photo, so we don't surprise them with a prompt on page load.
+	function probeLocationAvailability() {
+		if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+			locationStatus = 'unavailable';
+			return;
+		}
+		if (navigator.permissions) {
+			navigator.permissions
+				.query({ name: 'geolocation' as PermissionName })
+				.then((p) => {
+					if (p.state === 'granted') locationStatus = 'granted';
+					else if (p.state === 'denied') locationStatus = 'denied';
+					// 'prompt' -> leave as 'unknown'
+					p.onchange = () => {
+						if (p.state === 'granted') locationStatus = 'granted';
+						else if (p.state === 'denied') locationStatus = 'denied';
+					};
+				})
+				.catch(() => { /* ignore — fall back to prompt at upload time */ });
+		}
+	}
 
 	async function loadJob() {
 		try {
@@ -109,27 +144,102 @@
 	}
 
 	async function uploadTaskPhoto(taskId: string, file: File) {
+		// Clear any previous error for this task.
+		photoErrorForTask = { ...photoErrorForTask, [taskId]: '' };
+
+		// --- 1. Acquire GPS position (required) ---
+		let position: { lat: number; lon: number; accuracy: number; takenAt: string } | null = null;
+		locatingForTask = taskId;
+		try {
+			position = await getCurrentPosition();
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Could not get your location.';
+			photoErrorForTask = { ...photoErrorForTask, [taskId]: msg };
+			if (msg.includes('denied') || msg.includes('permission')) locationStatus = 'denied';
+			return;
+		} finally {
+			locatingForTask = null;
+		}
+
+		// --- 2. Upload with location attached ---
 		uploadingPhotoForTask = taskId;
 		const task = (job.sections || []).flatMap((s: any) => s.tasks || []).find((t: any) => t.id === taskId);
 		const shouldAutoComplete = task && task.requiredPhoto && !task.completed;
 		try {
 			const formData = new FormData();
 			formData.append('file', file);
+			formData.append('latitude', String(position.lat));
+			formData.append('longitude', String(position.lon));
+			formData.append('accuracy', String(position.accuracy));
+			formData.append('photoTakenAt', position.takenAt);
+
 			const uploadRes = await fetch(`/api/upload?type=task-photo&taskId=${taskId}`, {
 				method: 'POST',
 				body: formData,
 			});
-			if (!uploadRes.ok) throw new Error(await uploadRes.text());
+			if (!uploadRes.ok) {
+				let serverMsg = await uploadRes.text().catch(() => '');
+				try {
+					const parsed = JSON.parse(serverMsg);
+					serverMsg = parsed.error || serverMsg;
+				} catch { /* keep raw text */ }
+				photoErrorForTask = { ...photoErrorForTask, [taskId]: serverMsg || 'Upload failed.' };
+				return;
+			}
+			locationStatus = 'granted';
 			await loadJob();
 			if (shouldAutoComplete) {
 				await toggleTask(taskId, true);
 			}
 		} catch (e) {
 			console.error('Photo upload failed', e);
-			alert('Failed to upload photo.');
+			photoErrorForTask = {
+				...photoErrorForTask,
+				[taskId]: 'Network error — check your connection and try again.',
+			};
 		} finally {
 			uploadingPhotoForTask = null;
 		}
+	}
+
+	// Wrap navigator.geolocation.getCurrentPosition in a promise with a timeout.
+	// High accuracy is required so the geofence (150 m) is meaningful.
+	function getCurrentPosition(): Promise<{ lat: number; lon: number; accuracy: number; takenAt: string }> {
+		return new Promise((resolve, reject) => {
+			if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+				locationStatus = 'unavailable';
+				reject(new Error('Location is unavailable on this device. Photos require location permission.'));
+				return;
+			}
+			const startedAt = new Date().toISOString();
+			navigator.geolocation.getCurrentPosition(
+				(pos) => {
+					if (pos.coords.latitude == null || pos.coords.longitude == null) {
+						reject(new Error('Could not get your location. Please try again.'));
+						return;
+					}
+					resolve({
+						lat: pos.coords.latitude,
+						lon: pos.coords.longitude,
+						accuracy: pos.coords.accuracy ?? 0,
+						takenAt: startedAt,
+					});
+				},
+				(err) => {
+					if (err.code === err.PERMISSION_DENIED) {
+						locationStatus = 'denied';
+						reject(new Error('Location permission was denied. Photos can only be taken with location enabled. Please allow location in your browser settings and try again.'));
+					} else if (err.code === err.POSITION_UNAVAILABLE) {
+						reject(new Error('Your location is unavailable right now. Try moving to an open area and retry.'));
+					} else if (err.code === err.TIMEOUT) {
+						reject(new Error('Took too long to get your location. Try again.'));
+					} else {
+						reject(new Error('Could not get your location: ' + (err.message || 'unknown error')));
+					}
+				},
+				{ enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+			);
+		});
 	}
 
 	function handlePhotoFile(taskId: string, event: Event) {
@@ -145,8 +255,22 @@
 	}
 
 	function handleTaskTap(task: any) {
-		if (uploadingPhotoForTask) return;
+		if (uploadingPhotoForTask || locatingForTask) return;
 		if (!task.completed && task.requiredPhoto && (!task.photos || task.photos.length === 0)) {
+			if (locationStatus === 'denied') {
+				photoErrorForTask = {
+					...photoErrorForTask,
+					[task.id]: 'Location permission was denied. Photos require location access — enable it in your browser settings and retry.'
+				};
+				return;
+			}
+			if (locationStatus === 'unavailable') {
+				photoErrorForTask = {
+					...photoErrorForTask,
+					[task.id]: 'This device does not support location. Photos can only be taken on a location-enabled device.'
+				};
+				return;
+			}
 			openCamera(task.id);
 			return;
 		}
@@ -202,6 +326,12 @@
 
 	function mapsUrl(address: string): string {
 		return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+	}
+
+	function jobHasPhotoTasks(j: any): boolean {
+		return (j?.sections || []).some((s: any) =>
+			(s.tasks || []).some((t: any) => t.requiredPhoto)
+		);
 	}
 
 	function blockingSummary(): string {
@@ -261,6 +391,23 @@
 		{/if}
 	</div>
 
+	{#if locationStatus === 'denied' || locationStatus === 'unavailable'}
+		<div class="loc-banner warn">
+			{#if locationStatus === 'denied'}
+				<strong>📍 Location permission needed.</strong>
+				Photos can only be taken with location enabled. Tap your browser's address bar → Site settings → Location → Allow, then reload this page.
+			{:else}
+				<strong>📍 Location unavailable.</strong>
+				This device doesn't support location. Photos must be taken from a location-enabled phone or tablet.
+			{/if}
+		</div>
+	{:else if locationStatus === 'unknown' && jobHasPhotoTasks(job)}
+		<div class="loc-banner info">
+			<strong>📍 Location required for photos.</strong>
+			When you take a photo, we'll ask for your location to verify you're at the job site.
+		</div>
+	{/if}
+
 	{#if job.notes}
 		<div class="card" style="background: #fef7e0; border-color: var(--warning);">
 			<strong>📝 Notes:</strong> {job.notes}
@@ -306,27 +453,36 @@
 					</span>
 				</summary>
 				<div class="section-body">
-					{#each section.tasks as task}
-						{@const needsPhoto = task.requiredPhoto && (!task.photos || task.photos.length === 0)}
-						<button class="wtask-row" onclick={() => handleTaskTap(task)} disabled={uploadingPhotoForTask === task.id}>
-							<span class="wcheck" class:done={task.completed} class:camera={!task.completed && needsPhoto}>
-								{task.completed ? '✓' : !task.completed && needsPhoto ? '📸' : ''}
-							</span>
-							<span style="flex: 1;">
-								<span class="wtask-desc" class:done={task.completed} style="display: block;">{task.description}</span>
-								{#if uploadingPhotoForTask === task.id}
-									<span class="wtask-meta">Uploading photo...</span>
-								{:else if needsPhoto}
-									<span class="wtask-meta required">📸 Photo required — tap to take one</span>
-								{:else if task.requiredPhoto}
-									<span class="wtask-meta">📸 Photo added</span>
-								{/if}
-								{#if task.comment}
-									<span class="wtask-meta" style="display: block;">💬 {task.comment}</span>
-								{/if}
-							</span>
-						</button>
-						<input id="photo-input-{task.id}" type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={uploadingPhotoForTask === task.id} />
+				{#each section.tasks as task}
+					{@const needsPhoto = task.requiredPhoto && (!task.photos || task.photos.length === 0)}
+					{@const isBusy = uploadingPhotoForTask === task.id || locatingForTask === task.id}
+					<button class="wtask-row" onclick={() => handleTaskTap(task)} disabled={isBusy}>
+						<span class="wcheck" class:done={task.completed} class:camera={!task.completed && needsPhoto}>
+							{task.completed ? '✓' : !task.completed && needsPhoto ? '📸' : ''}
+						</span>
+						<span style="flex: 1;">
+							<span class="wtask-desc" class:done={task.completed} style="display: block;">{task.description}</span>
+							{#if locatingForTask === task.id}
+								<span class="wtask-meta">📡 Getting your location…</span>
+							{:else if uploadingPhotoForTask === task.id}
+								<span class="wtask-meta">Uploading photo…</span>
+							{:else if needsPhoto}
+								<span class="wtask-meta required">📸 Photo required — tap to take one</span>
+							{:else if task.requiredPhoto}
+								<span class="wtask-meta">📸 Photo added</span>
+							{/if}
+							{#if task.comment}
+								<span class="wtask-meta" style="display: block;">💬 {task.comment}</span>
+							{/if}
+						</span>
+					</button>
+					{#if photoErrorForTask[task.id]}
+						<div class="photo-error">
+							<span>⚠ {photoErrorForTask[task.id]}</span>
+							<button class="photo-error-retry" onclick={() => openCamera(task.id)} disabled={isBusy}>Retry</button>
+						</div>
+					{/if}
+					<input id="photo-input-{task.id}" type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={isBusy} />
 						<div class="photo-thumbs">
 							{#each task.photos || [] as photo}
 								<button style="padding: 0; border: none; background: none; cursor: pointer;" onclick={() => showingPhotoUrl = photo.url} aria-label="View task photo">

@@ -106,12 +106,14 @@ model Job {
   clientName    String
   clientPhone   String?
   clientEmail   String?
-  address       String
-  total         Float    @default(0)
-  status        String   @default("pending") // pending, in_progress, completed, cancelled
-  scheduledDate DateTime?
-  notes         String?
-  isRecurring           Boolean  @default(false)
+   address       String
+   latitude      Float?    // auto-geocoded from address; geofence target for photo uploads
+   longitude     Float?
+   total         Float    @default(0)
+   status        String   @default("pending") // pending, in_progress, completed, cancelled
+   scheduledDate DateTime?
+   notes         String?
+   isRecurring           Boolean  @default(false)
   recurrencePattern     String?  // weekly, biweekly, fourWeekly, monthly
   recurrenceEndDate     DateTime?
   recurringTemplateId   String?
@@ -155,12 +157,16 @@ model JobTask {
 }
 
 model TaskPhoto {
-  id        String   @id @default(cuid())
-  taskId    String
-  task      JobTask  @relation(fields: [taskId], references: [id])
-  url       String
-  takenAt   DateTime @default(now())
-  takenBy   String?  // workerId
+  id           String   @id @default(cuid())
+  taskId       String
+  task         JobTask  @relation(fields: [taskId], references: [id])
+  url          String   // processed, stamped, compressed base64 data URL
+  takenAt      DateTime @default(now())
+  takenBy      String?  // workerId
+  latitude     Float?   // worker's GPS at capture time
+  longitude    Float?
+  locationAccuracy Float? // GPS accuracy in meters
+  photoTakenAt DateTime? // actual moment the photo was captured (client timestamp)
 }
 
 model StartWithTask {

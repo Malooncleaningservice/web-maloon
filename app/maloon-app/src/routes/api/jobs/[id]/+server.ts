@@ -2,6 +2,7 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
+import { geocodeAddress } from '$lib/geo';
 
 export const GET: RequestHandler = apiHandler(async ({ params }) => {
 	const job = await prisma.job.findUnique({
@@ -42,7 +43,15 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	if (data.clientPhone !== undefined) updateData.clientPhone = data.clientPhone;
 	if (data.clientEmail !== undefined) updateData.clientEmail = data.clientEmail;
 	if (data.clientId !== undefined) updateData.clientId = data.clientId;
-	if (data.address !== undefined) updateData.address = data.address;
+	if (data.address !== undefined) {
+		updateData.address = data.address;
+		// Re-geocode when the address changes so the geofence stays accurate.
+		// Soft-fail: leaves lat/long as-is if geocoding returns nothing, but we
+		// null them so we don't geofence against the wrong spot.
+		const coords = await geocodeAddress(data.address || '');
+		updateData.latitude = coords ? coords.lat : null;
+		updateData.longitude = coords ? coords.lon : null;
+	}
 	if (data.notes !== undefined) updateData.notes = data.notes;
 	if (data.total !== undefined) updateData.total = data.total;
 	if (data.isRecurring !== undefined) updateData.isRecurring = data.isRecurring;
