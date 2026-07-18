@@ -10,6 +10,12 @@ import {
 	GEOFENCE_RADIUS_METERS,
 } from '$lib/geo';
 
+// Override the default 512KB limit — camera photos are 5-15MB raw.
+// sharp resizes them server-side, but the body must be received first.
+export const config = {
+	bodySizeLimit: '20M',
+};
+
 export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: RequestEvent) => {
 	const formData = await request.formData();
 	const file = formData.get('file') as File | null;

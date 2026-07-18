@@ -6,7 +6,8 @@ export default defineConfig({
 	plugins: [
 		sveltekit({
 			// adapter-node for Railway / any Node.js host
-			adapter: adapter()
+			adapter: adapter(),
+			bodySizeLimit: process.env.BODY_SIZE_LIMIT || '20M'
 		})
 	]
 });
