@@ -54,13 +54,6 @@
 		return { total, done };
 	}
 
-	function statusColor(s: string) {
-		if (s === 'pending') return '#e6a817';
-		if (s === 'in_progress') return '#1a73e8';
-		if (s === 'completed') return '#0d904f';
-		return '#5f6368';
-	}
-
 	function byDate(a: Job, b: Job): number {
 		if (!a.scheduledDate && !b.scheduledDate) return 0;
 		if (!a.scheduledDate) return 1;
@@ -122,7 +115,7 @@
 		<div class="card">
 			<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
 				<h3 style="font-size: 1rem; flex: 1;">{job.clientName}</h3>
-				<span class="badge" style="background: {statusColor(job.status)}20; color: {statusColor(job.status)};">
+				<span class="badge badge-status-{job.status}">
 					{job.status.replace('_', ' ').toUpperCase()}
 				</span>
 			</div>

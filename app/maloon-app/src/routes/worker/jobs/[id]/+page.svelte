@@ -2,6 +2,7 @@
 	import '../../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let jobId = $state('');
 	let job = $state<any>(null);
@@ -317,13 +318,6 @@
 		}
 	}
 
-	function statusColor(s: string) {
-		if (s === 'pending') return '#e6a817';
-		if (s === 'in_progress') return '#1a73e8';
-		if (s === 'completed') return '#0d904f';
-		return '#5f6368';
-	}
-
 	function mapsUrl(address: string): string {
 		return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
 	}
@@ -345,18 +339,12 @@
 	}
 </script>
 
-{#if showingPhotoUrl}
-	<div
-		style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer;"
-		onclick={() => showingPhotoUrl = null}
-		onkeydown={(e) => e.key === 'Escape' && (showingPhotoUrl = null)}
-		role="button"
-		tabindex="0"
-	>
+<Modal bare open={!!showingPhotoUrl} onClose={() => showingPhotoUrl = null}>
+	{#if showingPhotoUrl}
 		<!-- svelte-ignore a11y_img_redundant_alt -->
-		<img src={showingPhotoUrl} alt="Task photo" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
-	</div>
-{/if}
+		<img src={showingPhotoUrl} alt="Task photo" />
+	{/if}
+</Modal>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -370,7 +358,7 @@
 			<div style="flex: 1; min-width: 0;">
 				<h2 style="font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{job.clientName}</h2>
 			</div>
-			<span class="badge" style="background: {statusColor(job.status)}20; color: {statusColor(job.status)};">
+			<span class="badge badge-status-{job.status}">
 				{job.status.replace('_', ' ').toUpperCase()}
 			</span>
 		</div>
@@ -409,13 +397,13 @@
 	{/if}
 
 	{#if job.notes}
-		<div class="card" style="background: #fef7e0; border-color: var(--warning);">
+		<div class="card card-tint-warn">
 			<strong>📝 Notes:</strong> {job.notes}
 		</div>
 	{/if}
 
 	{#if statusError}
-		<div style="background: #fce8e6; color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+		<div class="msg-error">
 			{statusError}
 		</div>
 	{/if}
@@ -428,7 +416,7 @@
 
 	<!-- Start-With Tasks (prep) -->
 	{#if job.startWithTasks?.length}
-		<div class="card" style="background: #e8f0fe;">
+		<div class="card card-tint-info">
 			<h3 style="font-size: 1rem; margin-bottom: 4px;">🔑 Before You Start</h3>
 			{#each job.startWithTasks as swt}
 				<button class="wtask-row" onclick={() => toggleStartWith(swt.id, !swt.completed)}>
@@ -515,7 +503,7 @@
 			</button>
 		</div>
 	{:else if job.status === 'completed'}
-		<div class="card" style="text-align: center; background: #e6f4ea; margin-top: 20px;">
+		<div class="card card-tint-success" style="text-align: center; margin-top: 20px;">
 			<strong style="color: var(--success);">✓ Job completed — nice work!</strong>
 		</div>
 	{/if}

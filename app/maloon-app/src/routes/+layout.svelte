@@ -114,7 +114,7 @@
 									{#each notifications as n}
 										<div
 											class="notif-item"
-											style="padding: 8px; border-radius: var(--radius); margin-bottom: 4px; cursor: pointer; background: {n.read ? 'transparent' : '#e8f0fe'};"
+											style="padding: 8px; border-radius: var(--radius); margin-bottom: 4px; cursor: pointer; background: {n.read ? 'transparent' : 'var(--primary-light)'};"
 											onclick={() => { markRead(n.id); if (n.link) goto(n.link); closeNotifs(); }}
 											onkeydown={() => {}}
 										>

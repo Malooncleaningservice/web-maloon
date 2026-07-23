@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@prisma/adapter-mariadb": "^7.8.0",
 		"@prisma/client": "^7.8.0",
+		"bits-ui": "^2.18.1",
 		"mysql2": "^3.22.5",
 		"prisma": "^7.8.0",
 		"sharp": "^0.35.3"

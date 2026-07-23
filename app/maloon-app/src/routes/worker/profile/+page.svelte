@@ -151,12 +151,12 @@
 
 	<!-- Messages -->
 	{#if saveMessage}
-		<div style="background: #e6f4ea; color: var(--success); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+		<div class="msg-success">
 			{saveMessage}
 		</div>
 	{/if}
 	{#if saveError}
-		<div style="background: #fce8e6; color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+		<div class="msg-error">
 			{saveError}
 		</div>
 	{/if}

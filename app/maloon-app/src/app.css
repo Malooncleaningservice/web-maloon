@@ -1,16 +1,61 @@
+/*
+ * Design tokens — derived from the maloonservice.com "Pristine Freshness" system
+ * (see /DESIGN-GUIDE.md at repo root). Palette + type + elevation are carried
+ * over; decorative flourishes (glassmorphism, blobs, shimmer) are intentionally
+ * left out since this is a working tool, not a landing page.
+ */
 :root {
-	--primary: #1a73e8;
-	--primary-dark: #1557b0;
-	--success: #0d904f;
-	--warning: #e6a817;
-	--danger: #d93025;
-	--bg: #f8f9fa;
+	/* Brand */
+	--primary: #2e7d32;        /* forest-anchor — buttons, links, brand accents */
+	--primary-dark: #1b5e20;   /* deep-pine — hover/active state, headings */
+	--primary-light: #e6f4ea;  /* light tint for selected/unread backgrounds */
+	--accent: #4caf50;         /* leaf-green — progress fill, lighter accents */
+
+	/* Semantic status colors */
+	--success: #2e7d32;
+	--success-bg: #e6f4ea;
+	--warning: #a15c00;
+	--warning-bg: #fef3e0;
+	--danger: #c62828;
+	--danger-bg: #fce8e6;
+	--info: #1565c0;
+	--info-bg: #e8f0fe;
+
+	/* Neutrals */
+	--bg: #f4f8f4;
 	--surface: #ffffff;
-	--border: #dadce0;
-	--text: #202124;
-	--text-secondary: #5f6368;
-	--radius: 8px;
-	--shadow: 0 1px 3px rgba(0,0,0,0.12);
+	--border: #dde5dc;
+	--text: #22301f;
+	--text-secondary: #5c6b5a;
+	--text-muted: #8a978c;
+
+	/* Spacing scale */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 24px;
+	--space-6: 32px;
+
+	/* Radius scale */
+	--radius-sm: 8px;
+	--radius: 12px;
+	--radius-lg: 16px;
+
+	/* Elevation (soft green-tinted shadows, 3 tiers) */
+	--shadow-sm: 0 1px 2px rgba(27, 94, 32, 0.06);
+	--shadow: 0 2px 8px rgba(27, 94, 32, 0.08);
+	--shadow-lg: 0 8px 24px rgba(27, 94, 32, 0.16);
+
+	/* Type scale */
+	--text-xs: 0.75rem;
+	--text-sm: 0.85rem;
+	--text-base: 1rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.375rem;
+	--text-2xl: 1.75rem;
+
+	--transition: 0.16s ease;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,6 +67,10 @@ body {
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
 }
+
+h1, h2, h3 { color: var(--primary-dark); font-weight: 700; line-height: 1.25; }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-lg); }
 
 .app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
 
@@ -47,7 +96,7 @@ body {
 	border-bottom: 2px solid transparent;
 	transition: all 0.15s;
 }
-.top-nav nav a:hover { color: var(--text); border-color: var(--primary); }
+.top-nav nav a:hover { color: var(--primary-dark); border-color: var(--primary); }
 
 main { flex: 1; padding: 24px 20px; max-width: 900px; width: 100%; margin: 0 auto; }
 
@@ -59,6 +108,25 @@ main { flex: 1; padding: 24px 20px; max-width: 900px; width: 100%; margin: 0 aut
 	padding: 20px;
 	margin-bottom: 16px;
 }
+
+/* Tinted card variants — replace ad hoc inline background colors */
+.card-tint-info { background: var(--info-bg); }
+.card-tint-warn { background: var(--warning-bg); border: 1px solid var(--warning); }
+.card-tint-success { background: var(--success-bg); }
+
+/* Clickable card lift (used inside .job-card links) */
+.job-card .card { transition: transform var(--transition), box-shadow var(--transition); }
+.job-card:hover .card { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+/* Inline message banners — replace ad hoc inline background colors */
+.msg-success, .msg-error {
+	padding: 10px 14px;
+	border-radius: var(--radius);
+	margin-bottom: 12px;
+	font-size: var(--text-sm);
+}
+.msg-success { background: var(--success-bg); color: var(--success); }
+.msg-error { background: var(--danger-bg); color: var(--danger); }
 
 /* Forms */
 label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
@@ -75,7 +143,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
 	outline: none;
 	border-color: var(--primary);
-	box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+	box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
 }
 
 .btn {
@@ -88,16 +156,19 @@ input:focus, select:focus, textarea:focus {
 	font-size: 0.9rem;
 	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.15s;
+	transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
 	text-decoration: none;
 }
 .btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-success { background: var(--success); color: #fff; }
+.btn-success:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.btn-outline:hover { background: var(--bg); }
+.btn-outline:hover:not(:disabled) { background: var(--bg); border-color: var(--primary); }
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn:disabled { cursor: default; opacity: 0.65; }
 
 .row { display: flex; gap: 12px; align-items: center; }
 .col { flex: 1; }
@@ -117,10 +188,16 @@ input:focus, select:focus, textarea:focus {
 	font-size: 0.75rem;
 	font-weight: 600;
 }
-.badge-quote { background: #e8f0fe; color: var(--primary); }
-.badge-pending { background: #fef7e0; color: var(--warning); }
-.badge-active { background: #e6f4ea; color: var(--success); }
-.badge-complete { background: #e6f4ea; color: var(--success); }
+.badge-quote { background: var(--info-bg); color: var(--info); }
+.badge-pending { background: var(--warning-bg); color: var(--warning); }
+.badge-active { background: var(--success-bg); color: var(--success); }
+.badge-complete { background: var(--success-bg); color: var(--success); }
+
+/* Job/task status badges — replaces per-file statusColor() hex helpers */
+.badge-status-pending { background: var(--warning-bg); color: var(--warning); }
+.badge-status-in_progress { background: var(--info-bg); color: var(--info); }
+.badge-status-completed { background: var(--success-bg); color: var(--success); }
+.badge-status-cancelled { background: #eef1ee; color: var(--text-secondary); }
 
 .total-box {
 	background: var(--primary);
@@ -144,7 +221,7 @@ input:focus, select:focus, textarea:focus {
 	transition: all 0.15s;
 	font-weight: 500;
 }
-.checkbox-tile.checked { border-color: var(--primary); background: #e8f0fe; }
+.checkbox-tile.checked { border-color: var(--primary); background: var(--primary-light); }
 .checkbox-tile input { display: none; }
 
 .size-popup {
@@ -237,7 +314,16 @@ input:focus, select:focus, textarea:focus {
 	font-weight: 600;
 }
 .worker-tabbar a.active { color: var(--primary); }
-.worker-tabbar .tab-icon { font-size: 1.3rem; line-height: 1; }
+.worker-tabbar a.active .tab-icon {
+	background: var(--primary-light);
+	border-radius: var(--radius-sm);
+}
+.worker-tabbar .tab-icon {
+	font-size: 1.3rem;
+	line-height: 1;
+	padding: 2px 14px;
+	transition: background var(--transition);
+}
 @media (min-width: 900px) {
 	.worker-tabbar { display: none; }
 	.worker-portal { padding-bottom: 0; }
@@ -249,10 +335,10 @@ input:focus, select:focus, textarea:focus {
 /* Hero card (next job) */
 .hero-card {
 	display: block;
-	background: var(--primary);
+	background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
 	color: #fff;
-	border-radius: var(--radius);
-	box-shadow: var(--shadow);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-lg);
 	padding: 20px;
 	margin-bottom: 20px;
 	text-decoration: none;
@@ -418,38 +504,38 @@ input:focus, select:focus, textarea:focus {
 	gap: 8px;
 	margin: 6px 0 10px;
 	padding: 8px 10px;
-	background: #fce8e6;
-	border: 1px solid #f0c0bd;
-	border-radius: 6px;
-	color: #c5221f;
+	background: var(--danger-bg);
+	border: 1px solid rgba(198, 40, 40, 0.25);
+	border-radius: var(--radius-sm);
+	color: var(--danger);
 	font-size: 0.78rem;
 	line-height: 1.3;
 }
 .photo-error-retry {
 	flex-shrink: 0;
 	padding: 6px 12px;
-	border: 1px solid #c5221f;
+	border: 1px solid var(--danger);
 	border-radius: 5px;
 	background: #fff;
-	color: #c5221f;
+	color: var(--danger);
 	font-size: 0.78rem;
 	font-weight: 600;
 	cursor: pointer;
 }
-.photo-error-retry:active { background: #fbe0de; }
+.photo-error-retry:active { background: var(--danger-bg); }
 .photo-error-retry:disabled { opacity: 0.5; cursor: default; }
 
 /* Location-permission banner shown on the worker job page */
 .loc-banner {
 	padding: 10px 12px;
-	border-radius: 6px;
+	border-radius: var(--radius-sm);
 	font-size: 0.8rem;
 	line-height: 1.35;
 	margin-bottom: 12px;
 }
 .loc-banner strong { display: block; margin-bottom: 2px; }
-.loc-banner.warn { background: #fef7e0; border: 1px solid var(--warning); color: #7a5a00; }
-.loc-banner.info { background: #e8f0fe; border: 1px solid #c6dafc; color: #1a3fa8; }
+.loc-banner.warn { background: var(--warning-bg); border: 1px solid var(--warning); color: var(--warning); }
+.loc-banner.info { background: var(--info-bg); border: 1px solid rgba(21, 101, 192, 0.25); color: var(--info); }
 
 /* Section completion state */
 .section-card summary .section-check { color: var(--success); font-weight: 700; }

@@ -6,8 +6,10 @@ export default defineConfig({
 	plugins: [
 		sveltekit({
 			// adapter-node for Railway / any Node.js host
-			adapter: adapter(),
-			bodySizeLimit: process.env.BODY_SIZE_LIMIT || '20M'
+			adapter: adapter()
+			// Note: max request body size is controlled at runtime by the
+			// BODY_SIZE_LIMIT env var, read directly by adapter-node's
+			// handler.js (default 512K) — not configurable here.
 		})
 	]
 });

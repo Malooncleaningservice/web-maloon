@@ -10,12 +10,9 @@ import {
 	GEOFENCE_RADIUS_METERS,
 } from '$lib/geo';
 
-// Override the default 512KB limit — camera photos are 5-15MB raw.
-// sharp resizes them server-side, but the body must be received first.
-export const config = {
-	bodySizeLimit: '20M',
-};
-
+// Note: the max request body size is controlled by the BODY_SIZE_LIMIT env
+// var (set to 20M on Railway), read at server startup by adapter-node's
+// handler.js — there's no per-route override in this SvelteKit version.
 export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: RequestEvent) => {
 	const formData = await request.formData();
 	const file = formData.get('file') as File | null;
