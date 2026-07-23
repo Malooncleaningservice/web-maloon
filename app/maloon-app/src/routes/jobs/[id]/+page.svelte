@@ -2,6 +2,9 @@
 	import '../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import { confirmAction } from '$lib/stores/confirm.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let jobId = $state('');
 	let job = $state<{
@@ -79,17 +82,35 @@
 
 	// --- Status management ---
 	async function updateStatus(newStatus: string) {
+		if (newStatus === 'cancelled') {
+			const ok = await confirmAction({
+				title: 'Cancel this job?',
+				description: 'The assigned worker(s) will no longer see this job on their schedule.',
+				confirmText: 'Cancel Job',
+				danger: true
+			});
+			if (!ok) return;
+		}
+		if (newStatus === 'pending' && job.status === 'cancelled') {
+			const ok = await confirmAction({
+				title: 'Reopen this job?',
+				description: 'It will move back to pending and become visible to assigned workers again.',
+				confirmText: 'Reopen'
+			});
+			if (!ok) return;
+		}
 		statusUpdating = true;
 		try {
-			await fetch(`/api/jobs/${jobId}`, {
+			const res = await fetch(`/api/jobs/${jobId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ status: newStatus }),
 			});
+			if (!res.ok) throw new Error(await res.text());
 			job = { ...job, status: newStatus };
 		} catch (e) {
 			console.error('Status update failed', e);
-			alert('Failed to update status.');
+			toast.error('Failed to update status.');
 		} finally {
 			statusUpdating = false;
 		}
@@ -107,7 +128,7 @@
 			});
 			if (res.status === 409) {
 				const data = await res.json();
-				alert(`Conflict: Worker is already assigned to "${data.conflict?.clientName}" on this date.`);
+				toast.error(`Conflict: Worker is already assigned to "${data.conflict?.clientName}" on this date.`);
 				return;
 			}
 			if (!res.ok) throw new Error(await res.text());
@@ -115,6 +136,7 @@
 			await loadJob();
 		} catch (e) {
 			console.error('Assignment failed', e);
+			toast.error('Failed to assign worker.');
 		} finally {
 			assignSaving = false;
 		}
@@ -122,14 +144,16 @@
 
 	async function removeAssignment(assignmentId: string) {
 		try {
-			await fetch(`/api/jobs/${jobId}/assign`, {
+			const res = await fetch(`/api/jobs/${jobId}/assign`, {
 				method: 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ assignmentId }),
 			});
+			if (!res.ok) throw new Error(await res.text());
 			await loadJob();
 		} catch (e) {
 			console.error('Failed to remove assignment', e);
+			toast.error('Failed to remove worker.');
 		}
 	}
 
@@ -158,12 +182,14 @@
 			if (res.ok) {
 				showEditPanel = false;
 				await loadJob();
+				toast.success('Job details saved.');
 			} else {
 				const err = await res.json();
-				alert(err.error || 'Failed to save');
+				toast.error(err.error || 'Failed to save');
 			}
 		} catch (e) {
 			console.error(e);
+			toast.error('Failed to save job details.');
 		} finally {
 			editSaving = false;
 		}
@@ -304,7 +330,7 @@
 			await loadJob();
 		} catch (e) {
 			console.error('Photo upload failed', e);
-			alert('Failed to upload photo.');
+			toast.error('Failed to upload photo.');
 		} finally {
 			uploadingPhotoForTask = null;
 		}
@@ -328,18 +354,12 @@
 	← Back to Jobs
 </a>
 
-{#if showingPhotoUrl}
-	<div
-		style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer;"
-		onclick={() => showingPhotoUrl = null}
-		onkeydown={(e) => e.key === 'Escape' && (showingPhotoUrl = null)}
-		role="button"
-		tabindex="0"
-	>
+<Modal bare open={!!showingPhotoUrl} onClose={() => (showingPhotoUrl = null)}>
+	{#if showingPhotoUrl}
 		<!-- svelte-ignore a11y_img_redundant_alt -->
-		<img src={showingPhotoUrl} alt="Task photo" style="max-width: 90vw; max-height: 90vh; border-radius: 8px;" />
-	</div>
-{/if}
+		<img src={showingPhotoUrl} alt="Task photo" />
+	{/if}
+</Modal>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -360,7 +380,7 @@
 				<span class="badge badge-quote">FROM QUOTE</span>
 			{/if}
 			{#if job.isRecurring}
-				<span class="badge" style="background: #e8f0fe; color: var(--primary);">🔁 Recurring {job.recurrencePattern}</span>
+				<span class="badge badge-info">🔁 Recurring {job.recurrencePattern}</span>
 			{/if}
 			{#if job.recurringTemplateId}
 				<span class="badge badge-pending">📋 Generated</span>
@@ -406,51 +426,47 @@
 					👷 {assignments.map(a => `${a.worker.firstName} ${a.worker.lastName}`).join(', ')}
 				</span>
 			{/if}
-			<button class="btn btn-outline btn-sm" onclick={() => showAssignPanel = !showAssignPanel}>
-				{showAssignPanel ? 'Close' : 'Manage Workers'}
+			<button class="btn btn-outline btn-sm" onclick={() => showAssignPanel = true}>
+				Manage Workers
 			</button>
 		</div>
 	</div>
 
-	<!-- Worker Assignment Panel -->
-	{#if showAssignPanel}
-		<div class="card" style="background: #f8f9fa; margin-bottom: 16px;">
-			<h3 style="font-size: 0.95rem; margin-bottom: 8px;">Worker Assignment</h3>
-
-			<!-- Assigned Workers -->
-			{#if assignments.length > 0}
-				<div style="margin-bottom: 12px;">
-					<span class="text-secondary" style="font-size: 0.8rem;">Assigned</span>
-					{#each assignments as a}
-						<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
-							<span style="font-weight: 500;">{a.worker.firstName} {a.worker.lastName}</span>
-							<button class="btn btn-danger btn-sm" style="padding: 2px 8px; font-size: 0.7rem;"
-								onclick={() => removeAssignment(a.id)}>✕ Remove</button>
-						</div>
-					{/each}
-				</div>
-			{/if}
-
-			<!-- Assign New Worker -->
-			{#if unassignedWorkers().length > 0}
-				<div class="row" style="gap: 8px;">
-					<div class="col">
-						<select bind:value={assigningWorkerId}>
-							<option value="">— Select worker —</option>
-							{#each unassignedWorkers() as w}
-								<option value={w.id}>{w.firstName} {w.lastName}</option>
-							{/each}
-						</select>
+	<!-- Worker Assignment Modal -->
+	<Modal bind:open={showAssignPanel} title="Worker Assignment" maxWidth="440px">
+		<!-- Assigned Workers -->
+		{#if assignments.length > 0}
+			<div style="margin-bottom: 12px;">
+				<span class="text-secondary" style="font-size: 0.8rem;">Assigned</span>
+				{#each assignments as a}
+					<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
+						<span style="font-weight: 500;">{a.worker.firstName} {a.worker.lastName}</span>
+						<button class="btn btn-danger btn-sm" style="padding: 2px 8px; font-size: 0.7rem;"
+							onclick={() => removeAssignment(a.id)}>✕ Remove</button>
 					</div>
-					<button class="btn btn-primary btn-sm" onclick={assignWorker} disabled={assignSaving || !assigningWorkerId}>
-						{assignSaving ? 'Assigning...' : 'Assign'}
-					</button>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Assign New Worker -->
+		{#if unassignedWorkers().length > 0}
+			<div class="row" style="gap: 8px;">
+				<div class="col">
+					<select bind:value={assigningWorkerId}>
+						<option value="">— Select worker —</option>
+						{#each unassignedWorkers() as w}
+							<option value={w.id}>{w.firstName} {w.lastName}</option>
+						{/each}
+					</select>
 				</div>
-			{:else}
-				<p class="text-secondary" style="font-size: 0.85rem;">All active workers are assigned to this job.</p>
-			{/if}
-		</div>
-	{/if}
+				<button class="btn btn-primary btn-sm" onclick={assignWorker} disabled={assignSaving || !assigningWorkerId}>
+					{assignSaving ? 'Assigning...' : 'Assign'}
+				</button>
+			</div>
+		{:else}
+			<p class="text-secondary" style="font-size: 0.85rem;">All active workers are assigned to this job.</p>
+		{/if}
+	</Modal>
 
 	<!-- Job Edit & Recurrence Panel -->
 	<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
@@ -465,46 +481,43 @@
 		{/if}
 	</div>
 	{#if generateMessage}
-		<div class="card" style="background: {generateMessage.startsWith('Generated') ? '#e8f5e9' : '#fef7e0'}; border-left: 3px solid {generateMessage.startsWith('Generated') ? 'var(--success)' : 'var(--warning)'}; margin-bottom: 12px; padding: 8px 12px;">
+		<div class="card {generateMessage.startsWith('Generated') ? 'card-tint-success' : 'card-tint-warn'}" style="margin-bottom: 12px; padding: 8px 12px;">
 			<p style="font-size: 0.85rem;">{generateMessage}</p>
 		</div>
 	{/if}
 
-	{#if showEditPanel}
-		<div class="card" style="background: #f8f9fa; margin-bottom: 16px;">
-			<h3 style="font-size: 0.95rem; margin-bottom: 8px;">Edit Job Details</h3>
-			<div class="row mb-2">
-				<div class="col"><label for="ejTotal">Total ($)</label><input id="ejTotal" type="number" step="0.01" min="0" bind:value={editTotal} /></div>
-				<div class="col" style="display: flex; align-items: flex-end; gap: 8px;">
-					<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.85rem;">
-						<input type="checkbox" bind:checked={editIsRecurring} />
-						Recurring
-					</label>
-				</div>
-			</div>
-			{#if editIsRecurring}
-				<div class="row mb-2">
-					<div class="col">
-						<label for="ejPattern">Frequency</label>
-						<select id="ejPattern" bind:value={editRecurrencePattern}>
-							<option value="">— Select —</option>
-							<option value="weekly">Weekly</option>
-							<option value="biweekly">Biweekly</option>
-							<option value="fourWeekly">Every 4 Weeks</option>
-							<option value="monthly">Monthly</option>
-						</select>
-					</div>
-					<div class="col"><label for="ejEndDate">End Date</label><input id="ejEndDate" type="date" bind:value={editRecurrenceEndDate} /></div>
-				</div>
-			{/if}
-			<div style="display: flex; gap: 8px;">
-				<button class="btn btn-primary btn-sm" onclick={saveEdit} disabled={editSaving}>
-					{editSaving ? 'Saving...' : 'Save'}
-				</button>
-				<button class="btn btn-outline btn-sm" onclick={() => showEditPanel = false}>Cancel</button>
+	<Modal bind:open={showEditPanel} title="Edit Job Details" maxWidth="440px">
+		<div class="row mb-2">
+			<div class="col"><label for="ejTotal">Total ($)</label><input id="ejTotal" type="number" step="0.01" min="0" bind:value={editTotal} /></div>
+			<div class="col" style="display: flex; align-items: flex-end; gap: 8px;">
+				<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.85rem;">
+					<input type="checkbox" bind:checked={editIsRecurring} />
+					Recurring
+				</label>
 			</div>
 		</div>
-	{/if}
+		{#if editIsRecurring}
+			<div class="row mb-2">
+				<div class="col">
+					<label for="ejPattern">Frequency</label>
+					<select id="ejPattern" bind:value={editRecurrencePattern}>
+						<option value="">— Select —</option>
+						<option value="weekly">Weekly</option>
+						<option value="biweekly">Biweekly</option>
+						<option value="fourWeekly">Every 4 Weeks</option>
+						<option value="monthly">Monthly</option>
+					</select>
+				</div>
+				<div class="col"><label for="ejEndDate">End Date</label><input id="ejEndDate" type="date" bind:value={editRecurrenceEndDate} /></div>
+			</div>
+		{/if}
+		<div style="display: flex; gap: 8px;">
+			<button class="btn btn-primary btn-sm" onclick={saveEdit} disabled={editSaving}>
+				{editSaving ? 'Saving...' : 'Save'}
+			</button>
+			<button class="btn btn-outline btn-sm" onclick={() => showEditPanel = false}>Cancel</button>
+		</div>
+	</Modal>
 
 	<!-- Start With Tasks -->
 	<div class="card">
@@ -525,7 +538,7 @@
 
 	<!-- Notes (if present) -->
 	{#if job.notes}
-		<div class="card" style="background: #fffbe6; border-left: 3px solid var(--warning);">
+		<div class="card card-tint-warn">
 			<span class="text-secondary" style="font-size: 0.8rem;">Job Notes</span>
 			<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
 		</div>
@@ -559,8 +572,8 @@
 							{#if task.photos && task.photos.length > 0}
 								{#each task.photos as photo}
 									<button
-										class="btn btn-sm"
-										style="padding: 2px 6px; font-size: 0.7rem; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px; cursor: pointer;"
+										class="btn btn-success btn-sm"
+										style="padding: 2px 6px; font-size: 0.7rem;"
 										onclick={() => showingPhotoUrl = photo.url}
 									>
 										🖼 View

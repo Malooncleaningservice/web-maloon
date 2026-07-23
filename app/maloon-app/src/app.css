@@ -97,6 +97,46 @@ h3 { font-size: var(--text-lg); }
 	transition: all 0.15s;
 }
 .top-nav nav a:hover { color: var(--primary-dark); border-color: var(--primary); }
+.top-nav nav a.active { color: var(--primary-dark); border-color: var(--primary); }
+
+/* Admin nav: hamburger menu under 900px (mirrors worker's bottom tabbar breakpoint) */
+.nav-toggle {
+	display: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 1.3rem;
+	padding: 4px 8px;
+	color: var(--text);
+	margin-left: auto;
+}
+@media (max-width: 899px) {
+	.top-nav nav.admin-links {
+		display: none;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		flex-direction: column;
+		gap: 0;
+		background: var(--surface);
+		border-bottom: 1px solid var(--border);
+		box-shadow: var(--shadow);
+		padding: 8px 0;
+	}
+	.top-nav nav.admin-links.open { display: flex; }
+	.top-nav nav.admin-links a {
+		padding: 12px 20px;
+		border-bottom: none;
+		border-left: 3px solid transparent;
+	}
+	.top-nav nav.admin-links a:hover, .top-nav nav.admin-links a.active {
+		background: var(--bg);
+		border-left-color: var(--primary);
+	}
+	.nav-toggle { display: block; order: 2; }
+	.top-nav .admin-actions { order: 3; margin-left: 0 !important; }
+}
 
 main { flex: 1; padding: 24px 20px; max-width: 900px; width: 100%; margin: 0 auto; }
 
@@ -189,15 +229,24 @@ input:focus, select:focus, textarea:focus {
 	font-weight: 600;
 }
 .badge-quote { background: var(--info-bg); color: var(--info); }
+.badge-info { background: var(--info-bg); color: var(--info); }
 .badge-pending { background: var(--warning-bg); color: var(--warning); }
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-complete { background: var(--success-bg); color: var(--success); }
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
 
 /* Job/task status badges — replaces per-file statusColor() hex helpers */
+.badge-status-quote { background: #eef1ee; color: var(--text-secondary); }
 .badge-status-pending { background: var(--warning-bg); color: var(--warning); }
 .badge-status-in_progress { background: var(--info-bg); color: var(--info); }
 .badge-status-completed { background: var(--success-bg); color: var(--success); }
 .badge-status-cancelled { background: #eef1ee; color: var(--text-secondary); }
+
+/* Wide data tables (quotes, client detail) — horizontal scroll instead of overflow/crush on mobile */
+.table-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+table th, table td { text-align: left; padding: 8px 10px; font-size: var(--text-sm); border-bottom: 1px solid var(--border); }
+table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.03em; }
 
 .total-box {
 	background: var(--primary);

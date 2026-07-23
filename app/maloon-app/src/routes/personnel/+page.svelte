@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let workers = $state<Array<{
 		id: string;
@@ -52,18 +54,31 @@
 					createLogin: newWorker.createLogin,
 				}),
 			});
+			if (!res.ok) throw new Error(await res.text());
 			const result = await res.json();
 			if (result.identifierToken) {
 				generatedToken = result.identifierToken;
+			} else {
+				toast.success('Worker added.');
 			}
 			showAdd = false;
 			newWorker = { firstName: '', lastName: '', email: '', phone: '', role: 'worker', createLogin: false };
 			await loadWorkers();
 		} catch (e) {
 			console.error('Add worker failed', e);
+			toast.error('Failed to add worker.');
 		} finally {
 			saving = false;
 		}
+	}
+
+	let tokenCopied = $state(false);
+	async function copyToken() {
+		try {
+			await navigator.clipboard.writeText(generatedToken);
+			tokenCopied = true;
+			setTimeout(() => (tokenCopied = false), 2000);
+		} catch { /* clipboard unavailable */ }
 	}
 </script>
 
@@ -75,21 +90,21 @@
 </div>
 
 <!-- Generated Token Modal -->
-{#if generatedToken}
-	<div class="card" style="background: #e8f0fe; border: 2px solid var(--primary); margin-bottom: 16px;">
-		<h3 style="color: var(--primary); margin-bottom: 8px;">🎉 Access Code Generated</h3>
-		<p class="text-secondary" style="margin-bottom: 12px;">
-			Give this code to the worker so they can set up their account at the login page.
-		</p>
-		<div style="font-size: 1.6rem; font-family: monospace; text-align: center; padding: 12px; background: #fff; border-radius: var(--radius); letter-spacing: 3px; font-weight: 700; color: var(--text);">
-			{generatedToken}
-		</div>
-		<p class="text-secondary" style="margin-top: 8px; font-size: 0.8rem;">
-			This code is only shown once. Copy it now.
-		</p>
-		<button class="btn btn-outline btn-sm mt-2" onclick={() => generatedToken = ''}>Close</button>
+<Modal open={!!generatedToken} title="🎉 Access Code Generated" maxWidth="420px" onClose={() => (generatedToken = '')}>
+	<p class="text-secondary" style="margin-bottom: 12px;">
+		Give this code to the worker so they can set up their account at the login page.
+	</p>
+	<div style="font-size: 1.6rem; font-family: monospace; text-align: center; padding: 12px; background: var(--bg); border-radius: var(--radius); letter-spacing: 3px; font-weight: 700; color: var(--text);">
+		{generatedToken}
 	</div>
-{/if}
+	<p class="text-secondary" style="margin-top: 8px; font-size: 0.8rem;">
+		This code is only shown once — copy it now.
+	</p>
+	<div style="display: flex; gap: 8px; margin-top: 12px;">
+		<button class="btn btn-primary btn-sm" onclick={copyToken}>{tokenCopied ? '✓ Copied' : '📋 Copy Code'}</button>
+		<button class="btn btn-outline btn-sm" onclick={() => generatedToken = ''}>Close</button>
+	</div>
+</Modal>
 
 <!-- Add Worker Form -->
 {#if showAdd}
@@ -123,6 +138,11 @@
 			<p class="text-secondary" style="margin-bottom: 12px; font-size: 0.85rem;">
 				💡 No email provided — an access code will be generated instead.
 			</p>
+		{/if}
+		{#if newWorker.role === 'admin'}
+			<div class="card-tint-warn" style="padding: 8px 12px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
+				⚠️ Admin role grants full access to jobs, quotes, clients, and personnel data.
+			</div>
 		{/if}
 		<button class="btn btn-success" onclick={addWorker} disabled={saving}>
 			{saving ? 'Adding...' : 'Add Worker'}

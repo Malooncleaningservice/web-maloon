@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import { confirmAction } from '$lib/stores/confirm.svelte';
 
 	type Worker = { id: string; firstName: string; lastName: string; assignments: any[]; availability: any[] };
 	type Job = { id: string; clientName: string; address: string; status: string; total: number; notes: string | null; scheduledDate: string | null; assignments: any[] };
@@ -150,7 +152,7 @@
 			});
 			if (res.status === 409) {
 				const data = await res.json();
-				alert(data.error || 'Assignment conflict');
+				toast.error(data.error || 'Assignment conflict');
 				jobs = prevJobs;
 				return;
 			}
@@ -190,8 +192,22 @@
 	}
 
 	async function changeJobStatus(jobId: string, newStatus: string) {
-		if (newStatus === 'cancelled' && !confirm('Cancel this job?')) return;
-		if (newStatus === 'completed' && !confirm('Mark this job as completed?')) return;
+		if (newStatus === 'cancelled') {
+			const ok = await confirmAction({
+				title: 'Cancel this job?',
+				description: 'The assigned worker(s) will no longer see this job on their schedule.',
+				confirmText: 'Cancel Job',
+				danger: true
+			});
+			if (!ok) return;
+		}
+		if (newStatus === 'completed') {
+			const ok = await confirmAction({
+				title: 'Mark this job as completed?',
+				confirmText: 'Mark Completed'
+			});
+			if (!ok) return;
+		}
 
 		statusChanging[jobId] = true;
 		const prevJobs = [...jobs];
@@ -205,7 +221,7 @@
 			});
 			if (res.status === 400) {
 				const data = await res.json();
-				alert(data.error || 'Cannot change status');
+				toast.error(data.error || 'Cannot change status');
 				jobs = prevJobs;
 				return;
 			}
@@ -225,14 +241,12 @@
 </script>
 
 <!-- ── Header ─────────────────────────────────────────────────────────────── -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+<div class="dispatch-header">
 	<h2 style="font-size: 1.3rem;">Dispatch</h2>
-	<div style="display: flex; gap: 8px; align-items: center;">
-		<div style="display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color);">
-			<button class="btn btn-sm" style="border-radius: 0; border: none; background: {view === 'day' ? 'var(--primary)' : 'transparent'}; color: {view === 'day' ? '#fff' : 'inherit'};"
-				onclick={() => switchView('day')}>Day</button>
-			<button class="btn btn-sm" style="border-radius: 0; border: none; background: {view === 'week' ? 'var(--primary)' : 'transparent'}; color: {view === 'week' ? '#fff' : 'inherit'};"
-				onclick={() => switchView('week')}>Week</button>
+	<div class="dispatch-controls">
+		<div class="view-toggle">
+			<button class="view-toggle-btn" class:active={view === 'day'} onclick={() => switchView('day')}>Day</button>
+			<button class="view-toggle-btn" class:active={view === 'week'} onclick={() => switchView('week')}>Week</button>
 		</div>
 
 		{#if view === 'day'}
@@ -269,30 +283,30 @@
 
 <!-- ── Summary Bar ────────────────────────────────────────────────────────── -->
 {#if summary}
-	<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 16px;">
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700;">{summary.totalJobs}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Total</div>
+	<div class="summary-bar">
+		<div class="card summary-card">
+			<div class="summary-value">{summary.totalJobs}</div>
+			<div class="text-secondary summary-label">Total</div>
 		</div>
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700; color: var(--warning);">{summary.pendingCount}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Pending</div>
+		<div class="card summary-card">
+			<div class="summary-value" style="color: var(--warning);">{summary.pendingCount}</div>
+			<div class="text-secondary summary-label">Pending</div>
 		</div>
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700; color: var(--primary);">{summary.inProgressCount}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Active</div>
+		<div class="card summary-card">
+			<div class="summary-value" style="color: var(--primary);">{summary.inProgressCount}</div>
+			<div class="text-secondary summary-label">Active</div>
 		</div>
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700; color: var(--success);">{summary.completedCount}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Done</div>
+		<div class="card summary-card">
+			<div class="summary-value" style="color: var(--success);">{summary.completedCount}</div>
+			<div class="text-secondary summary-label">Done</div>
 		</div>
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700; color: var(--primary);">{summary.unassignedCount}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Unassigned</div>
+		<div class="card summary-card">
+			<div class="summary-value" style="color: var(--primary);">{summary.unassignedCount}</div>
+			<div class="text-secondary summary-label">Unassigned</div>
 		</div>
-		<div class="card" style="text-align: center; padding: 10px;">
-			<div style="font-size: 1.4rem; font-weight: 700; color: var(--success);">{formatCurrency(summary.estimatedRevenue)}</div>
-			<div class="text-secondary" style="font-size: 0.7rem;">Revenue</div>
+		<div class="card summary-card">
+			<div class="summary-value" style="color: var(--success);">{formatCurrency(summary.estimatedRevenue)}</div>
+			<div class="text-secondary summary-label">Revenue</div>
 		</div>
 	</div>
 {/if}
@@ -312,17 +326,21 @@
 	</div>
 {:else if view === 'week' && days}
 	<!-- ── Week View ────────────────────────────────────────────────────────── -->
-	<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
+	<div class="week-grid">
 		{#each days as day}
-			<div class="card" style="padding: 8px; min-height: 200px;">
-				<div style="font-weight: 600; font-size: 0.8rem; margin-bottom: 6px; text-align: center; padding-bottom: 4px; border-bottom: 2px solid var(--border-color);">
+			<div class="card week-day-card">
+				<div class="week-day-header">
 					{day.label}
 				</div>
 				{#if day.jobs.length === 0}
 					<p class="text-secondary" style="font-size: 0.7rem; text-align: center; padding-top: 12px;">—</p>
 				{:else}
 					{#each day.jobs as job}
-						<a href="/jobs/{job.id}" style="display: block; font-size: 0.72rem; padding: 3px 4px; margin-bottom: 3px; border-radius: 4px; background: var(--bg-hover); text-decoration: none; color: inherit; border-left: 3px solid {job.status === 'completed' ? 'var(--success)' : job.status === 'in_progress' ? 'var(--primary)' : 'var(--warning)'};">
+						<a
+							href="/jobs/{job.id}"
+							class="week-job-link"
+							style="border-left-color: {job.status === 'completed' ? 'var(--success)' : job.status === 'in_progress' ? 'var(--primary)' : 'var(--warning)'};"
+						>
 							<div style="font-weight: 600;">{formatTime(job.scheduledDate)} {job.clientName}</div>
 							<div style="font-size: 0.65rem; color: var(--text-secondary);">
 								{#if job.assignments?.length}
@@ -341,7 +359,7 @@
 	<!-- ── Worker Panel (week view) ──────────────────────────────────────────── -->
 	<div style="margin-top: 16px;">
 		<h3 style="font-size: 1rem; margin-bottom: 8px;">Worker Assignments This Week</h3>
-		<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px;">
+		<div class="worker-panel-grid">
 			{#each workers as w}
 				<div class="card" style="padding: 10px;">
 					<div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">{w.firstName} {w.lastName}</div>
@@ -366,7 +384,7 @@
 	</div>
 {:else if view === 'day'}
 	<!-- ── Day View Layout ──────────────────────────────────────────────────── -->
-	<div style="display: flex; gap: 16px; align-items: flex-start;">
+	<div class="day-layout">
 		<!-- Job list -->
 		<div style="flex: 1; min-width: 0;">
 			{#each jobs as job}
@@ -375,7 +393,7 @@
 						<div style="flex: 1; min-width: 200px;">
 							<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
 								{#if job.scheduledDate}
-									<span style="font-weight: 700; font-size: 0.85rem; background: var(--bg-hover); padding: 2px 8px; border-radius: 4px;">{formatTime(job.scheduledDate)}</span>
+									<span class="job-time-chip">{formatTime(job.scheduledDate)}</span>
 								{/if}
 								<a href="/jobs/{job.id}" style="font-weight: 600; font-size: 1rem; color: var(--primary); text-decoration: none;">
 									{job.clientName}
@@ -389,7 +407,7 @@
 							{/if}
 						</div>
 
-						<div style="min-width: 280px;">
+						<div class="job-actions-panel">
 							<!-- Assigned Workers -->
 							<div style="margin-bottom: 8px;">
 								{#if job.assignments?.length}
@@ -465,11 +483,11 @@
 		</div>
 
 		<!-- Worker Panel Sidebar -->
-		<div style="width: 280px; flex-shrink: 0; position: sticky; top: 80px;">
+		<div class="worker-sidebar">
 			<div class="card" style="padding: 12px;">
 				<h3 style="font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">Workers</h3>
 				{#each workers as w}
-					<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+					<div class="worker-sidebar-item">
 						<div style="font-weight: 600; font-size: 0.8rem; display: flex; justify-content: space-between;">
 							<span>{w.firstName} {w.lastName}</span>
 							<span style="font-size: 0.65rem; color: var(--text-secondary);">{w.assignments.length} job(s)</span>
@@ -496,3 +514,107 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.dispatch-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16px;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.dispatch-controls {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	.view-toggle {
+		display: flex;
+		border-radius: 6px;
+		overflow: hidden;
+		border: 1px solid var(--border);
+	}
+	.view-toggle-btn {
+		padding: 6px 12px;
+		border: none;
+		background: transparent;
+		color: var(--text);
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background var(--transition), color var(--transition);
+	}
+	.view-toggle-btn.active { background: var(--primary); color: #fff; }
+	.view-toggle-btn:not(.active):hover { background: var(--bg); }
+
+	.summary-bar {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+		gap: 8px;
+		margin-bottom: 16px;
+	}
+	.summary-card { text-align: center; padding: 10px; }
+	.summary-value { font-size: 1.4rem; font-weight: 700; }
+	.summary-label { font-size: 0.7rem; }
+
+	.job-time-chip {
+		font-weight: 700;
+		font-size: 0.85rem;
+		background: var(--bg);
+		padding: 2px 8px;
+		border-radius: 4px;
+	}
+
+	/* Day view: job list + sticky worker sidebar */
+	.day-layout { display: flex; gap: 16px; align-items: flex-start; }
+	.job-actions-panel { min-width: 280px; }
+	.worker-sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 80px; }
+	.worker-sidebar-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+	.worker-sidebar-item:last-child { border-bottom: none; }
+
+	/* Week view */
+	.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+	.week-day-card { padding: 8px; min-height: 200px; }
+	.week-day-header {
+		font-weight: 600;
+		font-size: 0.8rem;
+		margin-bottom: 6px;
+		text-align: center;
+		padding-bottom: 4px;
+		border-bottom: 2px solid var(--border);
+	}
+	.week-job-link {
+		display: block;
+		font-size: 0.72rem;
+		padding: 3px 4px;
+		margin-bottom: 3px;
+		border-radius: 4px;
+		background: var(--bg);
+		text-decoration: none;
+		color: inherit;
+		border-left: 3px solid;
+	}
+	.worker-panel-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+		gap: 8px;
+	}
+
+	/* Mobile: stack sidebar below job list, scroll week grid horizontally */
+	@media (max-width: 860px) {
+		.day-layout { flex-direction: column; }
+		.worker-sidebar { width: 100%; position: static; }
+		.job-actions-panel { min-width: 0; width: 100%; }
+	}
+	@media (max-width: 700px) {
+		.week-grid {
+			grid-template-columns: unset;
+			grid-auto-flow: column;
+			grid-auto-columns: minmax(150px, 1fr);
+			overflow-x: auto;
+			padding-bottom: 4px;
+		}
+	}
+</style>

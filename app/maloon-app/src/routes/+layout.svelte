@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Toaster from '$lib/components/Toaster.svelte';
+	import ConfirmDialogHost from '$lib/components/ConfirmDialogHost.svelte';
 
 	let { children } = $props();
 
@@ -11,6 +13,7 @@
 	let notifications = $state<Array<{ id: string; message: string; link?: string; read: boolean }>>([]);
 	let unreadCount = $state(0);
 	let showNotifs = $state(false);
+	let showMobileNav = $state(false);
 
 	onMount(async () => {
 		if (user && user.role === 'admin') {
@@ -54,6 +57,10 @@
 		showNotifs = false;
 	}
 
+	function closeMobileNav() {
+		showMobileNav = false;
+	}
+
 	function userDisplayName(): string {
 		if (user?.displayName) return user.displayName;
 		if (user?.worker) return `${user.worker.firstName} ${user.worker.lastName}`;
@@ -66,19 +73,29 @@
 	<div class="app-shell">
 		<header class="top-nav">
 			<a href="/" class="logo">Maloon Service</a>
-			<nav class={user.role === 'admin' ? '' : 'worker-links'}>
-				{#if user.role === 'admin'}
-					<a href="/quotes">Quotes</a>
-					<a href="/jobs">Jobs</a>
-					<a href="/dispatch">Dispatch</a>
-					<a href="/clients">Clients</a>
-					<a href="/personnel">Personnel</a>
-				{:else}
+			{#if user.role === 'admin'}
+				<nav class="admin-links" class:open={showMobileNav}>
+					<a href="/quotes" onclick={closeMobileNav}>Quotes</a>
+					<a href="/jobs" onclick={closeMobileNav}>Jobs</a>
+					<a href="/dispatch" onclick={closeMobileNav}>Dispatch</a>
+					<a href="/clients" onclick={closeMobileNav}>Clients</a>
+					<a href="/personnel" onclick={closeMobileNav}>Personnel</a>
+				</nav>
+				<button
+					class="nav-toggle"
+					aria-label="Toggle navigation menu"
+					aria-expanded={showMobileNav}
+					onclick={() => (showMobileNav = !showMobileNav)}
+				>
+					{showMobileNav ? '✕' : '☰'}
+				</button>
+			{:else}
+				<nav class="worker-links">
 					<a href="/worker">Dashboard</a>
 					<a href="/worker/profile">Profile</a>
-				{/if}
-			</nav>
-			<div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+				</nav>
+			{/if}
+			<div class="admin-actions" style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
 				<!-- Notification bell (admin only) -->
 				{#if user.role === 'admin'}
 					<div style="position: relative;">
@@ -150,6 +167,9 @@
 		</main>
 	</div>
 {/if}
+
+<Toaster />
+<ConfirmDialogHost />
 
 <style>
 	.notif-item:hover {

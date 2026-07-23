@@ -2,6 +2,8 @@
 	import '../../app.css';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { toast } from '$lib/stores/toast.svelte';
+	import { confirmAction } from '$lib/stores/confirm.svelte';
 
 	// --- Tabs ---
 	let activeTab = $state<'new' | 'saved'>('new');
@@ -122,7 +124,7 @@
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		} catch (e) {
 			console.error('Failed to load quote for editing', e);
-			alert('Failed to load quote.');
+			toast.error('Failed to load quote.');
 		}
 	}
 
@@ -135,7 +137,7 @@
 			goto(`/jobs/${job.id}`);
 		} catch (e) {
 			console.error('Conversion failed', e);
-			alert('Failed to create job from quote.');
+			toast.error('Failed to create job from quote.');
 		} finally {
 			convertingId = null;
 		}
@@ -247,15 +249,29 @@
 
 			if (!res.ok) throw new Error(await res.text());
 			const quote = await res.json();
-			alert(`Quote ${editingId ? 'updated' : 'saved'}! #${quote.id.slice(0, 8)} — $${grandTotal.toFixed(2)}`);
+			toast.success(`Quote ${editingId ? 'updated' : 'saved'}! #${quote.id.slice(0, 8)} — $${grandTotal.toFixed(2)}`);
 			resetForm();
 			await loadQuotes();
 		} catch (e) {
 			console.error('Save failed', e);
-			alert('Failed to save. Check the console.');
+			toast.error('Failed to save quote.');
 		} finally {
 			saving = false;
 		}
+	}
+
+	async function confirmReset() {
+		const hasContent = clientName || address || squareFootage > 0 || selectedItems.length > 0 || customItems.length > 0;
+		if (hasContent) {
+			const ok = await confirmAction({
+				title: 'Discard this quote?',
+				description: 'All entered fields and selected items will be cleared.',
+				confirmText: 'Discard',
+				danger: true
+			});
+			if (!ok) return;
+		}
+		resetForm();
 	}
 
 	function resetForm() {
@@ -298,30 +314,30 @@
 			</div>
 		{:else}
 			<div class="table-wrapper">
-				<table style="width: 100%; border-collapse: collapse;">
+				<table>
 					<thead>
-						<tr style="border-bottom: 2px solid var(--border, #e0e0e0); text-align: left;">
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Date</th>
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Client</th>
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Address</th>
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Total</th>
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Status</th>
-							<th style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">Action</th>
+						<tr>
+							<th>Date</th>
+							<th>Client</th>
+							<th>Address</th>
+							<th>Total</th>
+							<th>Status</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each quotes as quote}
-							<tr style="border-bottom: 1px solid var(--border, #eee);">
-								<td style="padding: 10px 12px; font-size: 0.85rem;">{formatDate(quote.createdAt)}</td>
-								<td style="padding: 10px 12px; font-size: 0.85rem; font-weight: 500;">{quote.clientName || '—'}</td>
-								<td style="padding: 10px 12px; font-size: 0.85rem; color: var(--text-secondary);">{quote.address || '—'}</td>
-								<td style="padding: 10px 12px; font-size: 0.85rem; font-weight: 600;">${quote.total.toFixed(2)}</td>
-								<td style="padding: 10px 12px;">
+							<tr>
+								<td style="font-size: 0.85rem;">{formatDate(quote.createdAt)}</td>
+								<td style="font-size: 0.85rem; font-weight: 500;">{quote.clientName || '—'}</td>
+								<td style="font-size: 0.85rem; color: var(--text-secondary);">{quote.address || '—'}</td>
+								<td style="font-size: 0.85rem; font-weight: 600;">${quote.total.toFixed(2)}</td>
+								<td>
 									<span class="badge {statusBadgeClass(quote.status)}" style="font-size: 0.75rem;">
 										{quote.status.toUpperCase()}
 									</span>
 								</td>
-								<td style="padding: 10px 12px; white-space: nowrap;">
+								<td style="white-space: nowrap;">
 									{#if quote.status === 'accepted' || quote.status === 'rejected'}
 										<span class="text-secondary" style="font-size: 0.8rem;">✓ Done</span>
 									{:else}
@@ -425,7 +441,7 @@
 
 		<!-- Selected Items Breakdown -->
 		{#if selectedItems.length > 0}
-			<div class="card" style="background: #f8f9fa; margin-bottom: 12px;">
+			<div class="card" style="background: var(--bg); margin-bottom: 12px;">
 				<h4 style="font-size: 0.9rem; margin-bottom: 8px;">Selected Items</h4>
 				{#each selectedItems as item}
 					<div class="task-row">
@@ -456,7 +472,7 @@
 		</div>
 
 		{#if customItems.length > 0}
-			<div class="card" style="background: #f8f9fa; margin-bottom: 12px;">
+			<div class="card" style="background: var(--bg); margin-bottom: 12px;">
 				{#each customItems as item, i}
 					<div class="task-row">
 						<span class="task-desc">{item.name}</span>
@@ -477,7 +493,7 @@
 		</div>
 
 		<div class="row mt-4" style="justify-content: flex-end; gap: 8px;">
-			<button class="btn btn-outline" onclick={resetForm}>Reset</button>
+			<button class="btn btn-outline" onclick={confirmReset}>Reset</button>
 			<button class="btn btn-success" onclick={saveQuote} disabled={saving}>
 				{saving ? 'Saving...' : editingId ? '💾 Update Quote' : '💾 Save Quote'}
 			</button>

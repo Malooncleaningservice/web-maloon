@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
 
 	let jobs = $state<Array<{id: string; clientName: string; clientId: string | null; client?: {id: string; name: string} | null; address: string; status: string; scheduledDate: string | null; total: number; isQuote: boolean; assignments?: Array<{worker: {firstName: string; lastName: string}}>}>>([]);
 	let loading = $state(true);
@@ -86,7 +87,7 @@
 	async function createJob() {
 		saving = true;
 		try {
-			await fetch('/api/jobs', {
+			const res = await fetch('/api/jobs', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -103,23 +104,21 @@
 					recurrenceEndDate: newJob.recurrenceEndDate || undefined,
 				}),
 			});
+			if (!res.ok) throw new Error(await res.text());
 			showNewJob = false;
 			newJob = { clientId: '', clientName: '', phone: '', email: '', address: '', scheduledDate: '', notes: '', total: '', isRecurring: false, recurrencePattern: '', recurrenceEndDate: '' };
 			await loadJobs();
+			toast.success('Job created.');
 		} catch (e) {
 			console.error('Create job failed', e);
+			toast.error('Failed to create job.');
 		} finally {
 			saving = false;
 		}
 	}
 
-	function statusColor(s: string) {
-		if (s === 'quote') return '#6c757d';
-		if (s === 'pending') return 'var(--warning)';
-		if (s === 'in_progress') return 'var(--primary)';
-		if (s === 'completed') return 'var(--success)';
-		if (s === 'cancelled') return 'var(--danger)';
-		return 'var(--text-secondary)';
+	function statusBadgeClass(s: string) {
+		return `badge-status-${s}`;
 	}
 
 	function formatDate(dateStr: string) {
@@ -245,7 +244,7 @@
 							{#if job.isQuote}
 								<span class="badge badge-quote">QUOTE</span>
 							{/if}
-							<span class="badge" style="background: {statusColor(job.status)}20; color: {statusColor(job.status)};">
+							<span class="badge {statusBadgeClass(job.status)}">
 								{job.status.replace('_', ' ')}
 							</span>
 						</div>

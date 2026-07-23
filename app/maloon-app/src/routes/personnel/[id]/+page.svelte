@@ -2,6 +2,9 @@
 	import '../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import { confirmAction } from '$lib/stores/confirm.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let workerId = $state('');
 	let worker = $state<{
@@ -74,23 +77,33 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(editDraft),
 			});
+			if (!res.ok) throw new Error(await res.text());
 			const data = await res.json();
 			worker = data;
 			editMode = false;
+			toast.success('Profile saved.');
 		} catch (e) {
 			console.error(e);
+			toast.error('Failed to save profile.');
 		} finally {
 			saving = false;
 		}
 	}
 
 	async function markW9Reviewed() {
-		await fetch(`/api/workers/${workerId}`, {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ w9Reviewed: true }),
-		});
-		worker = { ...worker, w9Reviewed: true };
+		try {
+			const res = await fetch(`/api/workers/${workerId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ w9Reviewed: true }),
+			});
+			if (!res.ok) throw new Error(await res.text());
+			worker = { ...worker, w9Reviewed: true };
+			toast.success('W-9 marked as reviewed.');
+		} catch (e) {
+			console.error(e);
+			toast.error('Failed to update W-9 review status.');
+		}
 	}
 
 	function handleW9FileSelect(event: Event) {
@@ -120,9 +133,10 @@
 				w9FileUrl: result.url,
 			};
 			w9File = null;
+			toast.success('W-9 uploaded.');
 		} catch (e) {
 			console.error('W-9 upload failed', e);
-			alert('Failed to upload W-9.');
+			toast.error('Failed to upload W-9.');
 		} finally {
 			uploadingW9 = false;
 		}
@@ -130,6 +144,14 @@
 
 	// --- Password reset ---
 	async function resetPassword() {
+		const ok = await confirmAction({
+			title: 'Reset this worker\u2019s access?',
+			description: 'Their current password or access code will stop working immediately, and a new one will be generated.',
+			confirmText: 'Reset Access',
+			danger: true
+		});
+		if (!ok) return;
+
 		resettingPassword = true;
 		resetMessage = '';
 		resetError = '';
@@ -151,16 +173,30 @@
 
 	// --- Approve / reject profile change ---
 	async function handleChangeReview(changeId: string, status: 'approved' | 'rejected') {
+		const change = profileChanges.find(c => c.id === changeId);
+		if (status === 'approved') {
+			const ok = await confirmAction({
+				title: `Approve change to ${change?.field ?? 'this field'}?`,
+				description: `This will overwrite the worker's current ${change?.field ?? 'value'} with "${change?.newValue}".`,
+				confirmText: 'Approve'
+			});
+			if (!ok) return;
+		}
 		approvingId = changeId;
 		try {
-			await fetch(`/api/profile-changes/${changeId}`, {
+			const res = await fetch(`/api/profile-changes/${changeId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ status })
 			});
+			if (!res.ok) throw new Error(await res.text());
 			profileChanges = profileChanges.map(c => c.id === changeId ? { ...c, status } : c);
 			if (status === 'approved') await loadWorker();
-		} catch { /* ignore */ } finally {
+			toast.success(status === 'approved' ? 'Change approved.' : 'Change rejected.');
+		} catch (e) {
+			console.error(e);
+			toast.error('Failed to update the change request.');
+		} finally {
 			approvingId = '';
 		}
 	}
@@ -178,24 +214,20 @@
 	← Back to Personnel
 </a>
 
-{#if showingPdfViewer && worker.w9FileUrl}
-	<div
-		style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;"
-	>
-		<div style="width: 90vw; height: 90vh; background: #fff; border-radius: 8px; overflow: hidden; position: relative;">
-			{#if isPdf(worker.w9FileUrl)}
-				<iframe src={worker.w9FileUrl} style="width: 100%; height: 100%; border: none;" title="W-9 PDF"></iframe>
-			{:else if isImage(worker.w9FileUrl)}
-				<img src={worker.w9FileUrl} alt="W-9" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
-			{/if}
-			<button
-				class="btn btn-outline"
-				style="position: absolute; top: 8px; right: 8px;"
-				onclick={() => showingPdfViewer = false}
-			>✕ Close</button>
-		</div>
-	</div>
-{/if}
+<Modal
+	open={showingPdfViewer && !!worker.w9FileUrl}
+	title="W-9 Document"
+	maxWidth="900px"
+	onClose={() => (showingPdfViewer = false)}
+>
+	{#if worker.w9FileUrl}
+		{#if isPdf(worker.w9FileUrl)}
+			<iframe src={worker.w9FileUrl} style="width: 100%; height: 75vh; border: none;" title="W-9 PDF"></iframe>
+		{:else if isImage(worker.w9FileUrl)}
+			<img src={worker.w9FileUrl} alt="W-9" style="max-width: 100%; max-height: 75vh; object-fit: contain; display: block; margin: 0 auto;" />
+		{/if}
+	{/if}
+</Modal>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -276,14 +308,10 @@
 				</div>
 			</div>
 			{#if resetMessage}
-				<div style="background: #e6f4ea; color: var(--success); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
-					{resetMessage}
-				</div>
+				<div class="msg-success">{resetMessage}</div>
 			{/if}
 			{#if resetError}
-				<div style="background: #fce8e6; color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.85rem;">
-					{resetError}
-				</div>
+				<div class="msg-error">{resetError}</div>
 			{/if}
 			<button class="btn btn-outline btn-sm" onclick={resetPassword} disabled={resettingPassword}>
 				{resettingPassword ? 'Generating...' : '🔄 Reset Password / Generate New Code'}

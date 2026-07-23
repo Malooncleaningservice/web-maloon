@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import { confirmAction } from '$lib/stores/confirm.svelte';
 
 	let clients = $state<Array<{id: string; name: string; phone: string | null; email: string | null; address: string | null; notes: string | null; _count: {quotes: number; jobs: number}}>>([]);
 	let loading = $state(true);
@@ -70,21 +72,34 @@
 
 			showForm = false;
 			await loadClients();
+			toast.success(editingId ? 'Client updated.' : 'Client created.');
 		} catch (e) {
 			console.error('Failed to save client', e);
+			toast.error('Failed to save client.');
 		} finally {
 			saving = false;
 		}
 	}
 
-	async function deleteClient(id: string, name: string) {
-		if (!confirm(`Delete client "${name}"? This cannot be undone.`)) return;
+	async function deleteClient(client: { id: string; name: string; _count: { quotes: number; jobs: number } }) {
+		const linkedCount = (client._count?.quotes ?? 0) + (client._count?.jobs ?? 0);
+		const ok = await confirmAction({
+			title: `Delete client "${client.name}"?`,
+			description: linkedCount > 0
+				? `This client has ${client._count.jobs} job(s) and ${client._count.quotes} quote(s) on file. Deleting cannot be undone.`
+				: 'This cannot be undone.',
+			confirmText: 'Delete Client',
+			danger: true
+		});
+		if (!ok) return;
 		try {
-			await fetch(`/api/clients/${id}`, { method: 'DELETE' });
+			const res = await fetch(`/api/clients/${client.id}`, { method: 'DELETE' });
+			if (!res.ok) throw new Error(await res.text());
 			await loadClients();
+			toast.success('Client deleted.');
 		} catch (e) {
 			console.error('Failed to delete client', e);
-			alert('Failed to delete client.');
+			toast.error('Failed to delete client.');
 		}
 	}
 </script>
@@ -147,7 +162,7 @@
 				</div>
 				<div style="display: flex; gap: 8px;">
 					<button class="btn btn-outline btn-sm" onclick={() => startEdit(client)}>Edit</button>
-					<button class="btn btn-danger btn-sm" onclick={() => deleteClient(client.id, client.name)}>Delete</button>
+					<button class="btn btn-danger btn-sm" onclick={() => deleteClient(client)}>Delete</button>
 				</div>
 			</div>
 		</div>
