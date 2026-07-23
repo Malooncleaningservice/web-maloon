@@ -431,27 +431,34 @@ p {
 }
 
 /* Language pill button */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .lang-pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0.35rem 0.9rem;
-    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border: 1.5px solid var(--forest-anchor);
     border-radius: 50px;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--sage-soft);
     text-decoration: none;
     white-space: nowrap;
-    transition: all 0.25s ease;
-    margin-left: 0.75rem;
+    background: transparent;
+    box-shadow: 0 0 0 2.5px var(--deep-pine), 0 0 0 5px var(--sage-soft), 0 0 0 7px var(--deep-pine);
+    transition: all 0.3s ease;
 }
 
 .lang-pill:hover {
-    border-color: var(--white);
     color: var(--white);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 2.5px var(--deep-pine), 0 0 0 5px var(--leaf-green), 0 0 0 7px var(--deep-pine);
     transform: translateY(-1px);
 }
 
@@ -752,9 +759,12 @@ p {
     }
 
     .lang-pill {
-        padding: 0.25rem 0.65rem;
+        padding: 0.25rem 0.6rem;
         font-size: 0.6rem;
-        margin-left: 0.4rem;
+    }
+
+    .nav-actions {
+        gap: 0.4rem;
     }
 
     /* Tier 2: Scrollable link strip */
