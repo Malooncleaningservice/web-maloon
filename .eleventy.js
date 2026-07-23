@@ -2,9 +2,11 @@ module.exports = function(eleventyConfig) {
   // Exclude component HTML files from template processing
   // (they're static assets fetched at runtime by hero-new.js)
   eleventyConfig.ignores.add("src/assets/components");
+  eleventyConfig.ignores.add("src/es/assets/components");
 
   // Copy static assets to output
   eleventyConfig.addPassthroughCopy("src/assets");
+  eleventyConfig.addPassthroughCopy("src/es/assets");
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/CNAME");
   eleventyConfig.addPassthroughCopy("src/.nojekyll");

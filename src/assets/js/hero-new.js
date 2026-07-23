@@ -7,7 +7,8 @@
 (function () {
     'use strict';
 
-    const STICKY_THRESHOLD = 300; // px from top before bar appears
+    const STICKY_THRESHOLD = 300;
+    const BASE = window.location.pathname.startsWith('/es/') ? '/es' : '';
 
     /* ─────────────────────────────────────────
        Sticky Bar
@@ -17,7 +18,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('/assets/components/sticky-bar.html');
+            const res  = await fetch(BASE + '/assets/components/sticky-bar.html');
             const html = await res.text();
             placeholder.outerHTML = html;
 
@@ -39,7 +40,7 @@
             }
 
             window.addEventListener('scroll', onScroll, { passive: true });
-            onScroll(); // run once on load
+            onScroll();
         } catch (err) {
             console.warn('Sticky bar failed to load:', err);
         }
@@ -53,7 +54,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('/assets/components/hero-home.html');
+            const res  = await fetch(BASE + '/assets/components/hero-home.html');
             const html = await res.text();
             placeholder.outerHTML = html;
         } catch (err) {
@@ -69,7 +70,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('/assets/components/transform-strip.html');
+            const res  = await fetch(BASE + '/assets/components/transform-strip.html');
             const html = await res.text();
             placeholder.outerHTML = html;
         } catch (err) {
