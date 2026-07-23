@@ -7,6 +7,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets");
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/CNAME");
+  eleventyConfig.addPassthroughCopy("src/.nojekyll");
   eleventyConfig.addPassthroughCopy({"src/*.png": "/"});
   eleventyConfig.addPassthroughCopy({"src/*.svg": "/"});
   eleventyConfig.addPassthroughCopy({"src/*.webmanifest": "/"});
