@@ -17,7 +17,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('assets/components/sticky-bar.html');
+            const res  = await fetch('/assets/components/sticky-bar.html');
             const html = await res.text();
             placeholder.outerHTML = html;
 
@@ -53,7 +53,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('assets/components/hero-home.html');
+            const res  = await fetch('/assets/components/hero-home.html');
             const html = await res.text();
             placeholder.outerHTML = html;
         } catch (err) {
@@ -69,7 +69,7 @@
         if (!placeholder) return;
 
         try {
-            const res  = await fetch('assets/components/transform-strip.html');
+            const res  = await fetch('/assets/components/transform-strip.html');
             const html = await res.text();
             placeholder.outerHTML = html;
         } catch (err) {
