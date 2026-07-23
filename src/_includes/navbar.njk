@@ -14,6 +14,9 @@
         <a href="{{ localeData.contact.whatsapp }}" class="cta-button mobile-cta">
             {%- if locale == 'en' -%}Get Quote{%- else -%}Cotizar{%- endif -%}
         </a>
+        <a href="{{ nav.languageSwitcher.url }}" class="lang-pill" aria-label="{{ nav.languageSwitcher.label }}">
+            {{- nav.languageSwitcher.abbr -}}
+        </a>
     </div>
 
     <!-- Tier 2: Main Navigation Links (hides on scroll) -->
@@ -40,9 +43,6 @@
                     {% endif %}
                 </li>
                 {% endfor %}
-                <li class="menu-item lang-switch">
-                    <a href="{{ nav.languageSwitcher.url }}">{{ nav.languageSwitcher.label }}</a>
-                </li>
             </ul>
         </div>
     </div>

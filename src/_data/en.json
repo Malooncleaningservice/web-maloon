@@ -445,7 +445,8 @@
       }
     ],
     "languageSwitcher": {
-      "label": "Español",
+      "label": "Ver sitio en Español",
+      "abbr": "ESP",
       "url": "/es/"
     },
     "sidebar": {

@@ -445,7 +445,8 @@
       }
     ],
     "languageSwitcher": {
-      "label": "English",
+      "label": "View site in English",
+      "abbr": "ENG",
       "url": "/"
     },
     "sidebar": {
