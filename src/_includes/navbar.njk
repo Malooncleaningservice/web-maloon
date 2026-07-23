@@ -9,14 +9,14 @@
             <img src="{{ localeData.brand.logo }}" alt="{{ localeData.brand.name }} Logo" class="logo-img">
         </div>
         <div class="nav-actions">
+            <a href="{{ nav.languageSwitcher.url }}" class="lang-pill" aria-label="{{ nav.languageSwitcher.label }}">
+                {{- nav.languageSwitcher.abbr -}}
+            </a>
             <a href="{{ localeData.contact.whatsapp }}" class="cta-button desktop-cta">
                 {%- if locale == 'en' -%}Get a Free Quote{%- else -%}Cotizaci&oacute;n Gratis{%- endif -%}
             </a>
             <a href="{{ localeData.contact.whatsapp }}" class="cta-button mobile-cta">
                 {%- if locale == 'en' -%}Get Quote{%- else -%}Cotizar{%- endif -%}
-            </a>
-            <a href="{{ nav.languageSwitcher.url }}" class="lang-pill" aria-label="{{ nav.languageSwitcher.label }}">
-                {{- nav.languageSwitcher.abbr -}}
             </a>
         </div>
     </div>
