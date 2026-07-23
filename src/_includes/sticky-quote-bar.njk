@@ -1,0 +1,12 @@
+{% set localeData = en if locale == 'en' else es %}
+
+<div class="sticky-quote-bar" id="sticky-quote-bar">
+    <div class="sticky-bar-left">
+        <i class="fas fa-clock"></i>
+        <span><strong>{{ localeData.contact.hours }}</strong> · Columbus & Central Ohio</span>
+    </div>
+    <a href="{{ localeData.contact.whatsapp }}" class="sticky-pill">
+        <i class="fab fa-whatsapp"></i>
+        {%- if locale == 'en' -%}Get a free quote{%- else -%}Cotización gratis{%- endif -%}
+    </a>
+</div>

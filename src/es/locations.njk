@@ -1,0 +1,59 @@
+---
+layout: base.njk
+pageKey: locations
+locale: es
+permalink: /es/locations.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.locations %}
+
+{# Hero placeholder #}
+<div id="locations-hero-placeholder"></div>
+
+{# Service Areas Section #}
+<section class="service-areas-section section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>{{ localeData.locations.title }}</h2>
+            <p>{{ localeData.locations.subtitle }}</p>
+        </div>
+        
+        <div class="areas-map reveal">
+            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
+                 alt="Mapa de Áreas de Servicio de Columbus Ohio" 
+                 class="map-image">
+        </div>
+
+        <div class="areas-grid">
+            {% set areasPerColumn = (localeData.locations.areas.length / 3) | round %}
+            <div class="areas-column">
+                {% for area in localeData.locations.areas.slice(0, 6) %}
+                <div class="area-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ area }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="areas-column">
+                {% for area in localeData.locations.areas.slice(6, 12) %}
+                <div class="area-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ area }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="areas-column">
+                {% for area in localeData.locations.areas.slice(12) %}
+                <div class="area-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ area }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Why Choose Us placeholder #}
+<div id="locations-why-choose-placeholder"></div>

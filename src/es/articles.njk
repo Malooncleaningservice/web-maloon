@@ -1,0 +1,50 @@
+---
+layout: base.njk
+pageKey: articles
+locale: es
+permalink: /es/articles.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.articles %}
+
+{# Hero Section #}
+<section class="articles-hero">
+    <div class="container">
+        <h1>Artículos y Consejos de Limpieza</h1>
+        <p>Guías útiles y conocimientos de nuestros profesionales de limpieza</p>
+    </div>
+</section>
+
+{# Articles Grid #}
+<section class="articles-grid section-white section-spacing">
+    <div class="container">
+        <div class="grid-3">
+            {% for article in localeData.articles %}
+            {% set anchorId = article.link | replace('articles.html#', '') %}
+            <article id="{{ anchorId }}" class="article-card reveal">
+                <div class="article-icon">📝</div>
+                <h3>{{ article.title }}</h3>
+                <p class="article-meta">{{ article.date }} • 5 min de lectura</p>
+                <p>{{ article.excerpt }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# CTA #}
+<section class="articles-cta section-green section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2 style="color: var(--white);">¿Listo para Limpieza Profesional?</h2>
+            <p style="color: rgba(255,255,255,0.9);">Obtenga una cotización gratis para su empresa u hogar hoy</p>
+        </div>
+        <div class="cta-buttons">
+            <a href="{{ localeData.contact.whatsapp }}" class="btn-cta-sparkle">
+                <i class="fab fa-whatsapp"></i>
+                Envíenos un mensaje por WhatsApp
+            </a>
+        </div>
+    </div>
+</section>

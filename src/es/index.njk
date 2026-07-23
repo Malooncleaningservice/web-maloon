@@ -1,0 +1,104 @@
+---
+layout: base.njk
+pageKey: index
+locale: es
+permalink: /es/index.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.index %}
+
+{# Hero placeholder - will be populated by hero-new.js #}
+<div id="home-hero-placeholder"></div>
+
+{# Transformation strip #}
+<div id="transform-strip-placeholder"></div>
+
+{# Social proof ticker #}
+<div class="social-ticker" aria-label="Clients we serve">
+    <div class="social-ticker__inner">
+        <div class="social-ticker__items">
+            <span class="social-ticker__item">Short North Retail Co.</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Columbus Medical Group</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Dublin Corporate Park</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>The Lofts at Worthington</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Gahanna Hospitality Group</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Westerville Schools District</span>
+            {# Duplicate for seamless loop #}
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Columbus Medical Group</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Short North Retail Co.</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Dublin Corporate Park</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>The Lofts at Worthington</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Gahanna Hospitality Group</span>
+            <span class="social-ticker__item"><span class="social-ticker__dot" aria-hidden="true"></span>Westerville Schools District</span>
+        </div>
+    </div>
+</div>
+
+{# Services overview section #}
+<section id="services-overview" class="section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header reveal">
+            <h2>Servicios Profesionales de Limpieza en <span class="green-accent">Columbus, OH</span></h2>
+        </div>
+        <div class="features-grid">
+            <div class="service-card reveal">
+                <div class="icon-badge">🏢</div>
+                <h3>Limpieza Comercial</h3>
+                <p>Servicios profesionales de limpieza para oficinas, centros de salud, tiendas minoristas y negocios de hotelería.</p>
+                <ul class="checkmark-list">
+                    <li>Limpieza de oficinas y corporaciones</li>
+                    <li>Saneamiento de centros de salud</li>
+                    <li>Mantenimiento de comercios</li>
+                    <li>Limpieza profunda de restaurantes y cocinas</li>
+                </ul>
+            </div>
+            <div class="service-card reveal">
+                <div class="icon-badge">🏠</div>
+                <h3>Limpieza Residencial</h3>
+                <p>Servicios confiables de limpieza de hogares para apartamentos y casas en Columbus y el centro de Ohio.</p>
+                <ul class="checkmark-list">
+                    <li>Limpieza regular semanal/quincenal</li>
+                    <li>Servicios de limpieza profunda</li>
+                    <li>Limpieza de mudanza/entrega</li>
+                    <li>Enfoque en cocina y baño</li>
+                </ul>
+            </div>
+        </div>
+        <div class="cta-center">
+            <a href="/es/contact.html" class="btn-primary">Obtenga una Cotización Gratis</a>
+        </div>
+    </div>
+</section>
+
+{# Why Choose Us section #}
+<section id="why-choose-us" class="section-green section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center reveal">
+            <h2 style="color: var(--white);">{{ localeData.why_us.title }}</h2>
+        </div>
+        <div class="features-grid-3">
+            {% for feature in localeData.why_us.features %}
+            <div class="feature-card reveal">
+                <div class="feature-icon">{{ feature.icon }}</div>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Final CTA #}
+<section id="final-cta" class="final-cta reveal">
+    <div class="container">
+        <h2 class="cta-h">¿Listo para un espacio más fresco?</h2>
+        <p class="cta-sub">Sirviendo empresas y hogares en Columbus — Lun a Sáb</p>
+        <div class="cta-buttons">
+            <a href="{{ localeData.contact.whatsapp }}" class="btn-cta-sparkle">
+                <i class="fab fa-whatsapp"></i>
+                Envíenos un mensaje por WhatsApp
+            </a>
+        </div>
+    </div>
+</section>

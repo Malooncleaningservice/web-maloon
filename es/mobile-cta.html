@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Obtenga una Cotización Gratis - Maloon Service</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <style>
+        body {
+            background: var(--bg-dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+            color: var(--text-light);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .mobile-cta-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+        .mobile-cta-container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .mobile-cta-container p {
+            font-size: 16px;
+            color: var(--muted-dark);
+            margin-bottom: 30px;
+        }
+        .mobile-cta-container .cta-button {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--brand-blue), var(--brand-purple));
+        }
+        .mobile-cta-container .phone-number {
+            font-size: 24px;
+            color: var(--brand-green);
+            text-decoration: none;
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-cta-container">
+        <h1>Obtenga una Cotización Gratis Hoy</h1>
+        <p>Permítanos ayudarle a mantener su negocio impecable y profesional.</p>
+        <a href="https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza." class="cta-button">Cotización por WhatsApp</a>
+        <p>O llámenos directamente:</p>
+        <a href="tel:6145551234" class="phone-number">614-555-1234</a>
+    </div>
+    <script>
+        document.addEventListener('click', function(e) {
+            if (e.target === document.body) {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

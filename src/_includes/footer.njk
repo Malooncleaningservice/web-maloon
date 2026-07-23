@@ -1,0 +1,59 @@
+{% set localeData = en if locale == 'en' else es %}
+{% set urlPrefix = '/es' if locale == 'es' else '' %}
+
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <img src="{{ localeData.brand.logo }}" alt="{{ localeData.brand.name }} Logo" style="height:100px; width:auto; object-fit: contain; margin-bottom: 15px;">
+                <p class="tagline" align="center">
+                    {%- if locale == 'en' -%}We make a difference.{%- else -%}Hacemos la diferencia.{%- endif -%}
+                </p>
+            </div>
+
+            <div class="footer-column">
+                <h3><i class="fas fa-map-marker-alt"></i>      Ohio</h3>
+            </div>
+
+            <div class="footer-column">
+                <h3>{%- if locale == 'en' -%}Contact us{%- else -%}Contáctenos{%- endif -%}</h3>
+                <div class="footer-divider"></div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <p><a href="{{ localeData.contact.whatsapp }}" style="color: var(--leaf-green); text-decoration: none; font-weight: 600;">
+                            {%- if locale == 'en' -%}Message on WhatsApp{%- else -%}Mensaje por WhatsApp{%- endif -%}
+                        </a></p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <p>{{ localeData.contact.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Portal Button -->
+        <div style="text-align: center; margin: 24px 0 8px;">
+            <a href="https://discerning-nourishment-production-bba8.up.railway.app" 
+               style="display: inline-block; background: var(--leaf-green); color: var(--white); padding: 10px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: opacity 0.2s;"
+               onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                🔐 {%- if locale == 'en' -%}Staff Portal{%- else -%}Portal del Personal{%- endif -%}
+            </a>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-links">
+                <a href="{{ urlPrefix }}/privacy.html">
+                    {%- if locale == 'en' -%}Privacy Policy{%- else -%}Política de Privacidad{%- endif -%}
+                </a>
+            </div>
+            <div class="copyright">
+                <p style="color: rgba(255, 255, 255, 0.65);">
+                    © {{ year }} {{ localeData.brand.name }}. 
+                    {%- if locale == 'en' -%}All rights reserved.{%- else -%}Todos los derechos reservados.{%- endif -%}
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

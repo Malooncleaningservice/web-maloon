@@ -1,0 +1,134 @@
+---
+layout: base.njk
+pageKey: contact
+locale: es
+permalink: /es/contact.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.contact %}
+
+{# Hero placeholder #}
+<div id="contact-hero-placeholder"></div>
+
+{# Contact Form Section #}
+<section class="contact-form-section section-spacing">
+    <div class="container">
+        <div class="section-header">
+            <h2>Obtenga su Cotización Gratis Hoy</h2>
+            <p>Servicios profesionales de limpieza personalizados para su empresa u hogar en Columbus, OH</p>
+        </div>
+
+        {# Quick Contact Options #}
+        <div class="highlight-box">
+            <h3>⚡ Respuesta Más Rápida</h3>
+            <p>Envíenos un mensaje en <a href="{{ localeData.contact.whatsapp }}" style="color: var(--leaf-green); font-weight: 600;">WhatsApp</a> para asistencia inmediata</p>
+        </div>
+
+        <div class="contact-form-container">
+            <form id="contactForm" class="contact-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Su Nombre*</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico*</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="phone">Número de Teléfono*</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">Nombre de la Empresa*</label>
+                        <input type="text" id="company" name="company" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="service">Tipo de Servicio*</label>
+                    <select id="service" name="service" required>
+                        <option value="">Seleccione un servicio</option>
+                        <option value="corporate">Limpieza de Oficinas Corporativas</option>
+                        <option value="healthcare">Limpieza de Centros de Salud</option>
+                        <option value="retail">Limpieza de Tiendas Minoristas</option>
+                        <option value="hospitality">Limpieza de Hotelería</option>
+                        <option value="disinfection">Servicios de Desinfección</option>
+                        <option value="residential">Limpieza Residencial</option>
+                        <option value="other">Otro (describa abajo)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Frecuencia de Limpieza*</label>
+                    <select id="frequency" name="frequency" required>
+                        <option value="">Seleccione frecuencia</option>
+                        <option value="daily">Diaria</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="biweekly">Quincenal</option>
+                        <option value="monthly">Mensual</option>
+                        <option value="one-time">Una Vez/Evento</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="size">Tamaño del Establecimiento (pies cuadrados)*</label>
+                    <input type="text" id="size" name="size" required placeholder="ej., 5000">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Detalles Adicionales</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Cuéntenos sobre sus necesidades específicas de limpieza, preferencias de horario o cualquier requisito especial..."></textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="urgent" name="urgent">
+                    <label for="urgent">Esta es una solicitud urgente</label>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="green" name="green" checked>
+                    <label for="green">Estoy interesado en opciones de limpieza ecológica</label>
+                </div>
+
+                <button type="submit" class="submit-button">Enviar Solicitud</button>
+            </form>
+
+            <div class="form-sidebar">
+                <div class="info-box">
+                    <h3>📞 Información de Contacto</h3>
+                    <p style="margin-bottom: 16px;"><strong>WhatsApp:</strong><br>
+                    <a href="{{ localeData.contact.whatsapp }}" style="color: var(--leaf-green); font-weight: 600;">Envíenos un mensaje ahora</a></p>
+                    
+                    <p style="margin-bottom: 16px;"><strong>Correo Electrónico:</strong><br>
+                    <a href="mailto:{{ localeData.contact.email }}" style="color: var(--leaf-green);">{{ localeData.contact.email }}</a></p>
+                    
+                    <p style="margin-bottom: 16px;"><strong>Horario:</strong><br>
+                    {{ localeData.contact.hours }}</p>
+                    
+                    <p><strong>Ubicación:</strong><br>
+                    {{ localeData.contact.address }}</p>
+                </div>
+
+                <div class="service-card">
+                    <h3>¿Qué Sigue?</h3>
+                    <ul class="checkmark-list">
+                        <li>Revisamos su solicitud dentro de 2 días hábiles</li>
+                        <li>Nuestro equipo se pondrá en contacto con usted para discutir detalles</li>
+                        <li>Proporcionamos una cotización detallada adaptada a sus necesidades</li>
+                        <li>Programe su primera limpieza a su conveniencia</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Service Areas placeholder #}
+<div id="contact-service-areas-placeholder"></div>

@@ -1,0 +1,693 @@
+{
+  "brand": {
+    "name": "Maloon Cleaning Service",
+    "tagline": "Limpieza Profesional",
+    "logo": "/logo-maloon.png",
+    "favicon": "/Maloon Service Logo-Favicon.svg"
+  },
+  "contact": {
+    "email": "info@maloonservices.com",
+    "address": "123 Cleaning Way, Columbus, OH 43215",
+    "whatsapp": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza.",
+    "hours": "Lun–Sáb • 8:00 AM – 6:00 PM",
+    "facebook": "#",
+    "twitter": "#",
+    "instagram": "#",
+    "linkedin": "#"
+  },
+  "services": {
+    "commercial": {
+      "title": "Servicios de Limpieza Comercial",
+      "subtitle": "Soluciones Profesionales para Cada Negocio en Columbus, OH",
+      "categories": [
+        {
+          "icon": "🏢",
+          "title": "Limpieza Corporativa",
+          "description": "Servicios profesionales de limpieza de oficinas diseñados para mantener entornos de trabajo productivos.",
+          "details": [
+            "Programas de limpieza ecológica con certificación LEED",
+            "Servicios de limpieza general y contratos de mantenimiento",
+            "Servicios de conserjería diurna para mantenimiento continuo",
+            "Planes de limpieza personalizados orientados a la sostenibilidad",
+            "Mantenimiento completo de pisos",
+            "Limpieza de alfombras por extracción",
+            "Lavado a presión para áreas exteriores",
+            "Personal temporal para eventos especiales"
+          ]
+        },
+        {
+          "icon": "⚕️",
+          "title": "Limpieza para el Sector Salud",
+          "description": "Limpieza especializada para instalaciones médicas con estrictos estándares de higiene.",
+          "details": [
+            "Limpieza profunda para hospitales, clínicas y consultorios médicos",
+            "Servicios de limpieza programados y contratos personalizados",
+            "Opciones de limpieza diurna para adaptarse al horario de su centro",
+            "Servicios de conserjería para espacios médicos de alto tráfico",
+            "Saneamiento y desinfección de baños",
+            "Limpieza especializada para laboratorios biomédicos",
+            "Limpieza de tapicería y muebles",
+            "Limpieza de ventanas y vidrios"
+          ]
+        },
+        {
+          "icon": "🛍️",
+          "title": "Limpieza para Comercios",
+          "description": "Mantenga sus espacios comerciales limpios y atractivos para los clientes.",
+          "details": [
+            "Servicios de limpieza por contrato y mantenimiento programado",
+            "Apoyo de conserjería diurna para mantener sus tiendas impecables",
+            "Servicios de saneamiento de baños",
+            "Limpieza para centros comerciales y desarrollos de uso mixto",
+            "Limpieza para múltiples ubicaciones de cadenas minoristas",
+            "Cuidado profesional de pisos en áreas de alto tráfico",
+            "Detallado de fachadas para mejorar la imagen del local",
+            "Limpieza de ventanas y vidrios"
+          ]
+        },
+        {
+          "icon": "🏨",
+          "title": "Limpieza para Hotelería",
+          "description": "Soluciones integrales de limpieza para hoteles y restaurantes.",
+          "details": [
+            "Servicios de limpieza para hoteles y resorts",
+            "Limpieza de espacios para eventos, banquetes y conferencias",
+            "Mantenimiento de áreas públicas, vestíbulos y pasillos",
+            "Limpieza de restaurantes y cocinas",
+            "Servicios generales de limpieza para áreas de alto tráfico",
+            "Programas de limpieza ecológica para sostenibilidad",
+            "Apoyo de mayordomía para espacios de eventos",
+            "Limpieza de áreas de estacionamiento"
+          ]
+        },
+        {
+          "icon": "🏗️",
+          "title": "Limpieza de Construcción",
+          "description": "Servicios de limpieza post-construcción para preparar su obra para la ocupación.",
+          "details": [
+            "Remoción de escombros y limpieza del sitio",
+            "Eliminación de polvo y suciedad de todas las superficies",
+            "Limpieza de ventanas y vidrios",
+            "Limpieza y pulido de pisos",
+            "Limpieza de toques finales",
+            "Lavado a presión exterior",
+            "Limpieza profunda interior",
+            "Eliminación de residuos y reciclaje"
+          ]
+        }
+      ],
+      "disinfection": {
+        "title": "Servicios Avanzados de Desinfección",
+        "subtitle": "Soluciones integrales de desinfección para empresas en Columbus",
+        "features": [
+          {
+            "icon": "💨",
+            "title": "Aplicaciones de Desinfección Sin Contacto",
+            "description": "Nuestro sistema de desinfección por nebulización cubre uniformemente superficies verticales y horizontales, reduciendo gérmenes sin requerir contacto directo."
+          },
+          {
+            "icon": "🧽",
+            "title": "Desinfección Manual y Mecánica",
+            "description": "Utilizamos una combinación de limpieza manual y equipos avanzados para desinfectar áreas de alto contacto, reduciendo la propagación de bacterias y virus."
+          }
+        ],
+        "services": [
+          "Desinfección por pulverización electrostática",
+          "Pruebas ATP para verificar la limpieza",
+          "Desinfección de superficies de alto contacto",
+          "Desinfectantes aprobados por la EPA",
+          "Protocolos de limpieza COVID-19",
+          "Limpieza de respuesta ante emergencias",
+          "Programas continuos de desinfección",
+          "Horarios de desinfección personalizados"
+        ]
+      },
+      "ongoing": {
+        "title": "Limpieza y Mantenimiento Continuo",
+        "subtitle": "Mantenga su Espacio de Trabajo en Columbus Limpio Todo el Año",
+        "items": [
+          {
+            "icon": "🌿",
+            "text": "Programas de limpieza ecológica con certificación LEED"
+          },
+          {
+            "icon": "🧵",
+            "text": "Limpieza profunda de alfombras con tecnología de extracción"
+          },
+          {
+            "icon": "🪟",
+            "text": "Cuidado completo de pisos para todas las superficies"
+          },
+          {
+            "icon": "👤",
+            "text": "Servicios de conserjería diurna para necesidades diarias"
+          },
+          {
+            "icon": "✨",
+            "text": "Pulido de mármol para espacios de lujo"
+          },
+          {
+            "icon": "🍽️",
+            "text": "Limpieza de cafeterías para una alimentación higiénica"
+          },
+          {
+            "icon": "💦",
+            "text": "Lavado a presión para áreas exteriores"
+          },
+          {
+            "icon": "📋",
+            "text": "Contratos de limpieza personalizados"
+          }
+        ]
+      }
+    },
+    "residential": {
+      "title": "Servicios de Limpieza Residencial",
+      "subtitle": "Limpieza rutinaria para apartamentos y casas. Semanal, quincenal o mensual.",
+      "categories": [
+        {
+          "icon": "🏠",
+          "title": "Limpieza Regular",
+          "description": "Limpieza rutinaria para apartamentos y casas. Semanal, quincenal o mensual.",
+          "details": [
+            "Desempolvado y aspirado",
+            "Trapeado de pisos",
+            "Saneamiento de baños",
+            "Limpieza de cocina",
+            "Doblado y organización de ropa",
+            "Remoción de basura"
+          ]
+        },
+        {
+          "icon": "🧼",
+          "title": "Limpieza Profunda",
+          "description": "Limpieza detallada de arriba a abajo para un verdadero reinicio. Ideal antes de eventos.",
+          "details": [
+            "Limpieza profunda de todas las habitaciones",
+            "Limpieza detrás y debajo de muebles",
+            "Limpieza interior de ventanas",
+            "Limpieza de zócalos y molduras",
+            "Limpieza de electrodomésticos (horno, nevera, microondas)",
+            "Limpieza de alfombras y tapicería"
+          ]
+        },
+        {
+          "icon": "📦",
+          "title": "Mudanza / Entrega",
+          "description": "Haga que su nuevo hogar brille — o deje el anterior impecable para la inspección.",
+          "details": [
+            "Limpieza completa de toda la propiedad",
+            "Enfoque en áreas de alto tráfico",
+            "Limpieza profunda de cocina y baño",
+            "Limpieza de ventanas",
+            "Limpieza de garaje y áreas exteriores",
+            "Recorrido final e inspección"
+          ]
+        },
+        {
+          "icon": "🪟",
+          "title": "Enfoque en Cocina y Baño",
+          "description": "Detallado de alto impacto donde más importa: grasa, juntas y brillo.",
+          "details": [
+            "Fregado profundo de lavabos y bañeras",
+            "Limpieza de juntas",
+            "Eliminación de grasa de estufas",
+            "Restauración de azulejos y juntas",
+            "Limpieza de espejos y vidrios",
+            "Saneamiento de áreas de alto contacto"
+          ]
+        }
+      ]
+    }
+  },
+  "why_us": {
+    "title": "¿Por Qué Elegir Maloon Cleaning Service?",
+    "features": [
+      {
+        "icon": "🌿",
+        "title": "Soluciones de Limpieza Sostenibles",
+        "description": "¿Busca una forma eficaz de mantener su negocio limpio sin dañar el medio ambiente? Ofrecemos servicios de limpieza ecológicos de alta calidad adaptados a sus necesidades."
+      },
+      {
+        "icon": "💰",
+        "title": "Limpieza Ecológica Rentable",
+        "description": "Nuestras soluciones de reciclaje y gestión de residuos ayudan a las empresas a ahorrar dinero mientras reducen su impacto ambiental."
+      },
+      {
+        "icon": "✅",
+        "title": "Servicio Confiable y Profesional",
+        "description": "Con años de experiencia, nuestro equipo ofrece limpieza confiable y de alta calidad en la que las empresas de Columbus pueden confiar."
+      },
+      {
+        "icon": "🧴",
+        "title": "Limpieza Potente Sin Químicos Agresivos",
+        "description": "Nuestros productos de limpieza naturales eliminan la suciedad sin químicos dañinos, manteniendo seguros a empleados y clientes."
+      },
+      {
+        "icon": "🏢",
+        "title": "Limpieza a Medida para Cada Industria",
+        "description": "Desde pequeñas oficinas hasta grandes espacios corporativos, Maloon Cleaning Service ofrece soluciones de limpieza personalizadas para todo tipo de negocios en Columbus, OH."
+      }
+    ]
+  },
+  "process": {
+    "title": "Cómo Funciona",
+    "steps": [
+      {
+        "number": 1,
+        "title": "Solicite una cotización",
+        "description": "Envíe su dirección, tamaño y tipo de servicio por WhatsApp."
+      },
+      {
+        "number": 2,
+        "title": "Elija un horario",
+        "description": "Confirmamos disponibilidad y programamos su limpieza."
+      },
+      {
+        "number": 3,
+        "title": "Disfrute la limpieza",
+        "description": "Llegamos listos y dejamos su espacio fresco e impecable."
+      }
+    ]
+  },
+  "locations": {
+    "title": "Nuestras Áreas de Servicio en Columbus",
+    "subtitle": "Sirviendo con orgullo a empresas en todo el centro de Ohio",
+    "areas": [
+      "Columbus Downtown",
+      "Short North",
+      "Dublin",
+      "Worthington",
+      "Hilliard",
+      "Westerville",
+      "Gahanna",
+      "Reynoldsburg",
+      "New Albany",
+      "Upper Arlington",
+      "Bexley",
+      "Grandview Heights",
+      "Powell",
+      "Lewis Center",
+      "Pickerington",
+      "Canal Winchester",
+      "Grove City",
+      "Y áreas cercanas"
+    ]
+  },
+  "testimonials": [
+    {
+      "stars": "★★★★★",
+      "quote": "Maloon Cleaning Service ha transformado nuestro entorno de oficina. Su equipo es profesional, confiable y siempre va más allá. Los productos de limpieza ecológicos han mejorado significativamente la calidad del aire interior.",
+      "author": "Sarah Johnson",
+      "role": "Gerente de Oficina, Downtown Columbus"
+    },
+    {
+      "stars": "★★★★★",
+      "quote": "Como centro de salud, requerimos los más altos estándares de limpieza. Maloon Cleaning Service ofrece constantemente resultados excepcionales con sus protocolos especializados de limpieza para el sector salud. Su atención al detalle es inigualable.",
+      "author": "Dr. Michael Chen",
+      "role": "Director de Clínica, Dublin"
+    },
+    {
+      "stars": "★★★★★",
+      "quote": "Hemos utilizado Maloon Cleaning Service para nuestras tiendas minoristas en Columbus durante más de 3 años. Su flexibilidad con los horarios y la calidad constante han sido invaluables para nuestras operaciones. ¡Altamente recomendado!",
+      "author": "Emily Rodriguez",
+      "role": "Gerente de Operaciones Minoristas"
+    }
+  ],
+  "articles": [
+    {
+      "title": "Los Beneficios de la Limpieza Ecológica para su Negocio",
+      "excerpt": "Descubra cómo los productos de limpieza ecológicos pueden mejorar la calidad del aire interior y la productividad de los empleados.",
+      "date": "1 de junio de 2026",
+      "link": "articles.html#green-cleaning"
+    },
+    {
+      "title": "Lista de Verificación de Limpieza Post-Construcción",
+      "excerpt": "Una guía completa para preparar su obra para la ocupación con limpieza profesional.",
+      "date": "15 de mayo de 2026",
+      "link": "articles.html#construction-checklist"
+    },
+    {
+      "title": "¿Con Qué Frecuencia Debe Limpiar su Oficina?",
+      "excerpt": "Encuentre el horario de limpieza ideal según el tipo, tamaño y requisitos de su industria.",
+      "date": "28 de abril de 2026",
+      "link": "articles.html#office-cleaning-frequency"
+    }
+  ],
+  "faq": [
+    {
+      "question": "¿Qué tipos de negocios atienden?",
+      "answer": "Atendemos una amplia gama de negocios, incluyendo oficinas corporativas, centros de salud, tiendas minoristas, restaurantes, hoteles, escuelas y más. Nuestros servicios se personalizan para satisfacer las necesidades específicas de cada industria."
+    },
+    {
+      "question": "¿Sus productos de limpieza son ecológicos?",
+      "answer": "¡Sí! Utilizamos productos de limpieza ambientalmente responsables que son seguros para empleados, clientes y el medio ambiente. Nuestros programas de limpieza ecológica ayudan a mejorar la calidad del aire interior manteniendo altos estándares de limpieza."
+    },
+    {
+      "question": "¿Con qué frecuencia pueden limpiar nuestras instalaciones?",
+      "answer": "Ofrecemos opciones de horarios flexibles que incluyen servicios de limpieza diarios, semanales, quincenales, mensuales o por una sola vez. También podemos proporcionar servicios de conserjería diurna para mantenimiento continuo durante el horario laboral."
+    },
+    {
+      "question": "¿Ofrecen servicios de desinfección?",
+      "answer": "Absolutamente. Ofrecemos servicios avanzados de desinfección que incluyen pulverización electrostática, limpieza de superficies de alto contacto y desinfectantes aprobados por la EPA para ayudar a reducir la propagación de gérmenes y virus."
+    },
+    {
+      "question": "¿Su personal está capacitado y asegurado?",
+      "answer": "Sí, todos nuestros profesionales de limpieza están completamente capacitados, verificados y asegurados. Mantenemos altos estándares de calidad, seguridad y profesionalismo."
+    },
+    {
+      "question": "¿Qué áreas de Columbus atienden?",
+      "answer": "Atendemos toda el área metropolitana de Columbus, incluyendo Downtown, Short North, Dublin, Worthington, Hilliard, Westerville, Gahanna, Reynoldsburg y las comunidades cercanas en el centro de Ohio."
+    }
+  ],
+  "navigation": {
+    "main": [
+      {
+        "id": "home",
+        "title": "Inicio",
+        "url": "index.html",
+        "icon": "home"
+      },
+      {
+        "id": "business",
+        "title": "Para Empresas",
+        "url": "business.html",
+        "icon": "building",
+        "dropdown": [
+          {
+            "id": "commercial-services",
+            "title": "Limpieza Comercial",
+            "url": "business.html#commercial-overview"
+          },
+          {
+            "id": "industries",
+            "title": "Industrias que Atendemos",
+            "url": "business.html#industries-section"
+          },
+          {
+            "id": "disinfection",
+            "title": "Servicios de Desinfección",
+            "url": "business.html#disinfection-section"
+          },
+          {
+            "id": "ongoing-maintenance",
+            "title": "Mantenimiento Continuo",
+            "url": "business.html#maintenance-section"
+          },
+          {
+            "id": "business-contact",
+            "title": "Cotización para Empresas",
+            "url": "contact.html"
+          }
+        ]
+      },
+      {
+        "id": "homes",
+        "title": "Para Hogares",
+        "url": "residential.html",
+        "icon": "home",
+        "dropdown": [
+          {
+            "id": "regular-cleaning",
+            "title": "Limpieza Regular",
+            "url": "residential.html#regular-cleaning"
+          },
+          {
+            "id": "deep-cleaning",
+            "title": "Limpieza Profunda",
+            "url": "residential.html#deep-cleaning"
+          },
+          {
+            "id": "move-in-out",
+            "title": "Mudanza / Entrega",
+            "url": "residential.html#move-in-out"
+          },
+          {
+            "id": "home-contact",
+            "title": "Cotización para Hogares",
+            "url": "contact.html"
+          }
+        ]
+      },
+      {
+        "id": "about",
+        "title": "Nosotros",
+        "url": "about.html",
+        "icon": "info-circle"
+      },
+      {
+        "id": "contact",
+        "title": "Contacto",
+        "url": "contact.html",
+        "icon": "phone"
+      }
+    ],
+    "sidebar": {
+      "index": [
+        {
+          "id": "home-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "services-overview",
+          "text": "Servicios"
+        },
+        {
+          "id": "final-cta",
+          "text": "Cotización"
+        }
+      ],
+      "about": [
+        {
+          "id": "about-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "company-overview",
+          "text": "Nuestra Historia"
+        },
+        {
+          "id": "mission-section",
+          "text": "Nuestra Misión"
+        },
+        {
+          "id": "testimonials-section",
+          "text": "Testimonios"
+        },
+        {
+          "id": "about-cta-placeholder",
+          "text": "Cotización"
+        }
+      ],
+      "business": [
+        {
+          "id": "business-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "commercial-overview",
+          "text": "Limpieza Comercial"
+        },
+        {
+          "id": "industries-section",
+          "text": "Industrias"
+        },
+        {
+          "id": "disinfection-section",
+          "text": "Desinfección"
+        },
+        {
+          "id": "maintenance-section",
+          "text": "Mantenimiento"
+        },
+        {
+          "id": "business-cta-placeholder",
+          "text": "Cotización"
+        }
+      ],
+      "residential": [
+        {
+          "id": "residential-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "residential-overview",
+          "text": "Nuestros Servicios"
+        },
+        {
+          "id": "regular-cleaning",
+          "text": "Limpieza Regular"
+        },
+        {
+          "id": "deep-cleaning",
+          "text": "Limpieza Profunda"
+        },
+        {
+          "id": "move-in-out",
+          "text": "Mudanza / Entrega"
+        },
+        {
+          "id": "residential-cta-placeholder",
+          "text": "Cotización"
+        }
+      ],
+      "services": [
+        {
+          "id": "services-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "services-overview",
+          "text": "Servicios"
+        },
+        {
+          "id": "ongoing-maintenance",
+          "text": "Mantenimiento"
+        },
+        {
+          "id": "services-cta-placeholder",
+          "text": "Cotización"
+        }
+      ],
+      "locations": [
+        {
+          "id": "locations-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "locations-why-choose-placeholder",
+          "text": "Nosotros"
+        }
+      ],
+      "contact": [
+        {
+          "id": "contact-hero-placeholder",
+          "text": "Inicio"
+        },
+        {
+          "id": "contactForm",
+          "text": "Formulario de Cotización"
+        },
+        {
+          "id": "contact-service-areas-placeholder",
+          "text": "Áreas de Servicio"
+        }
+      ],
+      "faq": [
+        {
+          "id": "faq-section",
+          "text": "Preguntas Frecuentes"
+        }
+      ]
+    }
+  },
+  "pages": {
+    "index": {
+      "hero": {
+        "title": "Maloon Service<br>Columbus, OH",
+        "subtitle": "Servicios Profesionales de Limpieza para Empresas y Hogares",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Obtenga una Cotización Gratis Hoy",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "about": {
+      "hero": {
+        "title": "Sobre Maloon Service",
+        "subtitle": "La Empresa de Limpieza Comercial y Residencial de Confianza en Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "Experimente la Diferencia de Maloon Cleaning Service",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "business": {
+      "hero": {
+        "title": "Servicios de Limpieza Comercial",
+        "subtitle": "Soluciones Profesionales para Cada Negocio en Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "¿Listo para un Espacio de Trabajo Más Limpio?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "services": {
+      "hero": {
+        "title": "Nuestros Servicios de Limpieza",
+        "subtitle": "Soluciones Profesionales para Cada Negocio y Hogar en Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "¿Listo para un Espacio de Trabajo Más Limpio?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "contact": {
+      "email": "info@maloonservices.com",
+      "address": "123 Cleaning Way, Columbus, OH 43215",
+      "whatsapp": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza.",
+      "hours": "Lun–Sáb • 8:00 AM – 6:00 PM",
+      "facebook": "#",
+      "twitter": "#",
+      "instagram": "#",
+      "linkedin": "#",
+      "hero": {
+        "title": "Contacte a Maloon Service",
+        "subtitle": "Obtenga una Cotización Gratis para Limpieza Profesional en Columbus, OH",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "¿Listo para un Espacio Más Limpio y Saludable?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "residential": {
+      "hero": {
+        "title": "Servicios de Limpieza Residencial",
+        "subtitle": "Limpieza rutinaria para apartamentos y casas. Semanal, quincenal o mensual.",
+        "background": "https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "¿Listo para un Hogar Impecable?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    },
+    "locations": {
+      "title": "Nuestras Áreas de Servicio en Columbus",
+      "subtitle": "Sirviendo con orgullo a empresas en todo el centro de Ohio",
+      "areas": [
+        "Columbus Downtown",
+        "Short North",
+        "Dublin",
+        "Worthington",
+        "Hilliard",
+        "Westerville",
+        "Gahanna",
+        "Reynoldsburg",
+        "New Albany",
+        "Upper Arlington",
+        "Bexley",
+        "Grandview Heights",
+        "Powell",
+        "Lewis Center",
+        "Pickerington",
+        "Canal Winchester",
+        "Grove City",
+        "Y áreas cercanas"
+      ],
+      "hero": {
+        "title": "Nuestras Áreas de Servicio",
+        "subtitle": "Sirviendo Empresas y Hogares en Todo el Centro de Ohio",
+        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      },
+      "cta": {
+        "title": "¿Listo para un Espacio Más Limpio?",
+        "whatsapp_url": "https://wa.me/16144830226?text=Hola%20Maloon%20Services!%20Quisiera%20una%20cotizacion%20de%20limpieza."
+      }
+    }
+  }
+}

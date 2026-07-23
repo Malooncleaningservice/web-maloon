@@ -1,0 +1,56 @@
+{% set localeData = en if locale == 'en' else es %}
+{% set nav = localeData.navigation %}
+{% set urlPrefix = '/es' if locale == 'es' else '' %}
+
+<nav class="main-nav">
+    <!-- Tier 1: Logo + Quote Button (always visible) -->
+    <div class="nav-tier-1">
+        <div class="logo">
+            <img src="{{ localeData.brand.logo }}" alt="{{ localeData.brand.name }} Logo" class="logo-img">
+        </div>
+        <a href="{{ localeData.contact.whatsapp }}" class="cta-button desktop-cta">
+            {%- if locale == 'en' -%}Get a Free Quote{%- else -%}Cotización Gratis{%- endif -%}
+        </a>
+        <a href="{{ localeData.contact.whatsapp }}" class="cta-button mobile-cta">
+            {%- if locale == 'en' -%}Get Quote{%- else -%}Cotizar{%- endif -%}
+        </a>
+    </div>
+
+    <!-- Tier 2: Main Navigation Links (hides on scroll) -->
+    <div class="nav-tier-2">
+        <div class="nav-strip-scroll">
+            <ul class="nav-menu">
+                {% for item in nav.main %}
+                <li class="menu-item{% if item.dropdown %} has-dropdown{% endif %}">
+                    <a href="{{ item.url }}"{% if item.dropdown %} aria-expanded="false"{% endif %}>
+                        {{ item.title }}
+                        {%- if item.dropdown %} <span class="dropdown-arrow">▾</span>{% endif -%}
+                    </a>
+                    {% if item.dropdown %}
+                    <div class="dropdown-menu" id="{{ item.id }}-dropdown">
+                        {% for dropItem in item.dropdown %}
+                            {% if dropItem.id == 'business-contact' or dropItem.id == 'home-contact' %}
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ dropItem.url }}" class="dropdown-cta">{{ dropItem.title }}</a>
+                            {% else %}
+                                <a href="{{ dropItem.url }}">{{ dropItem.title }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+                <li class="menu-item lang-switch">
+                    <a href="{{ nav.languageSwitcher.url }}">{{ nav.languageSwitcher.label }}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tier 3: Page Section Subs (mobile only — always visible) -->
+    <div class="nav-tier-3" id="nav-tier-3">
+        <div class="section-strip" id="mobile-section-strip">
+            <!-- Populated by main.js from sidebar data -->
+        </div>
+    </div>
+</nav>

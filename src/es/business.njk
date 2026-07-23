@@ -1,0 +1,105 @@
+---
+layout: base.njk
+pageKey: business
+locale: es
+permalink: /es/business.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.business %}
+
+{# Hero placeholder #}
+<div id="business-hero-placeholder"></div>
+
+{# Commercial Overview #}
+<section id="commercial-overview" class="services-overview section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>{{ localeData.services.commercial.title }}</h2>
+            <p>{{ localeData.services.commercial.subtitle }}</p>
+        </div>
+        <div class="features-grid-3">
+            {% for category in localeData.services.commercial.categories %}
+            <div class="service-card reveal">
+                <div class="icon-badge">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+                <ul class="checkmark-list">
+                    {% for detail in category.details.slice(0, 4) %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Industries Section #}
+<section id="industries-section" class="service-section section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>Industrias que Atendemos</h2>
+        </div>
+        {% for category in localeData.services.commercial.categories.slice(0, 4) %}
+        <div class="split-section {% if loop.index % 2 == 0 %}reverse{% endif %} reveal">
+            <div class="split-content">
+                <div class="icon-badge-large">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+                <ul class="checkmark-list">
+                    {% for detail in category.details %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="{{ category.title }}">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{# Disinfection Section #}
+<section id="disinfection-section" class="section-green section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2 style="color: var(--white);">{{ localeData.services.commercial.disinfection.title }}</h2>
+            <p style="color: rgba(255,255,255,0.9);">{{ localeData.services.commercial.disinfection.subtitle }}</p>
+        </div>
+        <div class="features-grid">
+            {% for feature in localeData.services.commercial.disinfection.features %}
+            <div class="feature-card">
+                <div class="feature-icon">{{ feature.icon }}</div>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Maintenance Section #}
+<section id="maintenance-section" class="ongoing-maintenance section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>{{ localeData.services.commercial.ongoing.title }}</h2>
+            <p>{{ localeData.services.commercial.ongoing.subtitle }}</p>
+        </div>
+        <div class="features-grid-4">
+            {% for item in localeData.services.commercial.ongoing.items %}
+            <div class="maintenance-item reveal">
+                <div class="maintenance-icon">{{ item.icon }}</div>
+                <p>{{ item.text }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Why Choose Us placeholder #}
+<div id="business-why-choose-placeholder"></div>
+
+{# CTA placeholder #}
+<div id="business-cta-placeholder"></div>

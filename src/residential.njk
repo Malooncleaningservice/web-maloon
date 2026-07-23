@@ -1,0 +1,65 @@
+---
+layout: base.njk
+pageKey: residential
+locale: en
+permalink: /residential.html
+---
+
+{% set localeData = en %}
+{% set pageData = localeData.pages.residential %}
+
+{# Hero placeholder #}
+<div id="residential-hero-placeholder"></div>
+
+{# Residential Overview #}
+<section id="residential-overview" class="services-overview section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>{{ localeData.services.residential.title }}</h2>
+            <p>{{ localeData.services.residential.subtitle }}</p>
+        </div>
+        <div class="features-grid">
+            {% for category in localeData.services.residential.categories %}
+            <div class="service-card reveal">
+                <div class="icon-badge">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+                <ul class="checkmark-list">
+                    {% for detail in category.details %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Service Details with Split Sections #}
+{% for category in localeData.services.residential.categories %}
+<section id="{{ category.title | lower | replace(' ', '-') | replace('/', '-') }}" class="service-section section-spacing reveal">
+    <div class="container">
+        <div class="split-section {% if loop.index % 2 == 0 %}reverse{% endif %} reveal">
+            <div class="split-content">
+                <div class="icon-badge-large">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+                <ul class="checkmark-list">
+                    {% for detail in category.details %}
+                    <li>{{ detail }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="split-image">
+                <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="{{ category.title }}">
+            </div>
+        </div>
+    </div>
+</section>
+{% endfor %}
+
+{# Why Choose Us placeholder #}
+<div id="residential-why-choose-placeholder"></div>
+
+{# CTA placeholder #}
+<div id="residential-cta-placeholder"></div>

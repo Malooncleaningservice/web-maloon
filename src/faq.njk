@@ -1,0 +1,50 @@
+---
+layout: base.njk
+pageKey: faq
+locale: en
+permalink: /faq.html
+---
+
+{% set localeData = en %}
+{% set pageData = localeData.pages.faq %}
+
+{# Hero section #}
+<section class="hero-section">
+    <div class="container">
+        <h1>Frequently Asked Questions</h1>
+        <p>Find answers to common questions about our commercial and residential cleaning services in Columbus, OH.</p>
+    </div>
+</section>
+
+{# FAQ Section #}
+<section class="faq-section section-white section-spacing">
+    <div class="container">
+        <div class="faq-container">
+            {% for item in localeData.faq %}
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span>{{ item.question }}</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{{ item.answer }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Final CTA #}
+<section class="final-cta-section reveal">
+    <div class="container">
+        <h2>Still have questions?</h2>
+        <p>We're here to help! Contact us for more information about our cleaning services.</p>
+        <div class="cta-buttons">
+            <a href="{{ localeData.contact.whatsapp }}" class="btn-cta-sparkle">
+                <i class="fab fa-whatsapp"></i>
+                Message us on WhatsApp
+            </a>
+        </div>
+    </div>
+</section>

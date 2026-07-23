@@ -1,0 +1,65 @@
+---
+layout: base.njk
+pageKey: services
+locale: es
+permalink: /es/services.html
+---
+
+{% set localeData = es %}
+{% set pageData = localeData.pages.services %}
+
+{# Hero placeholder #}
+<div id="services-hero-placeholder"></div>
+
+{# Services Overview #}
+<section id="services-overview" class="services-overview section-white section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2>Nuestros Servicios de Limpieza Completos</h2>
+            <p>Soluciones profesionales para cada empresa y hogar en Columbus, OH</p>
+        </div>
+        <div class="features-grid-3">
+            {% for category in localeData.services.commercial.categories.slice(0, 3) %}
+            <div class="service-card reveal">
+                <div class="icon-badge">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+            </div>
+            {% endfor %}
+            {% for category in localeData.services.residential.categories.slice(0, 3) %}
+            <div class="service-card reveal">
+                <div class="icon-badge">{{ category.icon }}</div>
+                <h3>{{ category.title }}</h3>
+                <p>{{ category.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Ongoing Maintenance #}
+<section id="ongoing-maintenance" class="ongoing-maintenance section-green section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center">
+            <h2 style="color: var(--white);">{{ localeData.services.commercial.ongoing.title }}</h2>
+            <p style="color: rgba(255,255,255,0.9);">{{ localeData.services.commercial.ongoing.subtitle }}</p>
+        </div>
+        <div class="features-grid-4">
+            {% for item in localeData.services.commercial.ongoing.items %}
+            <div class="maintenance-item reveal">
+                <div class="maintenance-icon">{{ item.icon }}</div>
+                <p>{{ item.text }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# Why Choose Us placeholder #}
+<div id="services-why-choose-placeholder"></div>
+
+{# Service Areas placeholder #}
+<div id="services-service-areas-placeholder"></div>
+
+{# CTA placeholder #}
+<div id="services-cta-placeholder"></div>

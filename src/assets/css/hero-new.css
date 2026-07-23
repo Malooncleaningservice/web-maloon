@@ -1,0 +1,443 @@
+/*
+ * hero-new.css
+ * Styles for: hero-home, transform-strip
+ * Depends on: main.css (design tokens must be loaded first)
+ */
+
+/* ─────────────────────────────────────────
+   1. HERO — SPLIT SCREEN
+   Left: deep-pine messaging panel
+   Right: photo with floating stat card
+───────────────────────────────────────── */
+
+.hero-home {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 520px;
+    position: relative;
+}
+
+/* ── Left panel ── */
+.hero-home__left {
+    background: var(--deep-pine);
+    display: flex;
+    align-items: center;
+    padding: 5rem 4rem 5rem 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle organic blobs */
+.hero-home__left::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+}
+.hero-home__left::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: 30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(76, 175, 80, 0.06);
+    pointer-events: none;
+}
+
+.hero-home__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #a5d6a7;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.03em;
+}
+
+.hero-home__eyebrow i {
+    font-size: 11px;
+    color: var(--leaf-green);
+}
+
+.hero-home__h1 {
+    font-size: clamp(32px, 3.8vw, 54px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+}
+
+.hero-home__accent {
+    display: block;
+    color: #a5d6a7;
+    font-style: normal;
+}
+
+.hero-home__sub {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.7;
+    max-width: 380px;
+    margin-bottom: 2.25rem;
+}
+
+.hero-home__btns {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.hero-home__btn-primary {
+    background: var(--leaf-green);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 26px;
+    border-radius: var(--radius-card);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    box-shadow: var(--elevation-1);
+}
+
+.hero-home__btn-primary i { font-size: 18px; }
+
+.hero-home__btn-primary:hover {
+    background: var(--forest-anchor);
+    transform: translateY(-3px);
+    box-shadow: var(--elevation-2);
+}
+
+.hero-home__btn-ghost {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 13px 18px;
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: var(--transition-standard);
+}
+
+.hero-home__btn-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Right panel ── */
+.hero-home__right {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.hero-home__photo-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.hero-home__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* Soft left-edge vignette so photo doesn't fight left panel */
+.hero-home__photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        rgba(27, 94, 32, 0.35) 0%,
+        transparent 40%
+    );
+}
+
+/* ── Floating stat card ── */
+.hero-home__stat-card {
+    position: relative;
+    z-index: 2;
+    margin: 0 20px 20px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(200, 230, 201, 0.6);
+    border-radius: var(--radius-organic);
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+}
+
+.hero-home__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 8px;
+}
+
+.hero-home__stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--forest-anchor);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.hero-home__stat-plus {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--leaf-green);
+}
+
+.hero-home__stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.3;
+}
+
+.hero-home__stat-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--sage-soft);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .hero-home {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .hero-home__left {
+        padding: 3.5rem 2rem 3rem;
+    }
+
+    .hero-home__right {
+        height: 320px;
+    }
+
+    .hero-home__stat-card {
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        margin: 0 16px 16px;
+    }
+
+    /* Hide last stat on small screens */
+    .hero-home__stat:last-child,
+    .hero-home__stat-divider:last-of-type {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-home__h1 { font-size: 30px; }
+    .hero-home__sub { font-size: 14px; }
+    .hero-home__btns { flex-direction: column; align-items: flex-start; }
+    .hero-home__stat-card { grid-template-columns: 1fr auto 1fr; }
+    .hero-home__stat:nth-child(4),
+    .hero-home__stat:nth-child(5),
+    .hero-home__stat-divider:nth-child(4),
+    .hero-home__stat-divider:nth-child(6) { display: none; }
+}
+
+
+/* ─────────────────────────────────────────
+   3. TRANSFORMATION STRIP
+   Sage-soft background section immediately
+   below the hero — visceral before/after.
+───────────────────────────────────────── */
+
+.transform-strip {
+    background: var(--fresh-mint);
+    border-top: 1px solid var(--sage-soft);
+    border-bottom: 1px solid var(--sage-soft);
+    padding: 2.5rem 0;
+}
+
+.transform-strip__eyebrow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--forest-anchor);
+    margin-bottom: 1.5rem;
+}
+
+.transform-strip__panels {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: center;
+    gap: 0 16px;
+}
+
+/* ── Panel shared ── */
+.transform-strip__panel {
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    border: 1px solid var(--sage-soft);
+    background: var(--white);
+    box-shadow: var(--elevation-1);
+}
+
+.transform-strip__panel-photo {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.transform-strip__panel-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.transform-strip__panel:hover .transform-strip__panel-photo img {
+    transform: scale(1.04);
+}
+
+/* Label badge over photo */
+.transform-strip__label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.transform-strip__label i { font-size: 13px; }
+
+.transform-strip__label--before {
+    background: rgba(255, 255, 255, 0.9);
+    color: #7a5c42;
+    border: 1px solid rgba(122, 92, 66, 0.25);
+}
+
+.transform-strip__label--after {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--forest-anchor);
+    border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+/* Trait lists below photo */
+.transform-strip__traits {
+    list-style: none;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.transform-strip__traits li {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transform-strip__traits li i {
+    font-size: 12px;
+    color: #b0a090;
+    flex-shrink: 0;
+    width: 14px;
+}
+
+.transform-strip__traits--after li i {
+    color: var(--leaf-green);
+}
+
+.transform-strip__traits--after li {
+    color: var(--deep-pine);
+    font-weight: 500;
+}
+
+/* ── Centre arrow ── */
+.transform-strip__arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.transform-strip__arrow-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--leaf-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--elevation-1);
+}
+
+.transform-strip__arrow-icon i {
+    color: var(--white);
+    font-size: 18px;
+}
+
+.transform-strip__arrow-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--forest-anchor);
+    text-transform: uppercase;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+    .transform-strip__panels {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 12px 0;
+    }
+
+    .transform-strip__arrow {
+        flex-direction: row;
+        padding: 4px 0;
+    }
+
+    .transform-strip__arrow-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .transform-strip__arrow-icon i {
+        transform: rotate(90deg);
+    }
+}

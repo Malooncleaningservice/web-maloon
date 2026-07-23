@@ -1,0 +1,29 @@
+---
+layout: base.njk
+pageKey: mobile-cta
+locale: en
+permalink: /mobile-cta.html
+---
+
+{% set localeData = en %}
+
+<section class="mobile-cta-container">
+    <div class="mobile-cta-content">
+        <div class="cta-icon">✨</div>
+        <h1>Get Your Free Cleaning Quote</h1>
+        <p>Professional cleaning services for your business or home in Columbus, OH</p>
+        
+        <div class="cta-buttons">
+            <a href="{{ localeData.contact.whatsapp }}" class="btn-primary btn-large">
+                <i class="fab fa-whatsapp"></i>
+                Message on WhatsApp
+            </a>
+            <a href="tel:6145551234" class="btn-secondary btn-large">
+                <i class="fas fa-phone"></i>
+                Call 614-555-1234
+            </a>
+        </div>
+        
+        <p class="small-text">Available Mon-Sat, 8:00 AM - 6:00 PM</p>
+    </div>
+</section>
