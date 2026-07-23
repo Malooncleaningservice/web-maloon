@@ -246,6 +246,7 @@ p {
     gap: 0.5rem;
     white-space: nowrap;
     flex-wrap: nowrap;
+    justify-content: center;
 }
 
 .menu-item a {
