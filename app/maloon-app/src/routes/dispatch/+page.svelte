@@ -25,6 +25,11 @@
 	let assigning = $state<Record<string, boolean>>({});
 	let removing = $state<Record<string, boolean>>({});
 	let statusChanging = $state<Record<string, boolean>>({});
+	let expandedJobs = $state<Record<string, boolean>>({});
+
+	function toggleExpand(jobId: string) {
+		expandedJobs[jobId] = !expandedJobs[jobId];
+	}
 
 	function getMonday(d: Date) {
 		const m = new Date(d);
@@ -408,74 +413,92 @@
 						</div>
 
 						<div class="job-actions-panel">
-							<!-- Assigned Workers -->
-							<div style="margin-bottom: 8px;">
+							<!-- Compact summary -->
+							<div class="job-summary-row">
 								{#if job.assignments?.length}
-									{#each job.assignments as a}
-										<div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-											<span style="font-size: 0.82rem;">
-												👷 {a.worker?.firstName} {a.worker?.lastName}
-												{#if a.scheduledDate}<span class="text-secondary"> ({formatTime(a.scheduledDate)})</span>{/if}
-											</span>
-											<button class="btn btn-danger btn-sm" style="padding: 1px 5px; font-size: 0.65rem;"
-												onclick={() => removeAssignment(job.id, a.id)}
-												disabled={removing[a.id]}>✕</button>
-										</div>
-									{/each}
+									<span class="text-secondary" style="font-size: 0.82rem;">
+										👷 {job.assignments.map((a: any) => a.worker?.firstName).join(', ')}
+									</span>
 								{:else}
-									<span class="text-secondary" style="font-size: 0.82rem;">No workers assigned</span>
+									<span class="badge badge-pending" style="font-size: 0.7rem;">Unassigned</span>
 								{/if}
+								<button class="btn btn-outline btn-sm manage-btn" onclick={() => toggleExpand(job.id)}>
+									{expandedJobs[job.id] ? 'Close' : 'Manage'}
+								</button>
 							</div>
 
-							<!-- Quick Assign -->
-							{#if unassignedForJob(job).length > 0}
-								<div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-									<select
-										bind:value={assignWorker[job.id]}
-										style="font-size: 0.78rem; padding: 3px 6px; min-width: 120px;"
-									>
-										<option value="">+ Assign...</option>
-										{#each unassignedForJob(job) as w}
-											<option value={w.id}>{w.firstName} {w.lastName}</option>
-										{/each}
-									</select>
-									<input type="time" bind:value={assignTime[job.id]} style="font-size: 0.75rem; padding: 3px 6px; width: 100px;" placeholder="Time" />
-									<button
-										class="btn btn-primary btn-sm"
-										style="font-size: 0.72rem; padding: 3px 8px;"
-										onclick={() => assignWorkerToJob(job.id)}
-										disabled={assigning[job.id] || !assignWorker[job.id]}
-									>
-										{assigning[job.id] ? '...' : 'Go'}
-									</button>
+							{#if expandedJobs[job.id]}
+								<div class="job-manage-panel">
+									<!-- Assigned Workers -->
+									<div style="margin-bottom: 8px;">
+										{#if job.assignments?.length}
+											{#each job.assignments as a}
+												<div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
+													<span style="font-size: 0.82rem;">
+														👷 {a.worker?.firstName} {a.worker?.lastName}
+														{#if a.scheduledDate}<span class="text-secondary"> ({formatTime(a.scheduledDate)})</span>{/if}
+													</span>
+													<button class="btn btn-danger btn-sm" style="padding: 1px 5px; font-size: 0.65rem;"
+														onclick={() => removeAssignment(job.id, a.id)}
+														disabled={removing[a.id]}>✕</button>
+												</div>
+											{/each}
+										{:else}
+											<span class="text-secondary" style="font-size: 0.82rem;">No workers assigned</span>
+										{/if}
+									</div>
+
+									<!-- Quick Assign -->
+									{#if unassignedForJob(job).length > 0}
+										<div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+											<select
+												bind:value={assignWorker[job.id]}
+												style="font-size: 0.78rem; padding: 3px 6px; min-width: 120px;"
+											>
+												<option value="">+ Assign...</option>
+												{#each unassignedForJob(job) as w}
+													<option value={w.id}>{w.firstName} {w.lastName}</option>
+												{/each}
+											</select>
+											<input type="time" bind:value={assignTime[job.id]} style="font-size: 0.75rem; padding: 3px 6px; width: 100px;" placeholder="Time" />
+											<button
+												class="btn btn-primary btn-sm"
+												style="font-size: 0.72rem; padding: 3px 8px;"
+												onclick={() => assignWorkerToJob(job.id)}
+												disabled={assigning[job.id] || !assignWorker[job.id]}
+											>
+												{assigning[job.id] ? '...' : 'Go'}
+											</button>
+										</div>
+									{/if}
+
+									<!-- Quick Status Actions -->
+									<div style="margin-top: 8px; display: flex; gap: 4px;">
+										{#if job.status === 'pending'}
+											<button class="btn btn-primary btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
+												onclick={() => changeJobStatus(job.id, 'in_progress')}
+												disabled={statusChanging[job.id]}>▶ Start</button>
+											<button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
+												onclick={() => changeJobStatus(job.id, 'cancelled')}
+												disabled={statusChanging[job.id]}>✕ Cancel</button>
+										{:else if job.status === 'in_progress'}
+											<button class="btn btn-success btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
+												onclick={() => changeJobStatus(job.id, 'completed')}
+												disabled={statusChanging[job.id]}>✓ Complete</button>
+											<button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
+												onclick={() => changeJobStatus(job.id, 'cancelled')}
+												disabled={statusChanging[job.id]}>✕ Cancel</button>
+										{:else if job.status === 'cancelled'}
+											<button class="btn btn-outline btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
+												onclick={() => changeJobStatus(job.id, 'pending')}
+												disabled={statusChanging[job.id]}>↩ Reopen</button>
+										{/if}
+										{#if statusChanging[job.id]}
+											<span style="font-size: 0.7rem;">updating...</span>
+										{/if}
+									</div>
 								</div>
 							{/if}
-
-							<!-- Quick Status Actions -->
-							<div style="margin-top: 8px; display: flex; gap: 4px;">
-								{#if job.status === 'pending'}
-									<button class="btn btn-primary btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
-										onclick={() => changeJobStatus(job.id, 'in_progress')}
-										disabled={statusChanging[job.id]}>▶ Start</button>
-									<button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
-										onclick={() => changeJobStatus(job.id, 'cancelled')}
-										disabled={statusChanging[job.id]}>✕ Cancel</button>
-								{:else if job.status === 'in_progress'}
-									<button class="btn btn-success btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
-										onclick={() => changeJobStatus(job.id, 'completed')}
-										disabled={statusChanging[job.id]}>✓ Complete</button>
-									<button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
-										onclick={() => changeJobStatus(job.id, 'cancelled')}
-										disabled={statusChanging[job.id]}>✕ Cancel</button>
-								{:else if job.status === 'cancelled'}
-									<button class="btn btn-outline btn-sm" style="font-size: 0.7rem; padding: 3px 8px;"
-										onclick={() => changeJobStatus(job.id, 'pending')}
-										disabled={statusChanging[job.id]}>↩ Reopen</button>
-								{/if}
-								{#if statusChanging[job.id]}
-									<span style="font-size: 0.7rem;">updating...</span>
-								{/if}
-							</div>
 						</div>
 					</div>
 				</div>
@@ -570,6 +593,13 @@
 	/* Day view: job list + sticky worker sidebar */
 	.day-layout { display: flex; gap: 16px; align-items: flex-start; }
 	.job-actions-panel { min-width: 280px; }
+	.job-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+	.manage-btn { font-size: 0.72rem; padding: 3px 10px; flex-shrink: 0; }
+	.job-manage-panel {
+		margin-top: 10px;
+		padding-top: 10px;
+		border-top: 1px dashed var(--border);
+	}
 	.worker-sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 80px; }
 	.worker-sidebar-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
 	.worker-sidebar-item:last-child { border-bottom: none; }

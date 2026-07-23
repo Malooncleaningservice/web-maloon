@@ -46,6 +46,16 @@
 	let newTaskRequiredPhoto = $state(false);
 	let addingTaskToSection = $state<string | null>(null);
 
+	// --- Tabs ---
+	let activeTab = $state<'overview' | 'checklist'>('overview');
+	let totalTaskCount = $derived(
+		startWithTasks.length + sections.reduce((sum, s) => sum + s.tasks.length, 0)
+	);
+	let completedTaskCount = $derived(
+		startWithTasks.filter((t) => t.completed).length +
+			sections.reduce((sum, s) => sum + completedCount(s), 0)
+	);
+
 	onMount(async () => {
 		jobId = $page.params.id;
 		await loadJob();
@@ -393,44 +403,164 @@
 		</div>
 	</div>
 
-	<!-- Status & Assignment Row -->
-	<div class="row mb-4" style="gap: 12px; flex-wrap: wrap;">
-		<!-- Status Buttons -->
-		<div style="display: flex; gap: 6px; align-items: center;">
-			{#if job.status === 'pending'}
-				<button class="btn btn-primary btn-sm" onclick={() => updateStatus('in_progress')} disabled={statusUpdating}>
-					▶ Start Job
+	<!-- Tabs -->
+	<div class="tab-bar">
+		<button class="tab-btn" class:active={activeTab === 'overview'} onclick={() => activeTab = 'overview'}>
+			Overview
+		</button>
+		<button class="tab-btn" class:active={activeTab === 'checklist'} onclick={() => activeTab = 'checklist'}>
+			Checklist{#if totalTaskCount > 0} <span class="text-secondary">({completedTaskCount}/{totalTaskCount})</span>{/if}
+		</button>
+	</div>
+
+	{#if activeTab === 'overview'}
+		<!-- Status & Assignment Row -->
+		<div class="row mb-4" style="gap: 12px; flex-wrap: wrap;">
+			<!-- Status Buttons -->
+			<div style="display: flex; gap: 6px; align-items: center;">
+				{#if job.status === 'pending'}
+					<button class="btn btn-primary btn-sm" onclick={() => updateStatus('in_progress')} disabled={statusUpdating}>
+						▶ Start Job
+					</button>
+				{/if}
+				{#if job.status === 'in_progress'}
+					<button class="btn btn-success btn-sm" onclick={() => updateStatus('completed')} disabled={statusUpdating}>
+						✅ Mark Complete
+					</button>
+				{/if}
+				{#if job.status !== 'completed' && job.status !== 'cancelled'}
+					<button class="btn btn-outline btn-sm" onclick={() => updateStatus('cancelled')} disabled={statusUpdating}>
+						✕ Cancel
+					</button>
+				{/if}
+				{#if job.status === 'cancelled'}
+					<button class="btn btn-outline btn-sm" onclick={() => updateStatus('pending')} disabled={statusUpdating}>
+						↩ Reopen
+					</button>
+				{/if}
+			</div>
+
+			<!-- Worker Assignments -->
+			<div style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
+				{#if assignments.length > 0}
+					<span class="text-secondary" style="font-size: 0.85rem;">
+						👷 {assignments.map(a => `${a.worker.firstName} ${a.worker.lastName}`).join(', ')}
+					</span>
+				{/if}
+				<button class="btn btn-outline btn-sm" onclick={() => showAssignPanel = true}>
+					Manage Workers
 				</button>
-			{/if}
-			{#if job.status === 'in_progress'}
-				<button class="btn btn-success btn-sm" onclick={() => updateStatus('completed')} disabled={statusUpdating}>
-					✅ Mark Complete
-				</button>
-			{/if}
-			{#if job.status !== 'completed' && job.status !== 'cancelled'}
-				<button class="btn btn-outline btn-sm" onclick={() => updateStatus('cancelled')} disabled={statusUpdating}>
-					✕ Cancel
-				</button>
-			{/if}
-			{#if job.status === 'cancelled'}
-				<button class="btn btn-outline btn-sm" onclick={() => updateStatus('pending')} disabled={statusUpdating}>
-					↩ Reopen
-				</button>
-			{/if}
+			</div>
 		</div>
 
-		<!-- Worker Assignments -->
-		<div style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
-			{#if assignments.length > 0}
-				<span class="text-secondary" style="font-size: 0.85rem;">
-					👷 {assignments.map(a => `${a.worker.firstName} ${a.worker.lastName}`).join(', ')}
-				</span>
+		<!-- Job Edit & Recurrence Panel -->
+		<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+			{#if job.total != null && job.total > 0}
+				<span class="fw-bold" style="font-size: 1rem;">${job.total.toFixed(2)}</span>
 			{/if}
-			<button class="btn btn-outline btn-sm" onclick={() => showAssignPanel = true}>
-				Manage Workers
-			</button>
+			<button class="btn btn-outline btn-sm" onclick={openEdit}>✎ Edit Details</button>
+			{#if job.isRecurring}
+				<button class="btn btn-primary btn-sm" onclick={generateRecurring} disabled={generating}>
+					{generating ? 'Generating...' : '🔄 Generate Instances'}
+				</button>
+			{/if}
 		</div>
-	</div>
+		{#if generateMessage}
+			<div class="card {generateMessage.startsWith('Generated') ? 'card-tint-success' : 'card-tint-warn'}" style="margin-bottom: 12px; padding: 8px 12px;">
+				<p style="font-size: 0.85rem;">{generateMessage}</p>
+			</div>
+		{/if}
+
+		<!-- Notes (if present) -->
+		{#if job.notes}
+			<div class="card card-tint-warn">
+				<span class="text-secondary" style="font-size: 0.8rem;">Job Notes</span>
+				<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
+			</div>
+		{/if}
+	{:else}
+		<!-- Start With Tasks -->
+		<div class="card">
+			<h3 style="font-size: 1rem; margin-bottom: 8px;">⚡ Start With (Prep Tasks)</h3>
+			{#each startWithTasks as task}
+				<div class="task-row">
+					<input id="sw-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleStartWith(task.id, e.currentTarget.checked)} />
+					<label for="sw-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; color: {task.completed ? 'var(--text-secondary)' : 'var(--text)'}; cursor: pointer;">
+						{task.description}
+					</label>
+				</div>
+			{/each}
+			<div class="row mt-2">
+				<div class="col"><input placeholder="Add prep task..." bind:value={newTaskDesc} onkeydown={(e) => e.key === 'Enter' && addStartWithTask()} /></div>
+				<button class="btn btn-primary btn-sm" onclick={addStartWithTask}>+ Add</button>
+			</div>
+		</div>
+
+		<!-- Sections -->
+		{#each sections as section}
+			<details class="section-card" open={section.expanded}>
+				<summary>
+					<span>{section.name}</span>
+					<span class="text-secondary">{completedCount(section)}/{section.tasks.length} done</span>
+				</summary>
+				<div class="section-body">
+					{#each section.tasks as task}
+						<div class="task-row" style="flex-wrap: wrap;">
+							<div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
+								<input id="t-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleTask(section.id, task.id, e.currentTarget.checked)} />
+								<label for="t-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; cursor: pointer;">
+									{task.description}
+								</label>
+								<label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.7rem;" title="Require photo to complete">
+									<input type="checkbox" checked={task.requiredPhoto} onchange={(e) => toggleRequiredPhoto(section.id, task.id, e.currentTarget.checked)} />
+									📷
+								</label>
+							</div>
+							<div style="display: flex; align-items: center; gap: 8px;">
+								<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.75rem; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px;">
+									📎 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Photo'}
+									<input type="file" accept="image/*" style="display: none;" onchange={(e) => handlePhotoFile(section.id, task.id, e)} disabled={uploadingPhotoForTask === task.id} />
+								</label>
+								{#if task.photos && task.photos.length > 0}
+									{#each task.photos as photo}
+										<button
+											class="btn btn-success btn-sm"
+											style="padding: 2px 6px; font-size: 0.7rem;"
+											onclick={() => showingPhotoUrl = photo.url}
+										>
+											🖼 View
+										</button>
+									{/each}
+								{/if}
+							</div>
+						</div>
+					{/each}
+
+					{#if addingTaskToSection === section.id}
+						<div class="row mt-2">
+							<div class="col"><input placeholder="Task description..." bind:value={newTaskDesc} onkeydown={(e) => e.key === 'Enter' && addTask(section.id)} /></div>
+							<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap;">
+								<input type="checkbox" bind:checked={newTaskRequiredPhoto} />
+								📷 req
+							</label>
+							<button class="btn btn-primary btn-sm" onclick={() => addTask(section.id)}>Add</button>
+							<button class="btn btn-outline btn-sm" onclick={() => { addingTaskToSection = null; newTaskRequiredPhoto = false; }}>Cancel</button>
+						</div>
+					{:else}
+						<button class="btn btn-outline btn-sm mt-2" onclick={() => addingTaskToSection = section.id}>
+							+ Add Task
+						</button>
+					{/if}
+				</div>
+			</details>
+		{/each}
+
+		<!-- Add Section -->
+		<div class="row mt-4">
+			<div class="col"><input placeholder="New section name (e.g. Break Room)..." bind:value={newSectionName} onkeydown={(e) => e.key === 'Enter' && addSection()} /></div>
+			<button class="btn btn-primary" onclick={addSection}>+ Add Section</button>
+		</div>
+	{/if}
 
 	<!-- Worker Assignment Modal -->
 	<Modal bind:open={showAssignPanel} title="Worker Assignment" maxWidth="440px">
@@ -468,24 +598,7 @@
 		{/if}
 	</Modal>
 
-	<!-- Job Edit & Recurrence Panel -->
-	<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-		{#if job.total != null && job.total > 0}
-			<span class="fw-bold" style="font-size: 1rem;">${job.total.toFixed(2)}</span>
-		{/if}
-		<button class="btn btn-outline btn-sm" onclick={openEdit}>✎ Edit Details</button>
-		{#if job.isRecurring}
-			<button class="btn btn-primary btn-sm" onclick={generateRecurring} disabled={generating}>
-				{generating ? 'Generating...' : '🔄 Generate Instances'}
-			</button>
-		{/if}
-	</div>
-	{#if generateMessage}
-		<div class="card {generateMessage.startsWith('Generated') ? 'card-tint-success' : 'card-tint-warn'}" style="margin-bottom: 12px; padding: 8px 12px;">
-			<p style="font-size: 0.85rem;">{generateMessage}</p>
-		</div>
-	{/if}
-
+	<!-- Edit Job Details Modal -->
 	<Modal bind:open={showEditPanel} title="Edit Job Details" maxWidth="440px">
 		<div class="row mb-2">
 			<div class="col"><label for="ejTotal">Total ($)</label><input id="ejTotal" type="number" step="0.01" min="0" bind:value={editTotal} /></div>
@@ -518,94 +631,4 @@
 			<button class="btn btn-outline btn-sm" onclick={() => showEditPanel = false}>Cancel</button>
 		</div>
 	</Modal>
-
-	<!-- Start With Tasks -->
-	<div class="card">
-		<h3 style="font-size: 1rem; margin-bottom: 8px;">⚡ Start With (Prep Tasks)</h3>
-		{#each startWithTasks as task}
-			<div class="task-row">
-				<input id="sw-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleStartWith(task.id, e.currentTarget.checked)} />
-				<label for="sw-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; color: {task.completed ? 'var(--text-secondary)' : 'var(--text)'}; cursor: pointer;">
-					{task.description}
-				</label>
-			</div>
-		{/each}
-		<div class="row mt-2">
-			<div class="col"><input placeholder="Add prep task..." bind:value={newTaskDesc} onkeydown={(e) => e.key === 'Enter' && addStartWithTask()} /></div>
-			<button class="btn btn-primary btn-sm" onclick={addStartWithTask}>+ Add</button>
-		</div>
-	</div>
-
-	<!-- Notes (if present) -->
-	{#if job.notes}
-		<div class="card card-tint-warn">
-			<span class="text-secondary" style="font-size: 0.8rem;">Job Notes</span>
-			<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
-		</div>
-	{/if}
-
-	<!-- Sections -->
-	{#each sections as section}
-		<details class="section-card" open={section.expanded}>
-			<summary>
-				<span>{section.name}</span>
-				<span class="text-secondary">{completedCount(section)}/{section.tasks.length} done</span>
-			</summary>
-			<div class="section-body">
-				{#each section.tasks as task}
-					<div class="task-row" style="flex-wrap: wrap;">
-						<div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
-							<input id="t-{task.id}" type="checkbox" checked={task.completed} onchange={(e) => toggleTask(section.id, task.id, e.currentTarget.checked)} />
-							<label for="t-{task.id}" class="task-desc" style="text-decoration: {task.completed ? 'line-through' : 'none'}; cursor: pointer;">
-								{task.description}
-							</label>
-							<label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.7rem;" title="Require photo to complete">
-								<input type="checkbox" checked={task.requiredPhoto} onchange={(e) => toggleRequiredPhoto(section.id, task.id, e.currentTarget.checked)} />
-								📷
-							</label>
-						</div>
-						<div style="display: flex; align-items: center; gap: 8px;">
-							<label class="btn btn-outline btn-sm" style="cursor: pointer; font-size: 0.75rem; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px;">
-								📎 {uploadingPhotoForTask === task.id ? 'Uploading...' : 'Photo'}
-								<input type="file" accept="image/*" style="display: none;" onchange={(e) => handlePhotoFile(section.id, task.id, e)} disabled={uploadingPhotoForTask === task.id} />
-							</label>
-							{#if task.photos && task.photos.length > 0}
-								{#each task.photos as photo}
-									<button
-										class="btn btn-success btn-sm"
-										style="padding: 2px 6px; font-size: 0.7rem;"
-										onclick={() => showingPhotoUrl = photo.url}
-									>
-										🖼 View
-									</button>
-								{/each}
-							{/if}
-						</div>
-					</div>
-				{/each}
-
-				{#if addingTaskToSection === section.id}
-					<div class="row mt-2">
-						<div class="col"><input placeholder="Task description..." bind:value={newTaskDesc} onkeydown={(e) => e.key === 'Enter' && addTask(section.id)} /></div>
-						<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap;">
-							<input type="checkbox" bind:checked={newTaskRequiredPhoto} />
-							📷 req
-						</label>
-						<button class="btn btn-primary btn-sm" onclick={() => addTask(section.id)}>Add</button>
-						<button class="btn btn-outline btn-sm" onclick={() => { addingTaskToSection = null; newTaskRequiredPhoto = false; }}>Cancel</button>
-					</div>
-				{:else}
-					<button class="btn btn-outline btn-sm mt-2" onclick={() => addingTaskToSection = section.id}>
-						+ Add Task
-					</button>
-				{/if}
-			</div>
-		</details>
-	{/each}
-
-	<!-- Add Section -->
-	<div class="row mt-4">
-		<div class="col"><input placeholder="New section name (e.g. Break Room)..." bind:value={newSectionName} onkeydown={(e) => e.key === 'Enter' && addSection()} /></div>
-		<button class="btn btn-primary" onclick={addSection}>+ Add Section</button>
-	</div>
 {/if}

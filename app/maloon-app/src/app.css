@@ -273,6 +273,28 @@ table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text
 .checkbox-tile.checked { border-color: var(--primary); background: var(--primary-light); }
 .checkbox-tile input { display: none; }
 
+/* Tab bar — used to split up large detail pages (e.g. job detail) into sections */
+.tab-bar {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 16px;
+	border-bottom: 2px solid var(--border);
+}
+.tab-btn {
+	padding: 10px 16px;
+	border: none;
+	background: none;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-secondary);
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	transition: color var(--transition), border-color var(--transition);
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--primary-dark); border-color: var(--primary); }
+
 .size-popup {
 	position: absolute;
 	top: 100%;
