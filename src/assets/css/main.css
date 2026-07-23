@@ -1021,7 +1021,7 @@ p {
     transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.reveal.active {
+.reveal.reveal-active {
     opacity: 1;
     transform: translateY(0);
 }
