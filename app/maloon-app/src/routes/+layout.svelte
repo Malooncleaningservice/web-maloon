@@ -91,7 +91,8 @@
 				</button>
 			{:else}
 				<nav class="worker-links">
-					<a href="/worker">Dashboard</a>
+					<a href="/worker">Home</a>
+					<a href="/worker/jobs">Jobs</a>
 					<a href="/worker/profile">Profile</a>
 				</nav>
 			{/if}

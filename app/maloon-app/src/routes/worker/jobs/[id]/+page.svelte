@@ -354,7 +354,7 @@
 	{@const p = progress()}
 	<div class="job-sticky-header">
 		<div style="display: flex; align-items: center; gap: 10px;">
-			<a href="/worker" aria-label="Back to jobs" style="color: var(--primary); text-decoration: none; font-size: 1.3rem; line-height: 1; padding: 4px 8px 4px 0;">←</a>
+			<a href="/worker/jobs" aria-label="Back to jobs" style="color: var(--primary); text-decoration: none; font-size: 1.3rem; line-height: 1; padding: 4px 8px 4px 0;">←</a>
 			<div style="flex: 1; min-width: 0;">
 				<h2 style="font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{job.clientName}</h2>
 			</div>
