@@ -1,57 +1,41 @@
 <script lang="ts">
 	import '../../app.css';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 
 	type Job = {
 		id: string; clientName: string; address: string; status: string; scheduledDate: string | null;
-		sections?: Array<{ id: string; name: string; tasks: Array<{ id: string; description: string; completed: boolean }> }>;
-		startWithTasks?: Array<{ id: string; description: string; completed: boolean }>;
+		assignments?: Array<{ workerId: string }>;
 	};
 
 	let user = $state<{ id: string; displayName: string | null; workerId: string | null; worker?: { firstName: string; lastName: string } | null } | null>(null);
 	let jobs = $state<Job[]>([]);
 	let loading = $state(true);
-	let startingJob = $state(false);
+	let now = $state(Date.now());
+	let timer: ReturnType<typeof setInterval> | undefined;
 
 	onMount(async () => {
 		try {
 			const meRes = await fetch('/api/auth/me');
 			if (meRes.ok) user = await meRes.json();
-
 			if (user?.workerId) {
-				await loadAssignedJobs();
+				const res = await fetch('/api/worker/jobs');
+				if (res.ok) jobs = await res.json();
 			}
 		} catch { /* ignore */ }
 		loading = false;
+		timer = setInterval(() => (now = Date.now()), 30000);
 	});
 
-	async function loadAssignedJobs() {
-		try {
-			const res = await fetch('/api/worker/jobs');
-			if (res.ok) {
-				jobs = await res.json();
-			}
-		} catch { /* ignore */ }
-	}
+	onDestroy(() => {
+		if (timer) clearInterval(timer);
+	});
 
-	function completedTasks(job: Job): { total: number; done: number } {
-		let total = 0, done = 0;
-		if (job.sections) {
-			for (const s of job.sections) {
-				if (s.tasks) {
-					for (const t of s.tasks) {
-						total++;
-						if (t.completed) done++;
-					}
-				}
-			}
-		}
-		if (job.startWithTasks) {
-			total += job.startWithTasks.length;
-			done += job.startWithTasks.filter((t) => t.completed).length;
-		}
-		return { total, done };
+	function isToday(iso: string | null): boolean {
+		if (!iso) return false;
+		const d = new Date(iso);
+		const n = new Date();
+		return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
 	}
 
 	function byDate(a: Job, b: Job): number {
@@ -61,34 +45,51 @@
 		return new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime();
 	}
 
-	function isToday(iso: string | null): boolean {
-		if (!iso) return false;
-		const d = new Date(iso);
-		const now = new Date();
-		return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-	}
-
-	function formatDate(iso: string | null): string {
-		if (!iso) return '';
-		const d = new Date(iso);
-		const dateStr = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-		const hasTime = d.getHours() !== 0 || d.getMinutes() !== 0;
-		return hasTime ? `${dateStr} · ${d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}` : dateStr;
-	}
-
 	function mapsUrl(address: string): string {
 		return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
 	}
 
+	function formatTime(iso: string): string {
+		return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+	}
+
+	function crewLabel(job: Job): string {
+		const n = job.assignments?.length ?? 0;
+		return n <= 1 ? 'Solo job' : `${n} crew`;
+	}
+
 	let activeJobs = $derived(jobs.filter((j) => j.status !== 'completed' && j.status !== 'cancelled').sort(byDate));
 	let nextJob = $derived(activeJobs.find((j) => j.status === 'in_progress') ?? activeJobs[0] ?? null);
-	let todayJobs = $derived(activeJobs.filter((j) => j !== nextJob && isToday(j.scheduledDate)));
-	let upcomingJobs = $derived(activeJobs.filter((j) => j !== nextJob && !isToday(j.scheduledDate)));
-	let doneJobs = $derived(jobs.filter((j) => j.status === 'completed').sort(byDate));
+	let laterToday = $derived(activeJobs.filter((j) => j !== nextJob && isToday(j.scheduledDate)));
+
+	let jobsTodayCount = $derived(jobs.filter((j) => j.status !== 'cancelled' && isToday(j.scheduledDate)).length);
+	let completedTodayCount = $derived(jobs.filter((j) => j.status === 'completed' && isToday(j.scheduledDate)).length);
+
+	let nextJobIn = $derived.by(() => {
+		if (!nextJob) return '—';
+		if (nextJob.status === 'in_progress') return 'Now';
+		if (!nextJob.scheduledDate) return '—';
+		const diffMs = new Date(nextJob.scheduledDate).getTime() - now;
+		if (diffMs <= 0) return 'Now';
+		const mins = Math.round(diffMs / 60000);
+		if (mins < 60) return `${mins}m`;
+		const hrs = Math.floor(mins / 60);
+		const remMins = mins % 60;
+		return remMins > 0 ? `${hrs}h ${remMins}m` : `${hrs}h`;
+	});
+
+	let greeting = $derived.by(() => {
+		const hour = new Date(now).getHours();
+		if (hour < 12) return 'Good morning';
+		if (hour < 17) return 'Good afternoon';
+		return 'Good evening';
+	});
+
+	let firstName = $derived(user?.worker?.firstName || user?.displayName || 'there');
+	let todayLabel = $derived(new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
 
 	async function heroAction(job: Job) {
 		if (job.status === 'pending') {
-			startingJob = true;
 			try {
 				await fetch(`/api/worker/jobs/${job.id}`, {
 					method: 'PATCH',
@@ -96,117 +97,115 @@
 					body: JSON.stringify({ status: 'in_progress' })
 				});
 			} catch { /* ignore */ }
-			startingJob = false;
 		}
 		goto(`/worker/jobs/${job.id}`);
 	}
-
-	let greeting = $state('');
-	onMount(() => {
-		const hour = new Date().getHours();
-		if (hour < 12) greeting = 'Good morning';
-		else if (hour < 17) greeting = 'Good afternoon';
-		else greeting = 'Good evening';
-	});
 </script>
 
-{#snippet jobCard(job: Job)}
-	<a href="/worker/jobs/{job.id}" class="job-card">
-		<div class="card">
-			<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-				<h3 style="font-size: 1rem; flex: 1;">{job.clientName}</h3>
-				<span class="badge badge-status-{job.status}">
-					{job.status.replace('_', ' ').toUpperCase()}
-				</span>
-			</div>
-			<p class="text-secondary">{job.address}</p>
-			{#if job.scheduledDate}
-				<p class="text-secondary">📅 {formatDate(job.scheduledDate)}</p>
-			{/if}
-			{#if completedTasks(job).total > 0}
-				<div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-					<div class="progress-track" style="flex: 1;">
-						<div class="progress-fill" style="width: {completedTasks(job).done / completedTasks(job).total * 100}%"></div>
-					</div>
-					<span style="font-size: 0.8rem; font-weight: 600; white-space: nowrap;">
-						{completedTasks(job).done}/{completedTasks(job).total}
-					</span>
-				</div>
-			{/if}
-		</div>
-	</a>
-{/snippet}
+<div class="wh-topband">
+	<div class="wh-topband-row">
+		<span class="wh-logo">Maloon Service</span>
+	</div>
+	<div class="wh-date">{todayLabel}</div>
+	<div class="wh-greeting">{greeting}, {firstName}</div>
+</div>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
 		<p class="text-secondary">Loading...</p>
 	</div>
+{:else if jobs.length === 0}
+	<div class="wh-glass wh-empty">
+		<div class="wh-icon">
+			<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l6 6v14H6z" /><path d="M14 2v6h6" /><path d="M9 13h6" /><path d="M9 17h6" /></svg>
+		</div>
+		<h3 style="margin-bottom: 6px;">No jobs assigned</h3>
+		<p class="text-secondary">You don't have any jobs assigned yet. Check back later or contact your supervisor.</p>
+	</div>
 {:else}
-	<div style="margin-bottom: 20px;">
-		<h2 style="font-size: 1.3rem; margin-bottom: 4px;">
-			{greeting}, {user?.worker?.firstName || user?.displayName || 'Worker'}!
-		</h2>
-		<p class="text-secondary">Here's what's on your plate.</p>
+	<div class="wh-stat-row">
+		<div class="wh-glass wh-stat-tile">
+			<div class="wh-stat-value">{jobsTodayCount}</div>
+			<div class="wh-stat-label">Jobs today</div>
+		</div>
+		<div class="wh-glass wh-stat-tile">
+			<div class="wh-stat-value">{completedTodayCount}</div>
+			<div class="wh-stat-label">Completed</div>
+		</div>
+		<div class="wh-glass wh-stat-tile">
+			<div class="wh-stat-value">{nextJobIn}</div>
+			<div class="wh-stat-label">Next job in</div>
+		</div>
 	</div>
 
-	{#if jobs.length === 0}
-		<div class="card" style="text-align: center; padding: 48px 20px;">
-			<div style="font-size: 3rem; margin-bottom: 12px;">📋</div>
-			<h3 style="margin-bottom: 8px;">No Jobs Assigned</h3>
-			<p class="text-secondary">You don't have any jobs assigned yet. Check back later or contact your supervisor.</p>
-		</div>
-	{:else}
-		{#if nextJob}
-			<div class="hero-card">
-				<div class="hero-label">
-					{nextJob.status === 'in_progress' ? '● In progress' : 'Up next'}
+	{#if nextJob}
+		<h6 class="wh-section-title">Up next</h6>
+		<div class="wh-glass wh-next-card">
+			<div class="wh-next-top">
+				<div>
+					<div class="wh-next-name">{nextJob.clientName}</div>
+					<a href={mapsUrl(nextJob.address)} target="_blank" rel="noopener" class="wh-next-meta wh-next-address">
+						<svg class="wh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.5" /></svg>
+						{nextJob.address}
+					</a>
 				</div>
-				<h3>{nextJob.clientName}</h3>
-				<a href={mapsUrl(nextJob.address)} target="_blank" rel="noopener" class="hero-address" style="color: inherit; display: inline-block; margin-bottom: 4px;">
-					📍 {nextJob.address}
-				</a>
-				{#if nextJob.scheduledDate}
-					<div class="hero-address">📅 {formatDate(nextJob.scheduledDate)}</div>
+				{#if nextJob.status === 'in_progress'}
+					<span class="wh-tag wh-tag-next">In progress</span>
+				{:else if nextJob.scheduledDate}
+					<span class="wh-tag wh-tag-next">{formatTime(nextJob.scheduledDate)}</span>
 				{/if}
-				{#if completedTasks(nextJob).total > 0}
-					<div style="display: flex; align-items: center; gap: 10px; margin-top: 14px;">
-						<div class="progress-track" style="flex: 1;">
-							<div class="progress-fill" style="width: {completedTasks(nextJob).done / completedTasks(nextJob).total * 100}%"></div>
-						</div>
-						<span style="font-size: 0.8rem; font-weight: 600; white-space: nowrap;">
-							{completedTasks(nextJob).done}/{completedTasks(nextJob).total} tasks
-						</span>
-					</div>
-				{/if}
-				<button class="hero-cta" onclick={() => heroAction(nextJob!)} disabled={startingJob}>
-					{startingJob ? 'Starting...' : nextJob.status === 'in_progress' ? 'Continue →' : '▶ Start Job'}
-				</button>
 			</div>
-		{/if}
-
-		{#if todayJobs.length > 0}
-			<div class="job-group-title">Also today</div>
-			{#each todayJobs as job}
-				{@render jobCard(job)}
-			{/each}
-		{/if}
-
-		{#if upcomingJobs.length > 0}
-			<div class="job-group-title">Upcoming</div>
-			{#each upcomingJobs as job}
-				{@render jobCard(job)}
-			{/each}
-		{/if}
-
-		{#if doneJobs.length > 0}
-			<details style="margin-top: 20px;">
-				<summary class="job-group-title" style="cursor: pointer; list-style: none;">
-					✓ Done ({doneJobs.length}) — tap to show
-				</summary>
-				{#each doneJobs as job}
-					{@render jobCard(job)}
-				{/each}
-			</details>
-		{/if}
+			<div class="wh-next-meta">
+				<svg class="wh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.5 2.5-6 6-6s6 2.5 6 6" /><circle cx="17" cy="9" r="2.5" /><path d="M15 14c2.8.3 5 2.6 5 6" /></svg>
+				{crewLabel(nextJob)}
+			</div>
+			<div class="wh-next-actions">
+				<button class="btn btn-primary" onclick={() => heroAction(nextJob!)}>
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 20-8-4-8 4z" /></svg>
+					{nextJob.status === 'in_progress' ? 'Continue' : 'Start job'}
+				</button>
+				<a class="btn btn-outline" href="/worker/jobs/{nextJob.id}">Details</a>
+			</div>
+		</div>
 	{/if}
+
+	{#if laterToday.length > 0}
+		<h6 class="wh-section-title">Later today</h6>
+		{#each laterToday as job}
+			<a class="wh-glass wh-later-card" href="/worker/jobs/{job.id}">
+				<div class="wh-next-top">
+					<div>
+						<div class="wh-later-name">{job.clientName}</div>
+						<div class="wh-next-meta">
+							<svg class="wh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.5" /></svg>
+							{job.address}
+						</div>
+					</div>
+					{#if job.scheduledDate}
+						<span class="wh-tag wh-tag-neutral">{formatTime(job.scheduledDate)}</span>
+					{/if}
+				</div>
+			</a>
+		{/each}
+	{/if}
+
+	<h6 class="wh-section-title">Quick access</h6>
+	<div class="wh-qa-grid">
+		<a class="wh-glass wh-qa-tile" href="/worker/jobs">
+			<svg class="wh-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l1.5 1.5L8 5" /><path d="M4 12l1.5 1.5L8 11" /><path d="M4 18l1.5 1.5L8 17" /><path d="M11 6h9" /><path d="M11 12h9" /><path d="M11 18h9" /></svg>
+			<span>Jobs</span>
+		</a>
+		<a class="wh-glass wh-qa-tile" class:disabled={!nextJob} href={nextJob ? mapsUrl(nextJob.address) : undefined} target={nextJob ? '_blank' : undefined} rel={nextJob ? 'noopener' : undefined}>
+			<svg class="wh-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 20-8-4-8 4z" /></svg>
+			<span>Directions</span>
+		</a>
+		<a class="wh-glass wh-qa-tile" href="/worker/jobs?view=history">
+			<svg class="wh-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>
+			<span>History</span>
+		</a>
+		<a class="wh-glass wh-qa-tile" href="/worker/profile">
+			<svg class="wh-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="10" r="3" /><path d="M6.5 19a6 6 0 0 1 11 0" /></svg>
+			<span>Profile</span>
+		</a>
+	</div>
 {/if}

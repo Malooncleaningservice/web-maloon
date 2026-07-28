@@ -390,9 +390,12 @@ table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text
 	border-radius: var(--radius-sm);
 }
 .worker-tabbar .tab-icon {
-	font-size: 1.3rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	line-height: 1;
-	padding: 2px 14px;
+	padding: 4px 16px;
+	border-radius: var(--radius-sm);
 	transition: background var(--transition);
 }
 @media (min-width: 900px) {
@@ -619,6 +622,129 @@ table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text
 	padding: 14px;
 	font-size: 1rem;
 }
+
+/* ===== Worker Home screen ("Up next" overview) ===== */
+.wh-topband {
+	background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+	color: #fff;
+	padding: 18px 20px 22px;
+	margin: -24px -20px 20px;
+	position: relative;
+	overflow: hidden;
+}
+.wh-topband::before {
+	content: '';
+	position: absolute;
+	top: -20%;
+	right: -15%;
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.08);
+	filter: blur(30px);
+}
+.wh-topband-row { display: flex; justify-content: space-between; align-items: center; position: relative; }
+.wh-logo { font-weight: 800; font-size: 1.05rem; letter-spacing: 0.01em; position: relative; }
+.wh-date {
+	color: var(--primary-light);
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 14px;
+	position: relative;
+}
+.wh-greeting { font-size: 1.3rem; font-weight: 800; margin-top: 2px; position: relative; }
+
+@media (max-width: 600px) {
+	.wh-topband { margin: -16px -12px 20px; padding: 16px 16px 20px; }
+}
+
+/* Glass cards sit over the green band and the mint page background */
+.wh-glass {
+	background: rgba(255, 255, 255, 0.78);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+}
+
+.wh-stat-row { display: flex; gap: 10px; margin-bottom: 22px; }
+.wh-stat-tile { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 8px; text-align: center; }
+.wh-stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); }
+.wh-stat-label { font-size: 0.7rem; color: var(--text-muted); }
+
+.wh-section-title {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--text-secondary);
+	font-weight: 700;
+	margin: 0 0 10px;
+}
+
+.wh-next-card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 16px;
+	margin-bottom: 20px;
+	border: 1.5px solid var(--accent);
+}
+.wh-next-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.wh-next-name { font-size: 1rem; font-weight: 800; color: var(--primary-dark); }
+.wh-next-meta { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+.wh-next-address { color: inherit; text-decoration: none; }
+.wh-next-address:hover { text-decoration: underline; }
+.wh-next-actions { display: flex; gap: 8px; }
+.wh-next-actions .btn { flex: 1; justify-content: center; }
+
+.wh-tag { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.wh-tag-next { background: #ffb74d; color: #5c3d00; }
+.wh-tag-neutral { background: var(--primary-light); color: var(--primary-dark); }
+
+.wh-later-card { display: block; padding: 14px 16px; margin-bottom: 10px; text-decoration: none; color: inherit; }
+.wh-later-name { font-size: 0.9rem; font-weight: 700; color: var(--primary-dark); }
+
+.wh-qa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; }
+.wh-qa-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	aspect-ratio: 1;
+	padding: 8px;
+	text-decoration: none;
+	color: var(--text);
+	font-size: 0.68rem;
+	font-weight: 600;
+	text-align: center;
+}
+.wh-qa-tile .wh-icon { color: var(--primary); }
+.wh-qa-tile.disabled { opacity: 0.4; pointer-events: none; }
+
+.wh-icon { flex: none; color: var(--primary); }
+.wh-empty { text-align: center; padding: 40px 20px; }
+.wh-empty .wh-icon { color: var(--text-muted); margin-bottom: 8px; }
+
+/* Jobs list page: Active / History toggle */
+.wh-view-toggle { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+.wh-view-toggle button {
+	padding: 10px 4px;
+	margin-right: 20px;
+	border: none;
+	background: none;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-secondary);
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	transition: color var(--transition), border-color var(--transition);
+}
+.wh-view-toggle button.active { color: var(--primary-dark); border-color: var(--primary); }
 
 /* Locked profile fields */
 .locked-field {
