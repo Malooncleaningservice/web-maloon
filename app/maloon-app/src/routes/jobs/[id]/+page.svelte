@@ -1,10 +1,11 @@
 <script lang="ts">
-	import '../../../app.css';
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { toast } from '$lib/stores/toast.svelte';
-	import { confirmAction } from '$lib/stores/confirm.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+ 	import '../../../app.css';
+ 	import { page } from '$app/stores';
+ 	import { goto } from '$app/navigation';
+ 	import { onMount } from 'svelte';
+ 	import { toast } from '$lib/stores/toast.svelte';
+ 	import { confirmAction } from '$lib/stores/confirm.svelte';
+ 	import Modal from '$lib/components/Modal.svelte';
 
 	let jobId = $state('');
 	let job = $state<{
@@ -91,6 +92,32 @@
 	}
 
 	// --- Status management ---
+	let deleting = $state(false);
+	async function deleteJob() {
+		const ok = await confirmAction({
+			title: 'Delete this job?',
+			description: `This permanently removes the job for "${job.clientName || 'this client'}", including its sections, tasks, and photos. This cannot be undone.`,
+			confirmText: 'Delete Job',
+			danger: true,
+		});
+		if (!ok) return;
+		deleting = true;
+		try {
+			const res = await fetch(`/api/jobs/${jobId}`, { method: 'DELETE' });
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				throw new Error(data.error || 'Delete failed');
+			}
+			toast.success('Job deleted.');
+			goto('/jobs');
+		} catch (e) {
+			console.error('Delete job failed', e);
+			toast.error(e instanceof Error ? e.message : 'Failed to delete job.');
+		} finally {
+			deleting = false;
+		}
+	}
+
 	async function updateStatus(newStatus: string) {
 		if (newStatus === 'cancelled') {
 			const ok = await confirmAction({
@@ -241,6 +268,31 @@
 			sections = [...sections, { ...sec, expanded: true, tasks: [] }];
 			newSectionName = '';
 		} catch (e) { console.error(e); }
+	}
+
+	// --- Section rename (inline) ---
+	let renamingSectionId = $state<string | null>(null);
+	let renameValue = $state('');
+	function startRenameSection(section: { id: string; name: string }) {
+		renamingSectionId = section.id;
+		renameValue = section.name;
+	}
+	async function saveRenameSection(sectionId: string) {
+		const name = renameValue.trim();
+		if (!name) { renamingSectionId = null; return; }
+		try {
+			await fetch(`/api/jobs/${jobId}/sections`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ sections: [{ id: sectionId, name }] }),
+			});
+			sections = sections.map(s => s.id === sectionId ? { ...s, name } : s);
+		} catch (e) {
+			console.error('Rename section failed', e);
+			toast.error('Failed to rename section.');
+		} finally {
+			renamingSectionId = null;
+		}
 	}
 
 	async function addTask(sectionId: string) {
@@ -478,6 +530,17 @@
 				<p style="white-space: pre-wrap; margin-top: 4px;">{job.notes}</p>
 			</div>
 		{/if}
+
+		<!-- Danger zone -->
+		<div class="card" style="border: 1px solid var(--danger);">
+			<h3 style="font-size: 0.95rem; margin-bottom: 6px; color: var(--danger);">⚠️ Delete Job</h3>
+			<p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 10px;">
+				Permanently removes this job and all its tasks/photos. Consider cancelling instead if you want to keep the record.
+			</p>
+			<button class="btn btn-danger btn-sm" onclick={deleteJob} disabled={deleting}>
+				{deleting ? 'Deleting...' : '🗑 Delete Job'}
+			</button>
+		</div>
 	{:else}
 		<!-- Start With Tasks -->
 		<div class="card">
@@ -500,7 +563,26 @@
 		{#each sections as section}
 			<details class="section-card" open={section.expanded}>
 				<summary>
-					<span>{section.name}</span>
+					<span class="section-name-wrap">
+						{#if renamingSectionId === section.id}
+							<!-- svelte-ignore a11y_autofocus -->
+							<input
+								class="section-rename-input"
+								bind:value={renameValue}
+								onkeydown={(e) => {
+									if (e.key === 'Enter') saveRenameSection(section.id);
+									else if (e.key === 'Escape') renamingSectionId = null;
+								}}
+								onblur={() => saveRenameSection(section.id)}
+								onclick={(e) => e.stopPropagation()}
+								autofocus
+							/>
+						{:else}
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<button type="button" class="section-name" onclick={(e) => { e.stopPropagation(); startRenameSection(section); }} title="Click to rename">{section.name}</button>
+						{/if}
+					</span>
 					<span class="text-secondary">{completedCount(section)}/{section.tasks.length} done</span>
 				</summary>
 				<div class="section-body">

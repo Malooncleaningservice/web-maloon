@@ -24,13 +24,18 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	return json(section, { status: 201 });
 });
 
-export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ request }) => {
 	const { sections } = await request.json();
-	// sections: [{ id, sortOrder }, ...]
+	// sections: [{ id, name?, sortOrder? }, ...]
+	// `name` is optional (rename); `sortOrder` is optional (reorder).
 	for (const s of sections) {
+		const data: { name?: string; sortOrder?: number } = {};
+		if (s.name !== undefined) data.name = s.name;
+		if (s.sortOrder !== undefined) data.sortOrder = s.sortOrder;
+		if (Object.keys(data).length === 0) continue;
 		await prisma.jobSection.update({
 			where: { id: s.id },
-			data: { sortOrder: s.sortOrder }
+			data
 		});
 	}
 	return json({ success: true });

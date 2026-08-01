@@ -158,6 +158,21 @@ main { flex: 1; padding: 24px 20px; max-width: 900px; width: 100%; margin: 0 aut
 .job-card .card { transition: transform var(--transition), box-shadow var(--transition); }
 .job-card:hover .card { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
+/* Clickable dashboard stat card. Behaves like .card but is a link. */
+.stat-card {
+	display: block;
+	background: var(--surface);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	text-decoration: none;
+	color: inherit;
+	transition: transform var(--transition), box-shadow var(--transition);
+}
+.stat-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg);
+}
+
 /* Inline message banners — replace ad hoc inline background colors */
 .msg-success, .msg-error {
 	padding: 10px 14px;
@@ -570,6 +585,27 @@ table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text
 }
 .photo-thumbs .add-photo-btn .icon { font-size: 1.1rem; }
 
+/* Photo thumbnail wrapper + time chip — confirms the stamp was applied. */
+.photo-thumb-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+}
+.photo-time-chip {
+	font-size: 0.6rem;
+	color: var(--text-secondary);
+	background: var(--bg);
+	border-radius: 4px;
+	padding: 1px 4px;
+	line-height: 1.2;
+	max-width: 64px;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* Inline photo-upload error + retry (replaces generic alert()) */
 .photo-error {
 	display: flex;
@@ -613,6 +649,20 @@ table th { color: var(--text-secondary); font-weight: 600; font-size: var(--text
 
 /* Section completion state */
 .section-card summary .section-check { color: var(--success); font-weight: 700; }
+
+/* Section rename (inline) */
+.section-name-wrap { display: inline-flex; align-items: center; }
+.section-name { cursor: text; border-bottom: 1px dashed transparent; background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.section-name:hover { border-bottom: 1px dashed var(--border); }
+.section-rename-input {
+	font-size: inherit;
+	font-weight: inherit;
+	padding: 2px 6px;
+	border: 1px solid var(--primary);
+	border-radius: 4px;
+	background: var(--surface);
+	min-width: 120px;
+}
 
 /* Big action button (start / finish job) */
 .btn-block {

@@ -44,7 +44,7 @@
 
 	async function loadWorker() {
 		try {
-			const res = await fetch(`/api/workers/${user?.workerId}`);
+			const res = await fetch('/api/worker/me');
 			if (res.ok) {
 				worker = await res.json();
 				editPhone = worker.phone || '';
@@ -56,7 +56,7 @@
 
 	async function loadPendingChanges() {
 		try {
-			const res = await fetch(`/api/profile-changes?workerId=${user?.workerId}`);
+			const res = await fetch('/api/worker/profile-changes');
 			if (res.ok) pendingChanges = await res.json();
 		} catch { /* ignore */ }
 	}
@@ -67,7 +67,7 @@
 		saveMessage = '';
 		saveError = '';
 		try {
-			const res = await fetch(`/api/workers/${user?.workerId}`, {
+			const res = await fetch('/api/worker/me', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ phone: editPhone, notes: editNotes, email: editEmail }),
@@ -76,7 +76,8 @@
 				worker = { ...worker, phone: editPhone, notes: editNotes, email: editEmail };
 				saveMessage = 'Profile updated.';
 			} else {
-				saveError = 'Failed to save.';
+				const data = await res.json().catch(() => ({}));
+				saveError = data.error || 'Failed to save.';
 			}
 		} catch {
 			saveError = 'Network error.';
@@ -93,7 +94,7 @@
 		}
 		submittingChange = true;
 		try {
-			const res = await fetch('/api/profile-changes', {
+			const res = await fetch('/api/worker/profile-changes', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -106,9 +107,10 @@
 				await loadPendingChanges();
 				criticalFieldOpen = '';
 				criticalNewValue = '';
-				saveMessage = `Change to "${field}" submitted for approval.`;
+				saveMessage = `Change to "${formatFieldName(field)}" submitted for approval.`;
 			} else {
-				saveError = 'Failed to submit change.';
+				const data = await res.json().catch(() => ({}));
+				saveError = data.error || 'Failed to submit change.';
 			}
 		} catch {
 			saveError = 'Network error.';

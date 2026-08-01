@@ -15,13 +15,19 @@
 		w9Reviewed: boolean;
 		user?: { id: string; email: string | null; identifierToken: string | null } | null;
 	}>>([]);
+	// All workers (unfiltered) — `workers` is the displayed subset.
+	let allWorkers = $state<typeof workers>([]);
 	let loading = $state(true);
 	let showAdd = $state(false);
 	let newWorker = $state({ firstName: '', lastName: '', email: '', phone: '', role: 'worker', createLogin: false });
 	let saving = $state(false);
 	let generatedToken = $state('');
+	let statusFilter = $state(''); // '' = all, 'on_job' = currently on an active job
 
 	onMount(async () => {
+		const params = new URLSearchParams(window.location.search);
+		const statusParam = params.get('status');
+		if (statusParam) statusFilter = statusParam;
 		await loadWorkers();
 	});
 
@@ -30,11 +36,24 @@
 		try {
 			const res = await fetch('/api/workers');
 			const data = await res.json();
-			workers = data;
+			allWorkers = data;
+			applyFilter();
 		} catch (e) {
 			console.error('Failed to load workers', e);
 		} finally {
 			loading = false;
+		}
+	}
+
+	function applyFilter() {
+		if (statusFilter === 'on_job') {
+			// "On job" = active workers with at least one in_progress assignment.
+			workers = allWorkers.filter((w: any) =>
+				Array.isArray(w.assignments) &&
+				w.assignments.some((a: any) => a.job?.status === 'in_progress')
+			);
+		} else {
+			workers = allWorkers;
 		}
 	}
 
@@ -88,6 +107,13 @@
 		{showAdd ? 'Cancel' : '+ Add Worker'}
 	</button>
 </div>
+
+{#if statusFilter}
+	<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 0.85rem;">
+		<span class="badge badge-active">Filter: {statusFilter === 'on_job' ? 'On a job now' : statusFilter}</span>
+		<a href="/personnel" class="btn btn-outline btn-sm" style="text-decoration: none;">Show all</a>
+	</div>
+{/if}
 
 <!-- Generated Token Modal -->
 <Modal open={!!generatedToken} title="🎉 Access Code Generated" maxWidth="420px" onClose={() => (generatedToken = '')}>
@@ -186,9 +212,15 @@
 		</div>
 	{/each}
 
-	{#if workers.length === 0}
+	{#if workers.length === 0 && !statusFilter}
 		<div class="card" style="text-align: center; padding: 40px;">
-			<p class="text-secondary">No workers added yet.</p>
+			<p class="text-secondary" style="margin-bottom: 12px;">No workers added yet.</p>
+			<button class="btn btn-primary btn-sm" onclick={() => showAdd = true}>+ Add Your First Worker</button>
+		</div>
+	{:else if workers.length === 0 && statusFilter}
+		<div class="card" style="text-align: center; padding: 40px;">
+			<p class="text-secondary" style="margin-bottom: 12px;">No workers are currently on a job.</p>
+			<a href="/personnel" class="btn btn-outline btn-sm" style="text-decoration: none;">Show all personnel</a>
 		</div>
 	{/if}
 {/if}

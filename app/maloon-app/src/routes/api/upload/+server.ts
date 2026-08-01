@@ -125,38 +125,55 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 			}
 		}
 
-		// --- Reverse-geocode for the stamp ---
-		// Workers: use their GPS position. Admins (no GPS): fall back to the job's
-		// address. Soft-fail to "Unknown location" if Nominatim is unavailable.
-		let addressLine: string;
-		if (latitude != null && longitude != null) {
-			const reverse = await reverseGeocode(latitude, longitude);
-			addressLine = formatAddressForStamp(reverse);
-		} else if (job.address) {
-			addressLine = job.address;
-		} else {
-			addressLine = 'Unknown location';
+	// --- Reverse-geocode for the stamp ---
+	// Workers: use their GPS position. Admins (no GPS): fall back to the job's
+	// address. Soft-fail to coordinates (workers) or "Unknown location" if we
+	// have neither GPS nor a job address.
+	let addressLine: string;
+	let stampSource: 'reverse_geocode' | 'job_address' | 'coordinates' | 'unknown' = 'unknown';
+	if (latitude != null && longitude != null) {
+		const reverse = await reverseGeocode(latitude, longitude);
+		addressLine = formatAddressForStamp(reverse, { lat: latitude, lon: longitude });
+		stampSource = reverse ? 'reverse_geocode' : 'coordinates';
+	} else if (job.address) {
+		addressLine = job.address;
+		stampSource = 'job_address';
+	} else {
+		addressLine = 'Unknown location';
+		stampSource = 'unknown';
+	}
+
+	// --- Image processing: resize + stamp + compress ---
+	const stampTimestamp = photoTakenAt;
+	const processedUrl = await processTaskPhoto(buffer, {
+		timestamp: stampTimestamp,
+		addressLine,
+	});
+
+	// --- Persist ---
+	const photo = await prisma.taskPhoto.create({
+		data: {
+			taskId,
+			url: processedUrl,
+			takenBy: workerId,
+			latitude,
+			longitude,
+			locationAccuracy: accuracyMeters,
+			photoTakenAt,
 		}
-
-		// --- Image processing: resize + stamp + compress ---
-		const processedUrl = await processTaskPhoto(buffer, {
-			timestamp: photoTakenAt,
-			addressLine,
-		});
-
-		// --- Persist ---
-		const photo = await prisma.taskPhoto.create({
-			data: {
-				taskId,
-				url: processedUrl,
-				takenBy: workerId,
-				latitude,
-				longitude,
-				locationAccuracy: accuracyMeters,
-				photoTakenAt,
-			}
-		});
-		return json({ success: true, photo });
+	});
+	// Return stamp metadata so the client can confirm what was written
+	// (helpful when reverse-geocoding silently falls back to coordinates).
+	const warnings: string[] = [];
+	if (stampSource === 'coordinates') {
+		warnings.push('Location approximated to coordinates (reverse-geocode unavailable).');
+	} else if (stampSource === 'unknown') {
+		warnings.push('No location could be determined for this photo.');
+	}
+	if (isAdmin && latitude == null) {
+		warnings.push('Photo uploaded without GPS — admin upload. Stamp used the job address.');
+	}
+	return json({ success: true, photo, stamp: { timestamp: stampTimestamp, addressLine, source: stampSource }, warnings });
 	}
 
 	return json({ success: true, url: dataUrl, fileName: file.name });

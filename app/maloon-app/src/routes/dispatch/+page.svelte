@@ -275,11 +275,6 @@
 	</div>
 </div>
 
-<!-- ── Status Filter (unassigned) ─────────────────────────────────────────── -->
-{#if statusFilter === 'unassigned'}
-	{#key statusFilter}{/key}
-{/if}
-
 {#if view === 'day'}
 	<h3 class="text-secondary" style="font-size: 1rem; margin-bottom: 12px;">
 		{formatDateLabel(selectedDate)}

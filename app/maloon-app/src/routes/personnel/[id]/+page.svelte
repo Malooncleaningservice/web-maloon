@@ -1,10 +1,11 @@
 <script lang="ts">
-	import '../../../app.css';
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { toast } from '$lib/stores/toast.svelte';
-	import { confirmAction } from '$lib/stores/confirm.svelte';
-	import Modal from '$lib/components/Modal.svelte';
+ 	import '../../../app.css';
+ 	import { page } from '$app/stores';
+ 	import { goto } from '$app/navigation';
+ 	import { onMount } from 'svelte';
+ 	import { toast } from '$lib/stores/toast.svelte';
+ 	import { confirmAction } from '$lib/stores/confirm.svelte';
+ 	import Modal from '$lib/components/Modal.svelte';
 
 	let workerId = $state('');
 	let worker = $state<{
@@ -207,6 +208,33 @@
 
 	function isImage(url: string): boolean {
 		return url.startsWith('data:image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+	}
+
+	// --- Delete worker (irreversible) ---
+	let deleting = $state(false);
+	async function deleteWorker() {
+		const ok = await confirmAction({
+			title: `Delete ${worker.firstName} ${worker.lastName}?`,
+			description: 'This permanently removes the worker, their login account, and all job assignments. Their task photos remain on the jobs. This cannot be undone.',
+			confirmText: 'Delete Worker',
+			danger: true,
+		});
+		if (!ok) return;
+		deleting = true;
+		try {
+			const res = await fetch(`/api/workers/${workerId}`, { method: 'DELETE' });
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				throw new Error(data.error || 'Delete failed');
+			}
+			toast.success('Worker deleted.');
+			goto('/personnel');
+		} catch (e) {
+			console.error('Delete worker failed', e);
+			toast.error(e instanceof Error ? e.message : 'Failed to delete worker.');
+		} finally {
+			deleting = false;
+		}
 	}
 </script>
 
@@ -421,5 +449,16 @@
 		{:else}
 			<p class="text-secondary">No jobs assigned.</p>
 		{/if}
+	</div>
+
+	<!-- Danger zone -->
+	<div class="card" style="border: 1px solid var(--danger);">
+		<h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--danger);">⚠️ Danger Zone</h3>
+		<p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 12px;">
+			Deleting a worker is permanent and removes their login and job assignments.
+		</p>
+		<button class="btn btn-danger" onclick={deleteWorker} disabled={deleting}>
+			{deleting ? 'Deleting...' : '🗑 Delete Worker'}
+		</button>
 	</div>
 {/if}
