@@ -1,6 +1,6 @@
-# maloon-app
+# indigo-app
 
-Cleaning-service management platform — SvelteKit 5 + Prisma + Railway.
+Cleaning-service field management — SvelteKit 5 + Prisma + Railway.
 
 ## Developing
 

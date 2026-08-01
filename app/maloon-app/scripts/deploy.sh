@@ -86,7 +86,7 @@ fi
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║${NC}       maloon-app deploy script       ${CYAN}║${NC}"
+echo -e "${CYAN}║${NC}       Indigo app deploy script        ${CYAN}║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════╝${NC}"
 echo ""
 echo -e "  Build:   ${GREEN}$DO_BUILD${NC}"
