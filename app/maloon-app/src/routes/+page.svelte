@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import '../app.css';
 
 	let stats = $derived($page.data.stats);
 	let user = $derived($page.data.user);

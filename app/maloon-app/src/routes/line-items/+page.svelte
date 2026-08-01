@@ -1,5 +1,4 @@
 <script lang="ts">
-	import '../../app.css';
 	import { onMount } from 'svelte';
 	import { toast } from '$lib/stores/toast.svelte';
 	import { confirmAction } from '$lib/stores/confirm.svelte';
