@@ -219,11 +219,14 @@
 						reject(new Error('Could not get your location. Please try again.'));
 						return;
 					}
+					// Prefer the GPS fix timestamp (more accurate to the photo moment)
+					// over startedAt, which is set before the (up to 12s) GPS lock.
+					const fixTs = pos.timestamp ? new Date(pos.timestamp).toISOString() : startedAt;
 					resolve({
 						lat: pos.coords.latitude,
 						lon: pos.coords.longitude,
 						accuracy: pos.coords.accuracy ?? 0,
-						takenAt: startedAt,
+						takenAt: fixTs,
 					});
 				},
 				(err) => {
@@ -471,18 +474,25 @@
 						</div>
 					{/if}
 					<input id="photo-input-{task.id}" type="file" accept="image/*" capture="environment" style="display: none;" onchange={(e) => handlePhotoFile(task.id, e)} disabled={isBusy} />
-						<div class="photo-thumbs">
-							{#each task.photos || [] as photo}
+					<div class="photo-thumbs">
+						{#each task.photos || [] as photo}
+							<div class="photo-thumb-wrap">
 								<button style="padding: 0; border: none; background: none; cursor: pointer;" onclick={() => showingPhotoUrl = photo.url} aria-label="View task photo">
 									<!-- svelte-ignore a11y_img_redundant_alt -->
 									<img src={photo.url} alt="Task photo" />
 								</button>
-							{/each}
-							<button class="add-photo-btn" onclick={() => openCamera(task.id)} disabled={uploadingPhotoForTask === task.id}>
-								<span class="icon">📸</span>
-								<span>{uploadingPhotoForTask === task.id ? '...' : (task.photos?.length ? 'Add' : 'Photo')}</span>
-							</button>
-						</div>
+								{#if photo.photoTakenAt || photo.takenAt}
+									<span class="photo-time-chip">
+										🕒 {new Date(photo.photoTakenAt || photo.takenAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}
+									</span>
+								{/if}
+							</div>
+						{/each}
+						<button class="add-photo-btn" onclick={() => openCamera(task.id)} disabled={uploadingPhotoForTask === task.id}>
+							<span class="icon">📸</span>
+							<span>{uploadingPhotoForTask === task.id ? '...' : (task.photos?.length ? 'Add' : 'Photo')}</span>
+						</button>
+					</div>
 					{/each}
 				</div>
 			</details>

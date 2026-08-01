@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { toast } from '$lib/stores/toast.svelte';
 
 	let jobs = $state<Array<{id: string; clientName: string; clientId: string | null; client?: {id: string; name: string} | null; address: string; status: string; scheduledDate: string | null; total: number; isQuote: boolean; assignments?: Array<{worker: {firstName: string; lastName: string}}>}>>([]);
@@ -19,6 +20,17 @@
 	let clients = $state<Array<{id: string; name: string; phone: string | null; email: string | null; address: string | null}>>([]);
 
 	onMount(async () => {
+		// Read filters from URL params so dashboard deep-links work.
+		const params = new URLSearchParams(window.location.search);
+		const statusParam = params.get('status');
+		const dateParam = params.get('date');
+		if (statusParam) filterStatus = statusParam;
+		if (dateParam === 'today') {
+			const d = new Date();
+			filterDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+		} else if (dateParam) {
+			filterDate = dateParam;
+		}
 		await Promise.all([loadJobs(), loadClients()]);
 	});
 
@@ -272,7 +284,21 @@
 
 	{#if jobs.length === 0}
 		<div class="card" style="text-align: center; padding: 40px;">
-			<p class="text-secondary">No jobs found. Create one or adjust filters.</p>
+			<p class="text-secondary" style="margin-bottom: 12px;">
+				{#if filterDate || filterStatus}
+					No jobs match the current filters.
+				{:else}
+					No jobs yet.
+				{/if}
+			</p>
+			<div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+				{#if filterDate || filterStatus}
+					<button class="btn btn-outline btn-sm" onclick={() => { filterDate = ''; filterStatus = ''; loadJobs(); }}>Clear Filters</button>
+				{:else}
+					<button class="btn btn-primary btn-sm" onclick={() => showNewJob = true}>+ Create a Job</button>
+					<a href="/quotes" class="btn btn-outline btn-sm" style="text-decoration: none;">Start from a Quote</a>
+				{/if}
+			</div>
 		</div>
 	{/if}
 

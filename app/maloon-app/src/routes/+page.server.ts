@@ -5,7 +5,10 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user;
 	if (!user) throw redirect(302, '/login');
-	if (user.role === 'worker') throw redirect(302, '/worker');
+	// Workers and supervisors both use the worker portal. Supervisors are
+	// blocked from admin routes by hooks.server.ts, so sending them to /worker
+	// avoids a blank dashboard (`+page.svelte` only renders for role === 'admin').
+	if (user.role === 'worker' || user.role === 'supervisor') throw redirect(302, '/worker');
 
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);

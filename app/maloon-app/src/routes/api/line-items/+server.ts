@@ -3,9 +3,11 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
 
-export const GET: RequestHandler = apiHandler(async () => {
+// `?all=true` includes inactive items (admin catalog management).
+export const GET: RequestHandler = apiHandler(async ({ url }) => {
+	const all = url.searchParams.get('all') === 'true';
 	const items = await prisma.lineItem.findMany({
-		where: { isActive: true },
+		where: all ? undefined : { isActive: true },
 		orderBy: { name: 'asc' }
 	});
 	return json(items);
@@ -33,6 +35,7 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 			sizeSmall: data.sizeSmall,
 			sizeMedium: data.sizeMedium,
 			sizeLarge: data.sizeLarge,
+			isActive: data.isActive ?? true,
 		}
 	});
 	return json(item, { status: 201 });

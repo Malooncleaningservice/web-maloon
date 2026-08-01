@@ -26,6 +26,7 @@ const ADMIN_ROUTES = [
 	'/jobs',
 	'/clients',
 	'/dispatch',
+	'/line-items',
 	'/api/workers',
 	'/api/jobs',
 	'/api/quotes',

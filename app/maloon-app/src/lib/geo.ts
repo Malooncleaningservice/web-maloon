@@ -90,9 +90,19 @@ export async function reverseGeocode(lat: number, lon: number): Promise<ReverseG
  * Build a compact one-line address for the photo stamp:
  * "123 Main St, Springfield, IL 62704"
  * Falls back to `displayName` (full Nominatim string) if components are missing.
+ * If `r` is null (reverse geocode failed), returns the raw lat/lon so the
+ * photo always carries *some* location info rather than "Unknown location".
  */
-export function formatAddressForStamp(r: ReverseGeocodeResult | null): string {
-	if (!r) return 'Unknown location';
+export function formatAddressForStamp(
+	r: ReverseGeocodeResult | null,
+	coords?: { lat: number; lon: number } | null,
+): string {
+	if (!r) {
+		if (coords && coords.lat != null && coords.lon != null) {
+			return `${coords.lat.toFixed(6)}, ${coords.lon.toFixed(6)}`;
+		}
+		return 'Unknown location';
+	}
 	const a = r.address;
 	const street = [a.house_number, a.road].filter(Boolean).join(' ');
 	const city = a.city || a.town || a.village || a.county || '';

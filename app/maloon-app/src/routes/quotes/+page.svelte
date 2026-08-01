@@ -143,6 +143,56 @@
 		}
 	}
 
+	let deletingQuoteId = $state<string | null>(null);
+	async function deleteQuote(quoteId: string, clientName: string) {
+		const ok = await confirmAction({
+			title: 'Delete this quote?',
+			description: `Quote for "${clientName || 'this client'}" will be permanently removed. This cannot be undone.`,
+			confirmText: 'Delete',
+			danger: true,
+		});
+		if (!ok) return;
+		deletingQuoteId = quoteId;
+		try {
+			const res = await fetch(`/api/quotes/${quoteId}`, { method: 'DELETE' });
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				throw new Error(data.error || 'Delete failed');
+			}
+			toast.success('Quote deleted.');
+			await loadQuotes();
+		} catch (e) {
+			console.error('Delete quote failed', e);
+			toast.error(e instanceof Error ? e.message : 'Failed to delete quote.');
+		} finally {
+			deletingQuoteId = null;
+		}
+	}
+
+	// --- Quote status workflow (draft → sent → accepted/rejected) ---
+	let statusUpdatingId = $state<string | null>(null);
+	async function changeQuoteStatus(quoteId: string, status: 'sent' | 'accepted' | 'rejected' | 'draft') {
+		statusUpdatingId = quoteId;
+		try {
+			const res = await fetch(`/api/quotes/${quoteId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status }),
+			});
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				throw new Error(data.error || 'Failed to update status');
+			}
+			toast.success(`Quote marked as ${status}.`);
+			await loadQuotes();
+		} catch (e) {
+			console.error('Status update failed', e);
+			toast.error(e instanceof Error ? e.message : 'Failed to update status.');
+		} finally {
+			statusUpdatingId = null;
+		}
+	}
+
 	function formatDate(dateStr: string) {
 		return new Date(dateStr).toLocaleDateString('en-US', {
 			month: 'short', day: 'numeric', year: 'numeric'
@@ -224,7 +274,8 @@
 				squareFootage,
 				ratePerSqFt,
 				workerCount,
-				status: 'draft',
+				// Preserve existing status on edit; new quotes start as 'draft'.
+				status: editingId ? undefined : 'draft',
 				total: grandTotal,
 				lineItems: selectedItems.map(i => ({
 					name: i.name,
@@ -332,26 +383,55 @@
 								<td style="font-size: 0.85rem; font-weight: 500;">{quote.clientName || '—'}</td>
 								<td style="font-size: 0.85rem; color: var(--text-secondary);">{quote.address || '—'}</td>
 								<td style="font-size: 0.85rem; font-weight: 600;">${quote.total.toFixed(2)}</td>
-								<td>
-									<span class="badge {statusBadgeClass(quote.status)}" style="font-size: 0.75rem;">
-										{quote.status.toUpperCase()}
-									</span>
-								</td>
-								<td style="white-space: nowrap;">
-									{#if quote.status === 'accepted' || quote.status === 'rejected'}
-										<span class="text-secondary" style="font-size: 0.8rem;">✓ Done</span>
-									{:else}
-										<button class="btn btn-outline btn-sm" onclick={() => editQuote(quote.id)} style="margin-right: 4px;">Edit</button>
-										<button
-											class="btn btn-success btn-sm"
-											onclick={() => convertToJob(quote.id)}
-											disabled={convertingId === quote.id}
-										>
-											{convertingId === quote.id ? '⏳' : '🔨 Create Job'}
+							<td>
+								<span class="badge {statusBadgeClass(quote.status)}" style="font-size: 0.75rem;">
+									{quote.status.toUpperCase()}
+								</span>
+							</td>
+							<td style="white-space: nowrap;">
+								{#if quote.status === 'accepted' || quote.status === 'rejected'}
+									<button class="btn btn-sm btn-outline" onclick={() => deleteQuote(quote.id, quote.clientName)} disabled={deletingQuoteId === quote.id} title="Delete quote" style="margin-right: 4px;">
+										{deletingQuoteId === quote.id ? '⏳' : '🗑'}
+									</button>
+									<button class="btn btn-sm btn-outline" onclick={() => changeQuoteStatus(quote.id, 'draft')} disabled={statusUpdatingId === quote.id} title="Move back to draft">
+										↩ Draft
+									</button>
+								{:else}
+									<button class="btn btn-outline btn-sm" onclick={() => editQuote(quote.id)} style="margin-right: 4px;">Edit</button>
+									<button
+										class="btn btn-success btn-sm"
+										onclick={() => convertToJob(quote.id)}
+										disabled={convertingId === quote.id}
+										style="margin-right: 4px;"
+									>
+										{convertingId === quote.id ? '⏳' : '🔨 Create Job'}
+									</button>
+									<button class="btn btn-sm btn-outline" onclick={() => deleteQuote(quote.id, quote.clientName)} disabled={deletingQuoteId === quote.id} title="Delete quote">
+										{deletingQuoteId === quote.id ? '⏳' : '🗑'}
+									</button>
+								{/if}
+							</td>
+						</tr>
+						{#if quote.status === 'draft' || quote.status === 'sent'}
+							<tr style="background: var(--bg);">
+								<td colspan="6" style="padding: 6px 12px; font-size: 0.8rem;">
+									<span class="text-secondary" style="margin-right: 8px;">Mark as:</span>
+									{#if quote.status === 'draft'}
+										<button class="btn btn-sm btn-outline" onclick={() => changeQuoteStatus(quote.id, 'sent')} disabled={statusUpdatingId === quote.id}>
+											{statusUpdatingId === quote.id ? '⏳' : '📤 Sent'}
+										</button>
+									{/if}
+									{#if quote.status === 'sent'}
+										<button class="btn btn-sm btn-success" onclick={() => changeQuoteStatus(quote.id, 'accepted')} disabled={statusUpdatingId === quote.id} style="margin-right: 4px;">
+											{statusUpdatingId === quote.id ? '⏳' : '✓ Accepted'}
+										</button>
+										<button class="btn btn-sm btn-danger" onclick={() => changeQuoteStatus(quote.id, 'rejected')} disabled={statusUpdatingId === quote.id}>
+											{statusUpdatingId === quote.id ? '⏳' : '✕ Rejected'}
 										</button>
 									{/if}
 								</td>
 							</tr>
+						{/if}
 						{/each}
 					</tbody>
 				</table>

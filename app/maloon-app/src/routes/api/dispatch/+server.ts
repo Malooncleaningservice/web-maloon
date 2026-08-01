@@ -30,7 +30,12 @@ export const GET: RequestHandler = apiHandler(async ({ url }) => {
 		scheduledDate: { gte: range.start, lt: range.end },
 	};
 	if (statusFilter && statusFilter !== 'all') {
-		jobWhere.status = statusFilter;
+		if (statusFilter === 'unassigned') {
+			// Jobs with no worker assignments. Prisma's `none` filter on a relation.
+			jobWhere.assignments = { none: {} };
+		} else {
+			jobWhere.status = statusFilter;
+		}
 	}
 
 	const jobInclude = {
