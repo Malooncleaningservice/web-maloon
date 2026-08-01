@@ -103,7 +103,7 @@
 
 <div class="wh-topband">
 	<div class="wh-topband-row">
-		<span class="wh-logo">Maloon Service</span>
+		<span class="wh-logo">Indigo</span>
 	</div>
 	<div class="wh-date">{todayLabel}</div>
 	<div class="wh-greeting">{greeting}, {firstName}</div>

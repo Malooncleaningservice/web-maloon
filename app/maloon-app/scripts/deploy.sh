@@ -23,7 +23,7 @@ DRY_RUN=false
 
 usage() {
 	cat <<EOF
-deploy.sh — Build, push, and deploy the maloon-app
+deploy.sh — Build, push, and deploy the Indigo app
 
 Usage:  scripts/deploy.sh [flags]
 
@@ -135,7 +135,7 @@ if $DO_DEPLOY; then
 		if ! command -v railway &>/dev/null; then
 			fail "railway CLI not found — install from https://docs.railway.com/develop/cli"
 		fi
-		railway up --detach --cwd "$APP_DIR" || fail "Railway deploy failed"
+		(cd "$GIT_ROOT" && railway up --detach) || fail "Railway deploy failed"
 		ok "Railway deploy triggered"
 	fi
 fi

@@ -72,7 +72,7 @@
 {#if user}
 	<div class="app-shell">
 		<header class="top-nav">
-			<a href="/" class="logo">Maloon Service</a>
+			<a href="/" class="logo">Indigo</a>
 			{#if user.role === 'admin'}
 				<nav class="admin-links" class:open={showMobileNav}>
 					<a href="/quotes" onclick={closeMobileNav}>Quotes</a>

@@ -111,8 +111,8 @@
 
 		<!-- Logo -->
 		<div style="text-align: center; margin-bottom: 32px;">
-			<h1 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;">Maloon Service</h1>
-			<p class="text-secondary">Staff Portal</p>
+			<h1 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;">Indigo</h1>
+			<p class="text-secondary">Cleaning Service</p>
 		</div>
 
 		<!-- Setup Mode (first-time account setup) -->
@@ -194,7 +194,7 @@
 							<input
 								id="tokenInput"
 								bind:value={tokenInput}
-								placeholder="e.g. MLN-A3X9KM"
+								placeholder="e.g. IND-A3X9KM"
 								style="font-family: monospace; font-size: 1.2rem; text-align: center; letter-spacing: 2px;"
 								required
 							/>
