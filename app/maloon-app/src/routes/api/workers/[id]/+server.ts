@@ -41,15 +41,18 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 });
 
 export const DELETE: RequestHandler = apiHandler(async ({ params }) => {
-	// Delete associated user first if exists
-	const worker = await prisma.worker.findUnique({
-		where: { id: params.id },
-		include: { user: true }
+	await prisma.$transaction(async (tx: typeof prisma) => {
+		// Delete associated user first if exists (cascades sessions + notifications).
+		const worker = await tx.worker.findUnique({
+			where: { id: params.id },
+			include: { user: true }
+		});
+		if (worker?.user) {
+			await tx.user.delete({ where: { id: worker.user.id } });
+		}
+		await tx.jobAssignment.deleteMany({ where: { workerId: params.id } });
+		// ProfileChange records cascade-delete via onDelete: Cascade in schema.
+		await tx.worker.delete({ where: { id: params.id } });
 	});
-	if (worker?.user) {
-		await prisma.user.delete({ where: { id: worker.user.id } });
-	}
-	await prisma.jobAssignment.deleteMany({ where: { workerId: params.id } });
-	await prisma.worker.delete({ where: { id: params.id } });
 	return json({ success: true });
 });

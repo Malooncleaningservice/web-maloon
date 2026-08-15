@@ -66,7 +66,11 @@
 				error = data.error || 'Invalid token';
 				return;
 			}
-			setupMode = true;
+			if (data.mustResetPassword) {
+				setupMode = true;
+			} else {
+				await goto('/');
+			}
 		} catch {
 			error = 'Network error. Please try again.';
 		} finally {
@@ -194,7 +198,7 @@
 							<input
 								id="tokenInput"
 								bind:value={tokenInput}
-								placeholder="e.g. IND-A3X9KM"
+								placeholder="e.g. MLN-A3X9KM"
 								style="font-family: monospace; font-size: 1.2rem; text-align: center; letter-spacing: 2px;"
 								required
 							/>

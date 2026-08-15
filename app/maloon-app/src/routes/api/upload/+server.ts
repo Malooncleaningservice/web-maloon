@@ -23,6 +23,8 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 	const workerIdParam = url.searchParams.get('workerId');
 	const taskId = url.searchParams.get('taskId');
 
+	const isAdmin = locals.user?.role === 'admin';
+
 	// Convert file to base64 data URL (for w9/generic — unprocessed)
 	const buffer = Buffer.from(await file.arrayBuffer());
 	const mimeType = file.type || 'application/octet-stream';
@@ -30,6 +32,12 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 	const dataUrl = `data:${mimeType};base64,${base64}`;
 
 	if (type === 'w9' && workerIdParam) {
+		// Authorization: workers can only update their own W-9; admins any worker.
+		if (!isAdmin) {
+			if (!locals.user?.workerId || locals.user.workerId !== workerIdParam) {
+				return json({ error: 'You can only upload your own W-9' }, { status: 403 });
+			}
+		}
 		await prisma.worker.update({
 			where: { id: workerIdParam },
 			data: {
@@ -44,7 +52,6 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 	if (type === 'task-photo' && taskId) {
 		// --- Authorization: worker must own the task's job ---
 		const user = locals.user;
-		const isAdmin = user?.role === 'admin';
 
 		let workerId: string | null = user?.workerId ?? null;
 

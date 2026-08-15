@@ -31,8 +31,20 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request, locals
 		}
 	});
 
-	// If approved, apply the change to the Worker record
+	// If approved, apply the change to the Worker record.
+	// Only whitelisted fields may be written — prevents privilege escalation
+	// (e.g. a worker requesting a change to "role" → "admin").
+	const APPROVED_FIELDS = new Set([
+		'firstName', 'lastName',
+		'w9ParsedName', 'w9ParsedTin', 'w9ParsedAddress',
+	]);
 	if (status === 'approved') {
+		if (!APPROVED_FIELDS.has(change.field)) {
+			return json(
+				{ error: `Field "${change.field}" is not a valid profile change field` },
+				{ status: 400 }
+			);
+		}
 		const updateData: Record<string, string> = {};
 		updateData[change.field] = change.newValue;
 		await prisma.worker.update({

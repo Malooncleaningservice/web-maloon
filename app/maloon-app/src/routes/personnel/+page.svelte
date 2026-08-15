@@ -76,6 +76,8 @@
 			const result = await res.json();
 			if (result.identifierToken) {
 				generatedToken = result.identifierToken;
+			} else if (result.tempPassword) {
+				generatedToken = `Temp password: ${result.tempPassword}`;
 			} else {
 				toast.success('Worker added.');
 			}
@@ -115,9 +117,9 @@
 {/if}
 
 <!-- Generated Token Modal -->
-<Modal open={!!generatedToken} title="🎉 Access Code Generated" maxWidth="420px" onClose={() => (generatedToken = '')}>
+<Modal open={!!generatedToken} title="🎉 Access Generated" maxWidth="420px" onClose={() => (generatedToken = '')}>
 	<p class="text-secondary" style="margin-bottom: 12px;">
-		Give this code to the worker so they can set up their account at the login page.
+		Give this to the worker so they can set up their account at the login page.
 	</p>
 	<div style="font-size: 1.6rem; font-family: monospace; text-align: center; padding: 12px; background: var(--bg); border-radius: var(--radius); letter-spacing: 3px; font-weight: 700; color: var(--text);">
 		{generatedToken}

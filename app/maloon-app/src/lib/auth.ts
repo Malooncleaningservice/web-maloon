@@ -1,10 +1,10 @@
 import { prisma } from './prisma';
-import { randomBytes, createHash } from 'node:crypto';
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 // ---------------------------------------------------------------------------
-// Password helpers (bcrypt-free – we target Node 26+ using native crypto)
-// In production, install bcryptjs and swap these implementations.
-// For now, we use SHA-256 salted hashing which is adequate for an MVP.
+// Password helpers (scrypt — purpose-built for password hashing)
+// Uses Node's built-in scrypt with a per-password salt. This is resistant to
+// GPU/ASIC brute-force attacks, unlike plain SHA-256.
 // ---------------------------------------------------------------------------
 
 function salt(): string {
@@ -13,22 +13,21 @@ function salt(): string {
 
 export function hashPassword(password: string): string {
 	const s = salt();
-	const hash = cryptoHash(password, s);
+	const hash = scryptHash(password, s);
 	return `${s}:${hash}`;
 }
 
 export function verifyPassword(password: string, stored: string): boolean {
 	const [s, expected] = stored.split(':');
-	return cryptoHash(password, s) === expected;
+	if (!s || !expected) return false;
+	const actual = scryptHash(password, s);
+	// Constant-time comparison to prevent timing attacks.
+	return timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
 }
 
-function cryptoHash(data: string, salt: string): string {
-	// Simple iterated SHA-256 (100k rounds) – swap for bcryptjs in production
-	let h = salt + data;
-	for (let i = 0; i < 100_000; i++) {
-		h = createHash('sha256').update(h).digest('hex');
-	}
-	return h;
+function scryptHash(data: string, salt: string): string {
+	// scrypt with N=2^15, r=8, p=1 — reasonable strength for a web app.
+	return scryptSync(data, salt, 64).toString('hex');
 }
 
 // ---------------------------------------------------------------------------

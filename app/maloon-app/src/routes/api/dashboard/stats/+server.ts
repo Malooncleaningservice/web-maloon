@@ -22,7 +22,7 @@ export const GET: RequestHandler = apiHandler(async () => {
 		prisma.job.count({
 			where: {
 				status: 'completed',
-				updatedAt: { gte: today, lt: tomorrow }
+				completedAt: { gte: today, lt: tomorrow }
 			}
 		}),
 		prisma.worker.count({ where: { status: 'active' } }),

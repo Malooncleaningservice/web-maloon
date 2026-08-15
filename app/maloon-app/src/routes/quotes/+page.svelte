@@ -108,13 +108,18 @@
 			squareFootage = q.squareFootage || 0;
 			ratePerSqFt = q.ratePerSqFt || 0.15;
 			workerCount = q.workerCount || 1;
-			selectedItems = (q.quoteLineItems || []).map((li: any) => ({
-				id: li.id,
+		selectedItems = (q.quoteLineItems || []).map((li: any) => {
+			// Resolve the catalog ID so toggleItem can match when re-toggling.
+			const baseName = li.name.replace(/\s*\(.*\)$/, '').trim();
+			const catalogItem = lineItemCatalog.find(c => c.name === baseName);
+			return {
+				id: catalogItem?.id ?? li.id,
 				name: li.name,
 				price: li.price,
 				size: li.size || null,
 				quantity: li.quantity || 1,
-			}));
+			};
+		});
 			customItems = (q.quoteAddons || []).map((a: any) => ({
 				name: a.name,
 				price: a.price,

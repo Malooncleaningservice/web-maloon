@@ -49,7 +49,6 @@
 
 	async function logout() {
 		await fetch('/api/auth/logout', { method: 'POST' });
-		user = null;
 		await goto('/login');
 	}
 

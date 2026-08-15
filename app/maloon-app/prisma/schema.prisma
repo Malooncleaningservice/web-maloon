@@ -111,6 +111,7 @@ model Job {
    longitude     Float?
    total         Float    @default(0)
    status        String   @default("pending") // pending, in_progress, completed, cancelled
+   completedAt   DateTime?
    scheduledDate DateTime?
    notes         String?
    isRecurring           Boolean  @default(false)
