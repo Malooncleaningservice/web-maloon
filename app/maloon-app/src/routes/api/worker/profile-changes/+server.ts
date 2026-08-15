@@ -14,8 +14,16 @@ export const POST: RequestHandler = apiHandler(async ({ request, locals }) => {
 	const data = await request.json();
 	const { field, newValue, oldValue } = data;
 
+	const APPROVED_FIELDS = new Set([
+		'firstName', 'lastName',
+		'w9ParsedName', 'w9ParsedTin', 'w9ParsedAddress',
+	]);
+
 	if (!field || newValue === undefined) {
 		return json({ error: 'field and newValue are required' }, { status: 400 });
+	}
+	if (!APPROVED_FIELDS.has(field)) {
+		return json({ error: `Field "${field}" is not editable` }, { status: 400 });
 	}
 
 	const change = await prisma.profileChange.create({

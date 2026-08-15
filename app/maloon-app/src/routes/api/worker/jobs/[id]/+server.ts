@@ -86,7 +86,10 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, locals, request
 
 	const updated = await prisma.job.update({
 		where: { id: params.id },
-		data: { status }
+		data: {
+			status,
+			completedAt: status === 'completed' ? new Date() : null,
+		}
 	});
 	return json(updated);
 });

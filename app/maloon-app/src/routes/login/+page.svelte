@@ -1,5 +1,4 @@
 <script lang="ts">
-	import '../../app.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -67,7 +66,11 @@
 				error = data.error || 'Invalid token';
 				return;
 			}
-			setupMode = true;
+			if (data.mustResetPassword) {
+				setupMode = true;
+			} else {
+				await goto('/');
+			}
 		} catch {
 			error = 'Network error. Please try again.';
 		} finally {
@@ -112,8 +115,8 @@
 
 		<!-- Logo -->
 		<div style="text-align: center; margin-bottom: 32px;">
-			<h1 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;">Maloon Service</h1>
-			<p class="text-secondary">Staff Portal</p>
+			<h1 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;">Indigo</h1>
+			<p class="text-secondary">Cleaning Service</p>
 		</div>
 
 		<!-- Setup Mode (first-time account setup) -->

@@ -24,15 +24,29 @@ export const POST: RequestHandler = apiHandler(async ({ params, request }) => {
 	return json(task, { status: 201 });
 });
 
-export const PATCH: RequestHandler = apiHandler(async ({ request }) => {
+export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	const data = await request.json();
 	const updateData: Record<string, unknown> = {};
+
+	// Verify the task belongs to this section.
+	const existing = await prisma.jobTask.findUnique({
+		where: { id: data.taskId },
+		select: { sectionId: true },
+	});
+	if (!existing) return json({ error: 'Task not found' }, { status: 404 });
+	if (existing.sectionId !== params.id) {
+		return json({ error: 'Task does not belong to this section' }, { status: 400 });
+	}
 
 	if ('completed' in data) {
 		updateData.completed = data.completed;
 		if (data.completed) {
 			updateData.completedBy = data.completedBy;
 			updateData.completedAt = new Date();
+		} else {
+			// Clear attribution when uncompleting.
+			updateData.completedBy = null;
+			updateData.completedAt = null;
 		}
 	}
 	if ('comment' in data) updateData.comment = data.comment;

@@ -92,6 +92,8 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 		}
 
 		updateData.status = data.status;
+		// Track when the job was completed (and clear it if reopened).
+		updateData.completedAt = data.status === 'completed' ? new Date() : null;
 	}
 
 	const job = await prisma.job.update({
@@ -102,14 +104,21 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 });
 
 export const DELETE: RequestHandler = apiHandler(async ({ params }) => {
-	await prisma.jobAssignment.deleteMany({ where: { jobId: params.id } });
-	await prisma.startWithTask.deleteMany({ where: { jobId: params.id } });
-	const sections = await prisma.jobSection.findMany({ where: { jobId: params.id }, select: { id: true } });
-	for (const s of sections) {
-		await prisma.taskPhoto.deleteMany({ where: { task: { sectionId: s.id } } });
-		await prisma.jobTask.deleteMany({ where: { sectionId: s.id } });
-	}
-	await prisma.jobSection.deleteMany({ where: { jobId: params.id } });
-	await prisma.job.delete({ where: { id: params.id } });
+	await prisma.$transaction(async (tx: typeof prisma) => {
+		await tx.jobAssignment.deleteMany({ where: { jobId: params.id } });
+		await tx.startWithTask.deleteMany({ where: { jobId: params.id } });
+		const sections = await tx.jobSection.findMany({ where: { jobId: params.id }, select: { id: true } });
+		for (const s of sections) {
+			await tx.taskPhoto.deleteMany({ where: { task: { sectionId: s.id } } });
+			await tx.jobTask.deleteMany({ where: { sectionId: s.id } });
+		}
+		await tx.jobSection.deleteMany({ where: { jobId: params.id } });
+		// Detach child recurring jobs so the FK constraint isn't violated.
+		await tx.job.updateMany({
+			where: { recurringTemplateId: params.id },
+			data: { recurringTemplateId: null }
+		});
+		await tx.job.delete({ where: { id: params.id } });
+	});
 	return json({ success: true });
 });

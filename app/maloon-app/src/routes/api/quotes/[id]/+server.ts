@@ -28,10 +28,37 @@ export const PATCH: RequestHandler = apiHandler(async ({ params, request }) => {
 	if (data.total !== undefined) updateData.total = data.total;
 	if (data.notes !== undefined) updateData.notes = data.notes;
 
-	const quote = await prisma.quote.update({
-		where: { id: params.id },
-		data: updateData,
-		include: { quoteLineItems: true, quoteAddons: true }
+	// Replace line items and add-ons if provided (transactional).
+	const hasLineItems = Array.isArray(data.lineItems);
+	const hasAddons = Array.isArray(data.addons);
+
+	if (hasLineItems) {
+		updateData.quoteLineItems = {
+			create: data.lineItems.map((item: any) => ({
+				name: item.name,
+				price: item.price,
+				size: item.size ?? null,
+				quantity: item.quantity ?? 1,
+			}))
+		};
+	}
+	if (hasAddons) {
+		updateData.quoteAddons = {
+			create: data.addons.map((item: any) => ({
+				name: item.name,
+				price: item.price,
+			}))
+		};
+	}
+
+	const quote = await prisma.$transaction(async (tx: typeof prisma) => {
+		if (hasLineItems) await tx.quoteLineItem.deleteMany({ where: { quoteId: params.id } });
+		if (hasAddons) await tx.quoteAddon.deleteMany({ where: { quoteId: params.id } });
+		return tx.quote.update({
+			where: { id: params.id },
+			data: updateData,
+			include: { quoteLineItems: true, quoteAddons: true }
+		});
 	});
 	return json(quote);
 });

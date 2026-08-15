@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# deploy.sh — Deploy Maloon App to Railway via GitHub
+# deploy.sh — Deploy Indigo App to Railway via GitHub
 #
 # Steps performed (by default):
 #   1. Verify build compiles (npm run build)
@@ -92,7 +92,7 @@ run()   { echo -e "  $ $1"; [[ "$DRY_RUN" == false ]] && eval "$1"; }
 
 # --- Banner ---
 echo "╔══════════════════════════════════════════╗"
-echo "║   Maloon App — Deploy to Railway        ║"
+echo "║   Indigo App — Deploy to Railway        ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
 

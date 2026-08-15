@@ -1,6 +1,7 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { hashPassword, generateIdentifierToken } from '$lib/auth';
+import { randomBytes } from 'node:crypto';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
 
@@ -22,7 +23,7 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	let businessId = business?.id;
 	if (!businessId) {
 		const newBusiness = await prisma.business.create({
-			data: { name: 'Maloon Service', slug: 'maloon-services' }
+			data: { name: 'Indigo', slug: 'indigo' }
 		});
 		businessId = newBusiness.id;
 	}
@@ -30,11 +31,12 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	// Generate temp password and/or identifier token if creating login
 	let identifierToken: string | undefined;
 	let passwordHash: string | undefined;
+	let tempPassword: string | undefined;
 
 	if (data.createLogin) {
 		if (data.email) {
 			// Has email → create with temp password
-			const tempPassword = Math.random().toString(36).slice(2, 10) + 'A1!';
+			tempPassword = generateTempPassword();
 			passwordHash = hashPassword(tempPassword);
 		} else {
 			// No email → create with identifier token
@@ -71,5 +73,11 @@ export const POST: RequestHandler = apiHandler(async ({ request }) => {
 	return json({
 		...worker,
 		identifierToken: identifierToken || undefined,
+		tempPassword: tempPassword || undefined,
 	}, { status: 201 });
 });
+
+function generateTempPassword(): string {
+	// Cryptographically secure temp password (12 chars, alphanumeric).
+	return randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 12) + 'A1!';
+}

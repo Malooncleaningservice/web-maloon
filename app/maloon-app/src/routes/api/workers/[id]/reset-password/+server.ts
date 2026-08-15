@@ -1,6 +1,7 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import { generateIdentifierToken, hashPassword } from '$lib/auth';
+import { randomBytes } from 'node:crypto';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
 
@@ -14,7 +15,7 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 	if (!worker.user) return json({ error: 'No login account linked to this worker' }, { status: 400 });
 
 	const token = generateIdentifierToken();
-	const tempPassword = Math.random().toString(36).slice(2, 10) + 'A1!';
+	const tempPassword = randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 12) + 'A1!';
 
 	await prisma.user.update({
 		where: { id: worker.user.id },

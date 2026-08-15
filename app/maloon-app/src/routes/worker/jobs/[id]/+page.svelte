@@ -1,5 +1,4 @@
 <script lang="ts">
-	import '../../../../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/Modal.svelte';

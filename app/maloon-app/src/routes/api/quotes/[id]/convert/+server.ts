@@ -2,6 +2,7 @@ import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
+import { geocodeAddress } from '$lib/geo';
 
 export const POST: RequestHandler = apiHandler(async ({ params }) => {
 	const quote = await prisma.quote.findUnique({
@@ -21,9 +22,21 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 	let businessId = business?.id;
 	if (!businessId) {
 		const newBusiness = await prisma.business.create({
-			data: { name: 'Maloon Service', slug: 'maloon-services' }
+			data: { name: 'Indigo', slug: 'indigo' }
 		});
 		businessId = newBusiness.id;
+	}
+
+	// Geocode the address for the geofence check on photo uploads.
+	let latitude: number | null = null;
+	let longitude: number | null = null;
+	const address = quote.address ?? '';
+	if (address.trim().length >= 3) {
+		const coords = await geocodeAddress(address);
+		if (coords) {
+			latitude = coords.lat;
+			longitude = coords.lon;
+		}
 	}
 
 	// Create the job
@@ -35,7 +48,9 @@ export const POST: RequestHandler = apiHandler(async ({ params }) => {
 			clientName: quote.clientName ?? 'Unknown Client',
 			clientPhone: quote.clientPhone,
 			clientEmail: quote.clientEmail,
-			address: quote.address ?? '',
+			address,
+			latitude,
+			longitude,
 			total: quote.total,
 			status: 'pending',
 			notes: quote.notes,

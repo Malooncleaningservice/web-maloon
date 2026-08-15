@@ -6,7 +6,7 @@
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 
 const UA = process.env.NOMINATIM_USER_AGENT
-	|| 'Maloon-Service-App/1.0 (https://maloon.com; contact@maloon.com)';
+	|| 'Indigo-App/1.0';
 
 export interface LatLng {
 	lat: number;
