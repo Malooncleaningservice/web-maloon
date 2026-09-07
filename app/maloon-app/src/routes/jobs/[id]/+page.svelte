@@ -5,6 +5,7 @@
  	import { toast } from '$lib/stores/toast.svelte';
  	import { confirmAction } from '$lib/stores/confirm.svelte';
  	import Modal from '$lib/components/Modal.svelte';
+	import PhotoViewer, { type PhotoView } from '$lib/components/PhotoViewer.svelte';
 
 	let jobId = $state('');
 	let job = $state<{
@@ -15,11 +16,11 @@
 		recurringTemplateId?: string | null;
 		assignments?: Array<{id: string; worker: {id: string; firstName: string; lastName: string}}>;
 	}>({});
-	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean; photos?: Array<{id: string; url: string; takenAt: string}>}>}>>([]);
+	let sections = $state<Array<{id: string; name: string; sortOrder: number; expanded: boolean; tasks: Array<{id: string; description: string; sortOrder: number; completed: boolean; requiredPhoto: boolean; photos?: PhotoView[]}>}>>([]);
 	let startWithTasks = $state<Array<{id: string; description: string; completed: boolean}>>([]);
 	let loading = $state(true);
 	let uploadingPhotoForTask = $state<string | null>(null);
-	let showingPhotoUrl = $state<string | null>(null);
+	let viewingPhoto = $state<PhotoView | null>(null);
 	let statusUpdating = $state(false);
 
 	// Worker assignment state
@@ -409,18 +410,34 @@
 	function completedCount(section: { tasks: Array<{completed: boolean}> }) {
 		return section.tasks.filter((t) => t.completed).length;
 	}
+
+	// Merge an updated photo (e.g. new comment) back into the in-memory sections.
+	function updatePhotoInSections(updated: PhotoView) {
+		sections = sections.map((s) => ({
+			...s,
+			tasks: s.tasks.map((t) => ({
+				...t,
+				photos: (t.photos ?? []).map((p) => (p.id === updated.id ? { ...p, ...updated } : p)),
+			})),
+		}));
+	}
+
+	function handlePhotoSaved(updated: PhotoView) {
+		updatePhotoInSections(updated);
+		viewingPhoto = { ...viewingPhoto, ...updated };
+	}
 </script>
 
 <a href="/jobs" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 12px; display: inline-block;">
 	← Back to Jobs
 </a>
 
-<Modal bare open={!!showingPhotoUrl} onClose={() => (showingPhotoUrl = null)}>
-	{#if showingPhotoUrl}
-		<!-- svelte-ignore a11y_img_redundant_alt -->
-		<img src={showingPhotoUrl} alt="Task photo" />
-	{/if}
-</Modal>
+<PhotoViewer
+	photo={viewingPhoto}
+	canEditComment={true}
+	onClose={() => (viewingPhoto = null)}
+	onSaved={handlePhotoSaved}
+/>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -607,7 +624,7 @@
 										<button
 											class="btn btn-success btn-sm"
 											style="padding: 2px 6px; font-size: 0.7rem;"
-											onclick={() => showingPhotoUrl = photo.url}
+											onclick={() => viewingPhoto = photo}
 										>
 											🖼 View
 										</button>

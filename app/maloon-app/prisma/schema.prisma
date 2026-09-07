@@ -164,10 +164,13 @@ model TaskPhoto {
   url          String   @db.LongText // processed, stamped, compressed base64 data URL
   takenAt      DateTime @default(now())
   takenBy      String?  // workerId
+  takenByName  String?  // worker's display name at capture time (for verification display)
   latitude     Float?   // worker's GPS at capture time
   longitude    Float?
   locationAccuracy Float? // GPS accuracy in meters
+  addressLine  String?  @db.Text // human-readable location (reverse-geocoded or job address) shown on the stamp
   photoTakenAt DateTime? // actual moment the photo was captured (client timestamp)
+  comment      String?  @db.Text // worker's note attached to the photo
 }
 
 model StartWithTask {

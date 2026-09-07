@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import Modal from '$lib/components/Modal.svelte';
+	import PhotoViewer, { type PhotoView } from '$lib/components/PhotoViewer.svelte';
 
 	let jobId = $state('');
 	let job = $state<any>(null);
 	let loading = $state(true);
 	let uploadingPhotoForTask = $state<string | null>(null);
-	let showingPhotoUrl = $state<string | null>(null);
+	let viewingPhoto = $state<PhotoView | null>(null);
 	let updatingStatus = $state(false);
 	let statusError = $state('');
 	let openSections = $state<Record<string, boolean>>({});
@@ -22,7 +22,7 @@
 	// 'unknown' | 'granted' | 'denied' | 'unavailable'
 	let locationStatus = $state<'unknown' | 'granted' | 'denied' | 'unavailable'>('unknown');
 
-	let user = $state<{ id: string; workerId: string | null } | null>(null);
+	let user = $state<{ id: string; role?: string; workerId: string | null } | null>(null);
 
 	onMount(async () => {
 		jobId = $page.params.id ?? '';
@@ -187,9 +187,15 @@
 				return;
 			}
 			locationStatus = 'granted';
+			const uploadData = await uploadRes.json().catch(() => ({}));
 			await loadJob();
 			if (shouldAutoComplete) {
 				await toggleTask(taskId, true);
+			}
+			// Open the photo preview so the worker can confirm the recorded
+			// location/time and add a comment right away.
+			if (uploadData.photo) {
+				viewingPhoto = uploadData.photo;
 			}
 		} catch (e) {
 			console.error('Photo upload failed', e);
@@ -255,6 +261,32 @@
 	function openCamera(taskId: string) {
 		const input = document.getElementById(`photo-input-${taskId}`) as HTMLInputElement | null;
 		input?.click();
+	}
+
+	// Workers can edit comments only on their own photos; admins can edit any.
+	function canEditPhoto(photo: any): boolean {
+		if (user?.role === 'admin') return true;
+		return !!photo?.takenBy && !!user?.workerId && photo.takenBy === user.workerId;
+	}
+
+	// Merge an updated photo (e.g. new comment) back into the in-memory job.
+	function updatePhotoInJob(updated: PhotoView) {
+		if (!job) return;
+		job = {
+			...job,
+			sections: (job.sections || []).map((s: any) => ({
+				...s,
+				tasks: (s.tasks || []).map((t: any) => ({
+					...t,
+					photos: (t.photos || []).map((p: any) => (p.id === updated.id ? { ...p, ...updated } : p)),
+				})),
+			})),
+		};
+	}
+
+	function handlePhotoSaved(updated: PhotoView) {
+		updatePhotoInJob(updated);
+		viewingPhoto = { ...viewingPhoto, ...updated };
 	}
 
 	function handleTaskTap(task: any) {
@@ -341,12 +373,12 @@
 	}
 </script>
 
-<Modal bare open={!!showingPhotoUrl} onClose={() => showingPhotoUrl = null}>
-	{#if showingPhotoUrl}
-		<!-- svelte-ignore a11y_img_redundant_alt -->
-		<img src={showingPhotoUrl} alt="Task photo" />
-	{/if}
-</Modal>
+<PhotoViewer
+	photo={viewingPhoto}
+	canEditComment={viewingPhoto ? canEditPhoto(viewingPhoto) : false}
+	onClose={() => viewingPhoto = null}
+	onSaved={handlePhotoSaved}
+/>
 
 {#if loading}
 	<div class="card" style="text-align: center; padding: 40px;">
@@ -476,7 +508,7 @@
 					<div class="photo-thumbs">
 						{#each task.photos || [] as photo}
 							<div class="photo-thumb-wrap">
-								<button style="padding: 0; border: none; background: none; cursor: pointer;" onclick={() => showingPhotoUrl = photo.url} aria-label="View task photo">
+								<button style="padding: 0; border: none; background: none; cursor: pointer;" onclick={() => viewingPhoto = photo} aria-label="View task photo">
 									<!-- svelte-ignore a11y_img_redundant_alt -->
 									<img src={photo.url} alt="Task photo" />
 								</button>

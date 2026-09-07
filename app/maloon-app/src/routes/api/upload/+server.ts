@@ -92,8 +92,10 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 		const lonRaw = formData.get('longitude');
 		const accRaw = formData.get('accuracy');
 		const takenAtRaw = formData.get('photoTakenAt');
+		const commentRaw = formData.get('comment');
 
 		const photoTakenAt = takenAtRaw ? new Date(String(takenAtRaw)) : new Date();
+		const comment = commentRaw ? String(commentRaw).trim() : null;
 
 		let latitude: number | null = latRaw ? parseFloat(String(latRaw)) : null;
 		let longitude: number | null = lonRaw ? parseFloat(String(lonRaw)) : null;
@@ -157,16 +159,24 @@ export const POST: RequestHandler = apiHandler(async ({ request, url, locals }: 
 		addressLine,
 	});
 
+	// --- Attribution: capture the taker's name for the verification view ---
+	const takerName = locals.user?.worker
+		? `${locals.user.worker.firstName} ${locals.user.worker.lastName}`.trim()
+		: (locals.user?.displayName ?? null);
+
 	// --- Persist ---
 	const photo = await prisma.taskPhoto.create({
 		data: {
 			taskId,
 			url: processedUrl,
 			takenBy: workerId,
+			takenByName: takerName,
 			latitude,
 			longitude,
 			locationAccuracy: accuracyMeters,
+			addressLine,
 			photoTakenAt,
+			comment,
 		}
 	});
 	// Return stamp metadata so the client can confirm what was written
