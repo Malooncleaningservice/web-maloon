@@ -10,6 +10,14 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/CNAME");
   eleventyConfig.addPassthroughCopy("src/.nojekyll");
+  eleventyConfig.addPassthroughCopy("src/robots.txt");
+
+  // Collection of all rendered HTML pages for sitemap generation
+  eleventyConfig.addCollection("sitemap", function (collectionApi) {
+    return collectionApi.getAll().filter(function (item) {
+      return item.outputPath && item.outputPath.endsWith(".html");
+    });
+  });
   eleventyConfig.addPassthroughCopy({"src/*.png": "/"});
   eleventyConfig.addPassthroughCopy({"src/*.svg": "/"});
   eleventyConfig.addPassthroughCopy({"src/*.webmanifest": "/"});

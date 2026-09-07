@@ -1,5 +1,13 @@
 {% set localeData = en if locale == 'en' else es %}
 {% set pageData = localeData.pages[pageKey] if pageKey else {} %}
+{%- if pageKey == 'index' -%}
+  {% set enPath = '/' %}
+  {% set esPath = '/es/' %}
+{%- else -%}
+  {% set enPath = '/' + pageKey + '.html' %}
+  {% set esPath = '/es/' + pageKey + '.html' %}
+{%- endif -%}
+{% set canonicalPath = esPath if locale == 'es' else enPath %}
 <!DOCTYPE html>
 <html lang="{{ localeData.lang }}">
 <head>
@@ -20,6 +28,8 @@
     <link rel="icon" href="/Maloon Service Logo-Favicon.svg" type="image/svg+xml"/>
     <meta name="robots" content="index, follow"/>
     
+    <link rel="canonical" href="https://maloonservices.com{{ canonicalPath }}"/>
+    
     {% if pageData.ogTitle %}
     <meta property="og:title" content="{{ pageData.ogTitle }}"/>
     {% endif %}
@@ -27,15 +37,13 @@
     <meta property="og:description" content="{{ pageData.ogDescription }}"/>
     {% endif %}
     <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://maloonservices.com{{ canonicalPath }}"/>
+    <meta property="og:locale" content="{{ 'en_US' if locale == 'en' else 'es_US' }}"/>
     
     {# Hreflang tags for bilingual SEO #}
-    {% if locale == 'en' %}
-    <link rel="alternate" hreflang="en" href="https://maloonservices.com/{{ pageKey }}.html"/>
-    <link rel="alternate" hreflang="es" href="https://maloonservices.com/es/{{ pageKey }}.html"/>
-    {% else %}
-    <link rel="alternate" hreflang="en" href="https://maloonservices.com/{{ pageKey }}.html"/>
-    <link rel="alternate" hreflang="es" href="https://maloonservices.com/es/{{ pageKey }}.html"/>
-    {% endif %}
+    <link rel="alternate" hreflang="en" href="https://maloonservices.com{{ enPath }}"/>
+    <link rel="alternate" hreflang="es" href="https://maloonservices.com{{ esPath }}"/>
+    <link rel="alternate" hreflang="x-default" href="https://maloonservices.com{{ enPath }}"/>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
     
