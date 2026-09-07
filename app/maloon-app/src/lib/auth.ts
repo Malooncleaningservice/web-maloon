@@ -1,5 +1,5 @@
 import { prisma } from './prisma';
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 // ---------------------------------------------------------------------------
 // Password helpers (scrypt — purpose-built for password hashing)
@@ -21,13 +21,48 @@ export function verifyPassword(password: string, stored: string): boolean {
 	const [s, expected] = stored.split(':');
 	if (!s || !expected) return false;
 	const actual = scryptHash(password, s);
-	// Constant-time comparison to prevent timing attacks.
-	return timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
+	return safeEqualHex(actual, expected);
+}
+
+// Constant-time comparison of two hex strings. Returns false (instead of
+// throwing) when the buffers differ in length — which happens for legacy
+// SHA-256 hashes (32 bytes) vs. scrypt output (64 bytes).
+function safeEqualHex(a: string, b: string): boolean {
+	const bufA = Buffer.from(a, 'hex');
+	const bufB = Buffer.from(b, 'hex');
+	if (bufA.length !== bufB.length) return false;
+	return timingSafeEqual(bufA, bufB);
 }
 
 function scryptHash(data: string, salt: string): string {
 	// scrypt with N=2^15, r=8, p=1 — reasonable strength for a web app.
 	return scryptSync(data, salt, 64).toString('hex');
+}
+
+// ---------------------------------------------------------------------------
+// Legacy password-hash support (pre-scrypt: iterated SHA-256, 32 bytes)
+// Accounts created before the scrypt migration still store a 64-char hex
+// SHA-256 hash. We verify those so existing users can sign in, and the login
+// route transparently re-hashes them to scrypt.
+// ---------------------------------------------------------------------------
+
+export function isLegacyHash(stored: string): boolean {
+	const [s, expected] = stored.split(':');
+	return !!s && !!expected && expected.length === 64;
+}
+
+export function verifyLegacyPassword(password: string, stored: string): boolean {
+	const [s, expected] = stored.split(':');
+	if (!s || !expected) return false;
+	return legacyHash(password, s) === expected;
+}
+
+function legacyHash(data: string, salt: string): string {
+	let h = salt + data;
+	for (let i = 0; i < 100_000; i++) {
+		h = createHash('sha256').update(h).digest('hex');
+	}
+	return h;
 }
 
 // ---------------------------------------------------------------------------

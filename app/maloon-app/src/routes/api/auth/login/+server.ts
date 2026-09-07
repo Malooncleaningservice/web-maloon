@@ -1,6 +1,6 @@
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
-import { verifyPassword, createSession } from '$lib/auth';
+import { hashPassword, isLegacyHash, verifyLegacyPassword, verifyPassword, createSession } from '$lib/auth';
 import type { RequestHandler } from './$types';
 import { apiHandler } from '$lib/api-error';
 
@@ -45,7 +45,19 @@ export const POST: RequestHandler = apiHandler(async ({ request, cookies }) => {
 		return json({ error: 'Invalid email or password' }, { status: 401 });
 	}
 
-	if (!verifyPassword(password, user.passwordHash)) {
+	let verified = verifyPassword(password, user.passwordHash);
+
+	// Transparently migrate accounts whose hash predates scrypt so they can
+	// keep signing in; re-hash to scrypt on first successful login.
+	if (!verified && isLegacyHash(user.passwordHash) && verifyLegacyPassword(password, user.passwordHash)) {
+		await prisma.user.update({
+			where: { id: user.id },
+			data: { passwordHash: hashPassword(password) },
+		});
+		verified = true;
+	}
+
+	if (!verified) {
 		return json({ error: 'Invalid email or password' }, { status: 401 });
 	}
 
