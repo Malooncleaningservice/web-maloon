@@ -39,6 +39,10 @@
     <meta property="og:type" content="website"/>
     <meta property="og:url" content="https://maloonservices.com{{ canonicalPath }}"/>
     <meta property="og:locale" content="{{ 'en_US' if locale == 'en' else 'es_US' }}"/>
+    <meta property="og:image" content="https://maloonservices.com/assets/images/og-image.jpg"/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+    <meta property="og:image:alt" content="Night office interior with soap streaks mid-window-clean after hours"/>
     
     {# Hreflang tags for bilingual SEO #}
     <link rel="alternate" hreflang="en" href="https://maloonservices.com{{ enPath }}"/>
@@ -93,6 +97,15 @@
     }
     </script>
     {% endif %}
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18407829976"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-18407829976');
+    </script>
 </head>
 <body id="main-content">
     <a href="#main-content" class="skip-link">Skip to main content</a>

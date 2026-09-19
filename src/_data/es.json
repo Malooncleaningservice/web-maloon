@@ -25,6 +25,8 @@
         {
           "icon": "🏢",
           "title": "Limpieza Corporativa",
+          "image": "/assets/images/industries-corporate-lobby.webp",
+          "imageAlt": "Vestíbulo de oficina con piso de loseta pulida y brillante después de la limpieza de Maloon",
           "description": "Servicios profesionales de limpieza de oficinas diseñados para mantener entornos de trabajo productivos.",
           "details": [
             "Programas de limpieza ecológica con certificación LEED",
@@ -55,6 +57,8 @@
         {
           "icon": "🛍️",
           "title": "Limpieza para Comercios",
+          "image": "/assets/images/industries-retail-entry.webp",
+          "imageAlt": "Puertas de vidrio limpias de un comercio en Columbus",
           "description": "Mantenga sus espacios comerciales limpios y atractivos para los clientes.",
           "details": [
             "Servicios de limpieza por contrato y mantenimiento programado",
@@ -70,6 +74,8 @@
         {
           "icon": "🏨",
           "title": "Limpieza para Hotelería",
+          "image": "/assets/images/industries-hospitality-event-hall.webp",
+          "imageAlt": "Salón de eventos con pisos de concreto pulido limpiado de noche por Maloon",
           "description": "Soluciones integrales de limpieza para hoteles y restaurantes.",
           "details": [
             "Servicios de limpieza para hoteles y resorts",

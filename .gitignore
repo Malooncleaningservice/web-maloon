@@ -15,3 +15,7 @@ _site/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Internal photo work: raw source photos (contain GPS/EXIF) and review notes (client names/addresses)
+photos to maloon/
+PHOTO-REPLACEMENT-REVIEW.md

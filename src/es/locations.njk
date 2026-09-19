@@ -19,11 +19,14 @@ permalink: /es/locations.html
             <p>{{ localeData.locations.subtitle }}</p>
         </div>
         
-        <div class="areas-map reveal">
-            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                 alt="Mapa de Áreas de Servicio de Columbus Ohio" 
-                 class="map-image">
-        </div>
+        <figure class="areas-map reveal" style="max-width: 460px; margin: 0 auto; text-align: center;">
+            <img src="/assets/images/locations-storefront.webp"
+                 alt="Edificio comercial con ventanas recién limpiadas en Columbus, OH"
+                 width="800" height="1067"
+                 style="width: 100%; height: auto; border-radius: var(--radius-card); border: 1px solid var(--sage-soft); box-shadow: var(--elevation-1); display: block;"
+                 loading="lazy">
+            <figcaption style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">Un negocio de Columbus al que servimos</figcaption>
+        </figure>
 
         <div class="areas-grid">
             {% set areasPerColumn = (localeData.locations.areas.length / 3) | round %}

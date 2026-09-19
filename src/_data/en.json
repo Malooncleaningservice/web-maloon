@@ -25,6 +25,8 @@
         {
           "icon": "🏢",
           "title": "Corporate Cleaning",
+          "image": "/assets/images/industries-corporate-lobby.webp",
+          "imageAlt": "Grand office lobby with gleaming polished tile floor after Maloon cleaning",
           "description": "Professional office cleaning services designed to maintain productive work environments.",
           "details": [
             "LEED-certified green cleaning programs",
@@ -55,6 +57,8 @@
         {
           "icon": "🛍️",
           "title": "Retail Cleaning",
+          "image": "/assets/images/industries-retail-entry.webp",
+          "imageAlt": "Clean glass entry doors of a Columbus retail storefront",
           "description": "Keep your retail spaces clean and inviting for customers.",
           "details": [
             "Contract janitorial services and scheduled maintenance",
@@ -70,6 +74,8 @@
         {
           "icon": "🏨",
           "title": "Hospitality Cleaning",
+          "image": "/assets/images/industries-hospitality-event-hall.webp",
+          "imageAlt": "Event hall with polished concrete floors cleaned overnight by Maloon",
           "description": "Comprehensive cleaning solutions for hotels and restaurants.",
           "details": [
             "Housekeeping services for hotels and resorts",

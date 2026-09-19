@@ -271,8 +271,8 @@
 /* ─────────────────────────────────────────
    3. TRANSFORMATION STRIP
    Sage-soft background section immediately
-   below the hero — visceral before/after.
-───────────────────────────────────────── */
+   below the hero — results gallery.
+   ───────────────────────────────────────── */
 
 .transform-strip {
     background: var(--fresh-mint);
@@ -293,9 +293,9 @@
 
 .transform-strip__panels {
     display: grid;
-    grid-template-columns: 1fr 80px 1fr;
-    align-items: center;
-    gap: 0 16px;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    gap: 0 20px;
 }
 
 /* ── Panel shared ── */
@@ -305,11 +305,12 @@
     border: 1px solid var(--sage-soft);
     background: var(--white);
     box-shadow: var(--elevation-1);
+    margin: 0;
 }
 
 .transform-strip__panel-photo {
     position: relative;
-    height: 180px;
+    height: 260px;
     overflow: hidden;
 }
 
@@ -341,82 +342,19 @@
 
 .transform-strip__label i { font-size: 13px; }
 
-.transform-strip__label--before {
-    background: rgba(255, 255, 255, 0.9);
-    color: #7a5c42;
-    border: 1px solid rgba(122, 92, 66, 0.25);
-}
-
 .transform-strip__label--after {
     background: rgba(255, 255, 255, 0.9);
     color: var(--forest-anchor);
     border: 1px solid rgba(46, 125, 50, 0.3);
 }
 
-/* Trait lists below photo */
-.transform-strip__traits {
-    list-style: none;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.transform-strip__traits li {
+/* Caption below photo */
+.transform-strip__caption {
     font-size: 13px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.transform-strip__traits li i {
-    font-size: 12px;
-    color: #b0a090;
-    flex-shrink: 0;
-    width: 14px;
-}
-
-.transform-strip__traits--after li i {
-    color: var(--leaf-green);
-}
-
-.transform-strip__traits--after li {
-    color: var(--deep-pine);
     font-weight: 500;
-}
-
-/* ── Centre arrow ── */
-.transform-strip__arrow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.transform-strip__arrow-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--leaf-green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--elevation-1);
-}
-
-.transform-strip__arrow-icon i {
-    color: var(--white);
-    font-size: 18px;
-}
-
-.transform-strip__arrow-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--forest-anchor);
-    text-transform: uppercase;
+    color: var(--deep-pine);
+    padding: 12px 16px;
+    text-align: center;
 }
 
 /* ── Responsive ── */
@@ -424,20 +362,10 @@
     .transform-strip__panels {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto;
-        gap: 12px 0;
+        gap: 16px 0;
     }
 
-    .transform-strip__arrow {
-        flex-direction: row;
-        padding: 4px 0;
-    }
-
-    .transform-strip__arrow-icon {
-        width: 36px;
-        height: 36px;
-    }
-
-    .transform-strip__arrow-icon i {
-        transform: rotate(90deg);
+    .transform-strip__panel-photo {
+        height: 220px;
     }
 }
