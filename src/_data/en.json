@@ -57,8 +57,8 @@
         {
           "icon": "🛍️",
           "title": "Retail Cleaning",
-          "image": "/assets/images/industries-retail-entry.webp",
-          "imageAlt": "Clean glass entry doors of a Columbus retail storefront",
+          "image": "/assets/images/industries-retail-lobby.webp",
+          "imageAlt": "Retail lobby with a mirror-polished concrete floor after Maloon cleaning",
           "description": "Keep your retail spaces clean and inviting for customers.",
           "details": [
             "Contract janitorial services and scheduled maintenance",
@@ -602,8 +602,7 @@
       "ogDescription": "Eco-friendly commercial and residential cleaning services in Columbus, OH with sustainable solutions and professional results.",
       "hero": {
         "title": "Maloon Service<br>Columbus, OH",
-        "subtitle": "Professional Janitorial Services for Businesses & Homes",
-        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Professional Janitorial Services for Businesses & Homes"
       },
       "cta": {
         "title": "Get a Free Quote Today",
@@ -617,8 +616,7 @@
       "ogDescription": "Columbus OH's trusted commercial and residential cleaning company with eco-friendly solutions and professional service.",
       "hero": {
         "title": "About Maloon Service",
-        "subtitle": "Columbus, OH's Trusted Commercial & Residential Cleaning Company",
-        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Columbus, OH's Trusted Commercial & Residential Cleaning Company"
       },
       "cta": {
         "title": "Experience the Maloon Cleaning Service Difference",
@@ -632,8 +630,7 @@
       "ogDescription": "Professional commercial cleaning services for businesses in Columbus, OH. Offices, healthcare, retail, hospitality, disinfection, and ongoing maintenance.",
       "hero": {
         "title": "Commercial Cleaning Services",
-        "subtitle": "Professional Solutions for Every Business in Columbus, OH",
-        "background": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Professional Solutions for Every Business in Columbus, OH"
       },
       "cta": {
         "title": "Ready for a Cleaner Workspace?",
@@ -647,8 +644,7 @@
       "ogDescription": "Professional commercial and residential cleaning services tailored for Columbus businesses with eco-friendly solutions.",
       "hero": {
         "title": "Our Comprehensive Cleaning Services",
-        "subtitle": "Professional Solutions for Every Business & Home in Columbus, OH",
-        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Professional Solutions for Every Business & Home in Columbus, OH"
       },
       "cta": {
         "title": "Ready for a Cleaner Workspace?",
@@ -662,8 +658,7 @@
       "ogDescription": "Get in touch with Maloon Cleaning Service for professional commercial and residential cleaning services in Columbus, OH.",
       "hero": {
         "title": "Contact Maloon Service",
-        "subtitle": "Get a Free Quote for Professional Cleaning in Columbus, OH",
-        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Get a Free Quote for Professional Cleaning in Columbus, OH"
       },
       "cta": {
         "title": "Ready for a Cleaner, Healthier Workspace?",
@@ -677,8 +672,7 @@
       "ogDescription": "Professional residential cleaning services in Columbus, OH. Regular cleaning, deep cleaning, move-in/out, kitchen & bathroom focus. Eco-friendly and reliable.",
       "hero": {
         "title": "Residential Cleaning Services",
-        "subtitle": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly.",
-        "background": "https://images.unsplash.com/photo-1513694203270-74c605394108?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Routine cleaning for apartments and houses. Weekly, biweekly, or monthly."
       },
       "cta": {
         "title": "Ready for a Spotless Home?",
@@ -692,8 +686,7 @@
       "ogDescription": "Maloon Service serves businesses and homes throughout Columbus, OH and Central Ohio. View our service areas map and see if we cover your location.",
       "hero": {
         "title": "Our Service Areas",
-        "subtitle": "Serving Businesses & Homes Throughout Central Ohio",
-        "background": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        "subtitle": "Serving Businesses & Homes Throughout Central Ohio"
       },
       "cta": {
         "title": "Ready for a Cleaner Space?",
