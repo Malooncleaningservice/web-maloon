@@ -14,12 +14,14 @@ permalink: /contact.html
 {# Contact Form Section #}
 <section class="contact-form-section section-spacing">
     <div class="container">
-        <div class="section-header">
-            <h2>Get Your Free Quote Today</h2>
-            <p>Professional cleaning services customized for your business or home in Columbus, OH</p>
-        </div>
+            <div class="section-header">
+                <h2>Get Your Free Quote Today</h2>
+                <p>Professional cleaning services customized for your business or home in Columbus, OH</p>
+            </div>
 
-        {# Quick Contact Options #}
+            <p style="text-align: center; margin: -0.5rem 0 1.5rem; color: var(--text-muted); font-size: 0.95rem;">Prefer to call? <a href="{{ localeData.contact.phoneHref }}" style="color: var(--text-muted);">{{ localeData.contact.phone }}</a></p>
+
+            {# Quick Contact Options #}
         <div class="highlight-box">
             <h3>⚡ Fastest Response</h3>
             <p>Message us on <a href="{{ localeData.contact.whatsapp }}" style="color: var(--leaf-green); font-weight: 600;">WhatsApp</a> for immediate assistance</p>
@@ -132,3 +134,5 @@ permalink: /contact.html
 
 {# Service Areas placeholder #}
 <div id="contact-service-areas-placeholder"></div>
+
+<p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.95rem;">Or call us at <a href="{{ localeData.contact.phoneHref }}" style="color: var(--text-muted);">{{ localeData.contact.phone }}</a></p>
