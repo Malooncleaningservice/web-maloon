@@ -499,13 +499,14 @@ p {
 }
 
 .hero-content h1 {
+    color: white;
     margin-bottom: 1.5rem;
 }
 
 .hero-content h2 {
     font-size: clamp(18px, 2.5vw, 24px);
     font-weight: 400;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 3rem;
 }
 
