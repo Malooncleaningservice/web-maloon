@@ -8,8 +8,17 @@ permalink: /es/residential.html
 {% set localeData = es %}
 {% set pageData = localeData.pages.residential %}
 
-{# Hero placeholder #}
-<div id="residential-hero-placeholder"></div>
+{# Hero #}
+<section class="hero" style="background-image: linear-gradient(135deg, rgba(27,94,32,0.85) 0%, rgba(46,125,50,0.75) 100%), url('https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');">
+    <div class="hero-content">
+        <h1>{{ localeData.pages.residential.hero.title }}</h1>
+        <h2>{{ localeData.pages.residential.hero.subtitle }}</h2>
+        <a href="{{ localeData.pages.residential.cta.whatsapp_url }}" class="btn-primary">
+            <i class="fab fa-whatsapp"></i>
+            Cotización Gratis
+        </a>
+    </div>
+</section>
 
 {# Residential Overview #}
 <section id="residential-overview" class="services-overview section-white section-spacing reveal">
@@ -58,8 +67,34 @@ permalink: /es/residential.html
 </section>
 {% endfor %}
 
-{# Why Choose Us placeholder #}
-<div id="residential-why-choose-placeholder"></div>
+{# Why Choose Us #}
+<section id="residential-why-choose" class="section-green section-spacing reveal">
+    <div class="container">
+        <div class="section-header-center reveal">
+            <h2 style="color: var(--white);">{{ localeData.why_us.title }}</h2>
+        </div>
+        <div class="features-grid-3">
+            {% for feature in localeData.why_us.features %}
+            <div class="feature-card reveal">
+                <div class="feature-icon">{{ feature.icon }}</div>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-{# CTA placeholder #}
-<div id="residential-cta-placeholder"></div>
+{# CTA #}
+<section id="residential-cta" class="final-cta reveal">
+    <div class="container">
+        <h2 class="cta-h">{{ localeData.pages.residential.cta.title }}</h2>
+        <p class="cta-sub">Servimos hogares en Columbus — Lun a Sáb</p>
+        <div class="cta-buttons">
+            <a href="{{ localeData.pages.residential.cta.whatsapp_url }}" class="btn-cta-sparkle">
+                <i class="fab fa-whatsapp"></i>
+                Mensaje por WhatsApp
+            </a>
+        </div>
+    </div>
+</section>

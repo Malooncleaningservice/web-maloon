@@ -516,7 +516,7 @@
           "text": "Mantenimiento"
         },
         {
-          "id": "business-cta-placeholder",
+          "id": "business-cta",
           "text": "Cotización"
         }
       ],
@@ -542,7 +542,7 @@
           "text": "Mudanza / Entrega"
         },
         {
-          "id": "residential-cta-placeholder",
+          "id": "residential-cta",
           "text": "Cotización"
         }
       ],

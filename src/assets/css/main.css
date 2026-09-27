@@ -130,7 +130,7 @@ img {
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 24px var(--container-padding);
+    padding: 0 var(--container-padding);
 }
 
 /* --- Atmospheric Decorations (Blobs) --- */
@@ -187,13 +187,9 @@ h3 {
 }
 
 p {
-    /* margin-bottom: 1.5rem */
     color: var(--text-secondary);
-    font-size: -3px;
-    background-position: center top;
-    top: 32px;
-    bottom: 32px;
-    right: 32px;
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
 }
 
 /* 4. COMPONENTS */
@@ -2205,16 +2201,9 @@ body:has(.hero-split) .sidebar-wrapper {
 .social-ticker__inner {
     display: flex;
     gap: 2rem;
-
-    /* max-width: var(--max-width) */
     margin: 0;
-    padding: 0px var(--container-padding);
+    padding: 0 var(--container-padding);
     background-image: linear-gradient(90deg, rgb(60, 153, 65) 5%, rgba(4, 10, 4, 0) 26%, rgba(1, 3, 1, 0) 75%, rgb(60, 153, 65) 96%);
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
-    top: 0px;
-    position: inherit;
 }
 
 .social-ticker__label {
@@ -2239,7 +2228,7 @@ body:has(.hero-split) .sidebar-wrapper {
 }
 
 .social-ticker__item {
-    font-size: var(--text-secondary);
+    font-size: 14px;
     color: var(--text-secondary);
     white-space: nowrap;
     display: flex;
@@ -2366,17 +2355,229 @@ body:has(.hero-split) .sidebar-wrapper {
     }
 }
 
+/* ===== MISSING LAYOUT & COMPONENT CLASSES ===== */
+
+/* --- Centered Section Header --- */
+.section-header-center {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-header-center h2 {
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-header-center h2::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 4px;
+    background: var(--leaf-green);
+    margin: 12px auto 0;
+    border-radius: 2px;
+}
+
+.section-header-center p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .section-header-center {
+        margin-bottom: 2.5rem;
+    }
+}
+
+/* --- 3-Column Features Grid --- */
+.features-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+    .features-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .features-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* --- 4-Column Features Grid --- */
+.features-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+    .features-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .features-grid-4 {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* --- Feature Card (Why Choose Us, Disinfection) --- */
+.feature-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--sage-soft);
+    border-radius: var(--radius-card);
+    padding: 2rem;
+    box-shadow: var(--elevation-1);
+    transition: var(--transition-smooth);
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--elevation-2);
+    border-color: var(--leaf-green);
+}
+
+.feature-card h3 {
+    color: var(--deep-pine);
+    margin-bottom: 0.75rem;
+}
+
+.feature-card p {
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+/* --- Feature Icon --- */
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--gradient-fresh);
+    border-radius: var(--radius-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1.5rem;
+    border: 1px solid var(--sage-soft);
+}
+
+/* --- Large Icon Badge (Split Sections) --- */
+.icon-badge-large {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-fresh);
+    border-radius: var(--radius-organic);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--sage-soft);
+    box-shadow: var(--elevation-1);
+}
+
+/* --- Service Section (Split Section wrapper) --- */
+.service-section {
+    background: var(--sunlight-white);
+    padding: 5rem 0;
+}
+
+.service-section .split-content h3 {
+    margin-bottom: 1rem;
+}
+
+.service-section .split-content p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Alternating background for visual rhythm */
+.service-section:nth-of-type(even) {
+    background: var(--fresh-mint);
+}
+
+@media (max-width: 768px) {
+    .service-section {
+        padding: 3rem 0;
+    }
+}
+
+/* --- Services Overview --- */
+.services-overview {
+    background: var(--white);
+}
+
+/* --- CTA Center (button alignment) --- */
+.cta-center {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+/* --- Maintenance Items (Business page) --- */
+.maintenance-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--sage-soft);
+    border-radius: var(--radius-card);
+    box-shadow: var(--elevation-1);
+    transition: var(--transition-smooth);
+}
+
+.maintenance-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--elevation-2);
+    border-color: var(--leaf-green);
+}
+
+.maintenance-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--gradient-fresh);
+    border-radius: var(--radius-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin: 0 auto 1rem;
+    border: 1px solid var(--sage-soft);
+}
+
+.maintenance-item p {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+/* ===== END MISSING CLASSES ===== */
+
 /* ===== 9. SIDEBAR ===== */
 /* Hide sidebar on specific pages */
-body:has(#residential-hero-placeholder) .sidebar,
-body:has(#business-hero-placeholder) .sidebar,
+body:has(#residential-why-choose) .sidebar,
+body:has(#business-why-choose) .sidebar,
 body:has(#about-hero-placeholder) .sidebar,
 body:has(#services-hero-placeholder) .sidebar {
     display: none !important;
 }
 
-body:has(#residential-hero-placeholder) .main-content,
-body:has(#business-hero-placeholder) .main-content,
+body:has(#residential-why-choose) .main-content,
+body:has(#business-why-choose) .main-content,
 body:has(#about-hero-placeholder) .main-content,
 body:has(#services-hero-placeholder) .main-content {
     margin-left: 0 !important;
