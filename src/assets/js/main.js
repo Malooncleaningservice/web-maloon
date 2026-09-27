@@ -308,7 +308,9 @@ class FormManager {
     const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
 
-    Utils.addEventListener(contactForm, 'submit', (e) => {
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+
+    Utils.addEventListener(contactForm, 'submit', async (e) => {
       e.preventDefault();
 
       const formData = new FormData(contactForm);
@@ -317,9 +319,42 @@ class FormManager {
         data[key] = value;
       }
 
-      console.log('Form submitted:', data);
-      alert('Thank you for your request! We will contact you shortly.');
-      contactForm.reset();
+      const originalText = submitButton ? submitButton.textContent : '';
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+      }
+
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/maloonservice@gmail.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+        if (result.success === false) {
+          throw new Error(result.message || 'Submission failed');
+        }
+
+        alert('Thank you for your request! We will contact you shortly.');
+        contactForm.reset();
+      } catch (error) {
+        console.error('Form submission failed:', error);
+        alert('Sorry, something went wrong. Please try again or call us directly.');
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalText;
+        }
+      }
     });
   }
 }
