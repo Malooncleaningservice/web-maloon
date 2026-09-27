@@ -1728,6 +1728,21 @@ p {
     color: rgba(255, 255, 255, 0.9);
 }
 
+.section-green {
+    background: linear-gradient(135deg, var(--forest-anchor) 0%, var(--deep-pine) 100%);
+    color: white;
+    padding: 5rem 0;
+}
+
+.section-green h2,
+.section-green h3 {
+    color: white;
+}
+
+.section-green p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
 /* --- Enhanced Dropdown Navigation --- */
 .dropdown-menu-enhanced {
     position: absolute;
@@ -2121,7 +2136,8 @@ p {
     .section-pine,
     .section-sage,
     .section-white,
-    .section-forest {
+    .section-forest,
+    .section-green {
         padding: 3rem 0;
     }
 
