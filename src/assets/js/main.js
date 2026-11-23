@@ -344,6 +344,13 @@ class FormManager {
           throw new Error(result.message || 'Submission failed');
         }
 
+        // Registro de conversión de Google Ads: acción "Envío de formulario - Maloon".
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+            send_to: 'AW-18407829976/zsKlCLibyL0dENjjxMlE'
+          });
+        }
+
         alert('Thank you for your request! We will contact you shortly.');
         contactForm.reset();
       } catch (error) {
